@@ -62,6 +62,7 @@ def AbstractTask(task_prefix: str):
         requested_by = models.ForeignKey(
             User, null=True, on_delete=models.SET_NULL, editable=False
         )
+        finished_on = models.DateTimeField(blank=True, editable=False)
 
         django_app_name = task_prefix
 
