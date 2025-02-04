@@ -174,17 +174,19 @@ def AbstractTask(task_prefix: str):
         def get_task_files(self):
             return None
 
-        def db_update_on_terminate(self):
+        def set_fields_on_terminate(self):
             """
             When a task finishes (no matter the reason: success/error/cancel),
-            update fields `is_finished` and `finished_on` and save
-            Ségolène:
-                1) i put `self.save()` here to group all db-modifying logic together
+            update fields `is_finished` and `finished_on`
+
+            @segolene:
+                1) i left `self.save()` in `terminate_task()` because from what i see
+                    it's called at a lot of different times so moving it could have
+                    side effects.
                 2) should we care about timezones ?
             """
             self.is_finished = True
             self.finished_on = datetime.now()
-            self.save()
 
         def start_task(self, endpoint: str = "start"):
             """
@@ -217,7 +219,8 @@ def AbstractTask(task_prefix: str):
             self.status = status
             if error:
                 self.write_log(error)
-            self.db_update_on_terminate()
+            self.set_fields_on_terminate()
+            self.save()
 
             if notify and self.notify_email:
                 try:
