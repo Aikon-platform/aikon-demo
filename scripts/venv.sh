@@ -19,6 +19,7 @@ $python -m venv "$API_DIR"/venv
 $python -m venv "$FRONT_DIR"/venv
 
 for venv in "$API_VENV" "$FRONT_VENV"; do
+    color_echo yellow "Installing ${venv%/*/*}/requirements.txt inside $venv"
     "$venv"/pip install --upgrade pip
     "$venv"/pip install -r "${venv%/*/*}"/requirements.txt
 done
