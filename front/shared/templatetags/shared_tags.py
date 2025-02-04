@@ -1,17 +1,15 @@
 from django import template
 from django.utils.safestring import mark_safe
 
-from ..utils import pprint
-
 register = template.Library()
 
 
-@register.filter("field_type")
+@register.filter
 def field_type(obj):
     return obj.field.widget.__class__.__name__
 
 
-@register.filter("field_classes")
+@register.filter
 def field_classes(obj):
     classes = obj.field.widget.attrs.get("extra-class", "")
     if type(classes) is list:
@@ -92,4 +90,5 @@ def can_monitor(user, app_name):
 
 # @register.filter("dump")
 # def dump(value):
+#     from ..utils import pprint
 #     return f"<pre>{pprint(value)}</pre>"

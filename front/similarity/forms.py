@@ -129,21 +129,16 @@ class SimilarityForm(AbstractTaskOnCropsForm):
         available_algos = [
             algo
             for algo in SimilarityAlgorithm
-            if algo.name in list(AVAILABLE_SIMILARITY_ALGORITHMS.keys())
+            if algo.name in AVAILABLE_SIMILARITY_ALGORITHMS
         ]
+
         self.fields["algorithm"].choices += [
             (algo.name, algo.config.display_name) for algo in available_algos
         ]
 
-        self.algorithm_forms = {
-            algo.name: algo.config.form_class(prefix=f"{algo.name}_", *args)
-            for algo in available_algos
-        }
-
-        for name, form in self.algorithm_forms.items():
-            for field_name, field in form.fields.items():
-                full_field_name = f"{name}_{field_name}"
-                self.fields[full_field_name] = field
+        for algo in available_algos:
+            form = algo.config.form_class(prefix=f"{algo.name}_", *args)
+            self.fields.update(form.fields)
 
     def clean(self):
         cleaned_data = super().clean()
