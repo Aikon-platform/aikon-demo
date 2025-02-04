@@ -14,7 +14,7 @@ if [ -z "$python" ]; then
     exit 1
 fi
 
-color_title "SET UP VIRTUAL ENVIRONMENTS"
+echo_title "SET UP VIRTUAL ENVIRONMENTS"
 $python -m venv "$API_DIR"/venv
 $python -m venv "$FRONT_DIR"/venv
 
