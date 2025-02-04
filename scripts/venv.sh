@@ -20,7 +20,7 @@ $python -m venv "$FRONT_DIR"/venv
 
 for venv in "$API_VENV" "$FRONT_VENV"; do
     "$venv"/pip install --upgrade pip
-    "$venv"/pip install -r "${venv%/*/*/*}"/requirements.txt
+    "$venv"/pip install -r "${venv%/*/*}"/requirements.txt
 done
 "$API_VENV"/pip install python-dotenv
 
