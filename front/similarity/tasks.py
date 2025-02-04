@@ -10,6 +10,6 @@ All dramatiq tasks related to Similarity retrieval
 """
 
 
-@dramatiq.actor
-def collect_results(experiment_id: str, result_url: str):
-    pass
+# @dramatiq.actor
+# def collect_results(experiment_id: str, result_url: str):
+#     pass
