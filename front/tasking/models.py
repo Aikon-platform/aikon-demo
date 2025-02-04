@@ -5,6 +5,7 @@ from requests.exceptions import RequestException
 import traceback
 from typing import Dict, Any
 from pathlib import Path
+from datetime import datetime
 
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -62,7 +63,7 @@ def AbstractTask(task_prefix: str):
         requested_by = models.ForeignKey(
             User, null=True, on_delete=models.SET_NULL, editable=False
         )
-        finished_on = models.DateTimeField(blank=True, editable=False)
+        finished_on = models.DateTimeField(editable=False, blank=True, null=True)
 
         django_app_name = task_prefix
 
@@ -173,6 +174,18 @@ def AbstractTask(task_prefix: str):
         def get_task_files(self):
             return None
 
+        def db_update_on_terminate(self):
+            """
+            When a task finishes (no matter the reason: success/error/cancel),
+            update fields `is_finished` and `finished_on` and save
+            Ségolène:
+                1) i put `self.save()` here to group all db-modifying logic together
+                2) should we care about timezones ?
+            """
+            self.is_finished = True
+            self.finished_on = datetime.now()
+            self.save()
+
         def start_task(self, endpoint: str = "start"):
             """
             Start the task
@@ -204,8 +217,7 @@ def AbstractTask(task_prefix: str):
             self.status = status
             if error:
                 self.write_log(error)
-            self.is_finished = True
-            self.save()
+            self.db_update_on_terminate()
 
             if notify and self.notify_email:
                 try:
