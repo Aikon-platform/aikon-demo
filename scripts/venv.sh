@@ -2,7 +2,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source "$SCRIPT_DIR/utils.sh"
 
-for ver in 3.{12..10}; do
+for ver in 3.{10..12}; do
     if command -v "python$ver" &> /dev/null; then
         python="python$ver"
         break
@@ -10,7 +10,7 @@ for ver in 3.{12..10}; do
 done
 
 if [ -z "$python" ]; then
-    color_echo red "Python 3.10 or higher is required"
+    color_echo red "Python 3.10 to 3.12 is required"
     exit 1
 fi
 
