@@ -183,7 +183,11 @@ def AbstractTask(task_prefix: str):
                 1) i left `self.save()` in `terminate_task()` because from what i see
                     it's called at a lot of different times so moving it could have
                     side effects.
-                2) should we care about timezones ?
+                2) maybe move the setting of `self.status` here too to have all DB-modifying
+                    functions in one place at the abstract level ? if i see correctly,
+                    self.status, self.is_finished, self.save() are often/always
+                    called together
+                3) should we care about timezones ?
             """
             self.is_finished = True
             self.finished_on = datetime.now()
@@ -409,7 +413,7 @@ def AbstractAPITaskOnDataset(task_prefix: str):
             except (ConnectionError, RequestException):
                 self.write_log("Connection error when starting task")
                 self.status = "ERROR"
-                self.is_finished = True
+                self.set_fields_on_terminate()
                 self.save()
                 # Send error email to website admins
                 mail_admins(
@@ -432,7 +436,7 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                     f"Request for task failed with {api_query.status_code}: {api_query.text}\n{exc}"
                 )
                 self.status = "ERROR"
-                self.is_finished = True
+                self.set_fields_on_terminate()
 
             self.save()
 
@@ -452,11 +456,11 @@ def AbstractAPITaskOnDataset(task_prefix: str):
             try:
                 print(api_query.text)
                 self.status = "CANCELLED"
-                self.is_finished = True
+                self.set_fields_on_terminate()
             except:
                 self.write_log(f"Error cancelling task: {api_query.text}")
                 self.status = "ERROR"
-                self.is_finished = True
+                self.set_fields_on_terminate()
             self.save()
 
         def get_progress(self):

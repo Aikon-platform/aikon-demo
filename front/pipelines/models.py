@@ -52,7 +52,8 @@ class Pipeline(AbstractTaskOnDataset("pipelines")):
             self.next()
         else:
             self.status = "ERROR"
-            self.is_finished = True
+            # self.is_finished = True
+            self.set_fields_on_terminate()
             self.save()
 
     def next(self):
@@ -63,7 +64,8 @@ class Pipeline(AbstractTaskOnDataset("pipelines")):
                 getattr(self, f"start_{task}_task")()
                 return
         self.status = "SUCCESS"
-        self.is_finished = True
+        # self.is_finished = True
+        self.set_fields_on_terminate()
         self.save()
 
     def start_task(self):
@@ -75,7 +77,8 @@ class Pipeline(AbstractTaskOnDataset("pipelines")):
             if t and not t.is_finished:
                 t.cancel_task()
         self.status = "CANCELLED"
-        self.is_finished = True
+        # self.is_finished = True
+        self.set_fields_on_terminate()
         self.save()
 
     def get_progress(self):
