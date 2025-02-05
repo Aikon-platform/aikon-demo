@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -51,6 +53,15 @@ def startswith(text, starts):
         if text.startswith(str(start)):
             return True
     return False
+
+@register.filter
+def fmt_duration(delta):
+    if delta is None or not isinstance(delta, timedelta):
+        return delta
+    hours, remainder = divmod(delta.seconds, 3600)
+    minutes,seconds=divmod(remainder, 60)
+    delta = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+    return delta
 
 
 @register.filter

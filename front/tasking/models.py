@@ -3,9 +3,10 @@ import uuid
 import requests
 from requests.exceptions import RequestException
 import traceback
-from typing import Dict, Any
+from typing import Dict, Any, Literal, TypedDict
 from pathlib import Path
 from datetime import datetime, timedelta
+from time import strftime
 
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -34,6 +35,9 @@ User = get_user_model()
 
 API_URL = getattr(settings, "API_URL", "http://localhost:5000")
 BASE_URL = getattr(settings, "BASE_URL", "http://localhost:8000")
+
+TypeDurationEval = Literal["short", "mid", "long"]
+TypeDuration = TypedDict("TypeDuration", { "delta":str, "eval":TypeDurationEval })
 
 
 def AbstractTask(task_prefix: str):
@@ -136,15 +140,24 @@ def AbstractTask(task_prefix: str):
             return f"{settings.MEDIA_URL}{self.result_media_path}"
 
         @property
-        def task_duration(self) -> timedelta|None:
+        def task_duration(self) -> TypeDuration:
             """
             Get the duration of a task.
-            May return None since self.finished_on has been
-            added later and not all finished tasks have it
+            Returns:
+                None if the task is finished and finished_on is undefined.
+                TypeDuration else.
+                    delta : the duration, as a datetime.timedelta
+                    eval  : an evaluation of the task duration's badness
             """
-            return (self.finished_on - self.requested_on  if self.finished_on and self.requested_on
+            delta = (self.finished_on - self.requested_on  if self.finished_on and self.requested_on
                     else datetime.now(timezone.utc) - self.requested_on if not self.is_finished and not self.finished_on
                     else None)
+            if delta is None:
+                return delta
+            eval:TypeDurationEval = ("short" if delta < timedelta(minutes=30)
+                                     else "mid" if delta < timedelta(minutes=120)
+                                     else "long")
+            return { "delta": delta, "eval": eval }
 
 
         @cached_property
