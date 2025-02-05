@@ -24,10 +24,14 @@
                 </a>
             </p>
         {% endfor %}
+        {% if task.task_duration is not None %}
+            <p>Duration: {{ task.task_duration }}</p>
+        {% endif %}
     </div>
     <div class="column is-2 p-0 is-left is-top">
         <span class="tag status status-{{ task.status }}">{{ task.status }}</span>
     </div>
     <p class="user"><span class="iconify" data-icon="mdi:account"></span> {{ task.requested_by.username }}</p>
-    <p class="date">{{ task.requested_on|date:"Y-m-d H:i" }}</p>
+    <p class="date date-start">Start: {{ task.requested_on|date:"Y-m-d H:i" }}</p>
+
 </div>

@@ -5,7 +5,7 @@ from requests.exceptions import RequestException
 import traceback
 from typing import Dict, Any
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -134,6 +134,18 @@ def AbstractTask(task_prefix: str):
             URL to the result folder, including MEDIA_URL
             """
             return f"{settings.MEDIA_URL}{self.result_media_path}"
+
+        @property
+        def task_duration(self) -> timedelta|None:
+            """
+            Get the duration of a task.
+            May return None since self.finished_on has been
+            added later and not all finished tasks have it
+            """
+            return (self.finished_on - self.requested_on  if self.finished_on and self.requested_on
+                    else datetime.now(timezone.utc) - self.requested_on if not self.is_finished and not self.finished_on
+                    else None)
+
 
         @cached_property
         def full_log(self):
