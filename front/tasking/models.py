@@ -204,15 +204,8 @@ def AbstractTask(task_prefix: str):
             When a task finishes (no matter the reason: success/error/cancel),
             update fields `is_finished` and `finished_on`
 
-            @segolene:
-                1) i left `self.save()` in `terminate_task()` because from what i see
-                    it's called at a lot of different times so moving it could have
-                    side effects.
-                2) maybe move the setting of `self.status` here too to have all DB-modifying
-                    functions in one place at the abstract level ? if i see correctly,
-                    self.status, self.is_finished, self.save() are often/always
-                    called together
-                3) should we care about timezones ?
+            TOOD:move setting of `self.status` field  and `self.save()`
+            to have all db updates in one place
             """
             self.is_finished = True
             self.finished_on = datetime.now()
