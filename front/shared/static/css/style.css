@@ -21785,24 +21785,6 @@ ul.messages li.warning, ul.messages li.error {
   padding: 0.3em;
 }
 
-/** TODO find a better way to nest this ? */
-/*
-.eval-short, .eval-mid, .eval-long {
-    border: solid 2px;
-}
-*/
-.eval-short {
-  color: #7ebe1d;
-}
-
-.eval-mid {
-  color: #ccb000;
-}
-
-.eval-long {
-  color: #c81307;
-}
-
 .status {
   background-color: hsl(233, 100%, 63%);
   color: #fff;

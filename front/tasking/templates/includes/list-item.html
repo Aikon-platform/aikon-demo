@@ -32,16 +32,16 @@
     <div class="">
         <p class="date">{{ task.requested_on|date:"Y-m-d H:i" }}
             {% if task.task_duration %}
-                {% if task.task_duration.eval == 'short' %}
-                    <span class="tag is-white is-normal has-text-success"
-                    >{{ task.task_duration.delta|fmt_duration }}</span>
-                {% elif task.task_duration.eval == 'mid' %}
-                    <span class="tag is-white is-normal has-text-warning"
-                    >{{ task.task_duration.delta|fmt_duration }}</span>
-                {% else %}
-                    <span class="tag is-white is-normal has-text-danger"
-                    >{{ task.task_duration.delta|fmt_duration }}</span>
-                {% endif %}
+                <span class="
+                    tag is-white is-normal
+                    {% if task.task_duration.eval == 'short' %}
+                         has-text-success
+                    {% elif task.task_duration.eval == 'mid' %}
+                        has-text-warning
+                    {% else %}
+                        has-text-danger
+                    {% endif %}"
+                >{{ task.task_duration.delta|fmt_duration }}</span>
             {% endif %}
         </p>
 

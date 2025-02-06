@@ -20,7 +20,6 @@ from shared.utils import pprint
 from .utils import PathAndRename, IMG_EXTENSIONS, unzip_on_the_fly, sanitize_str
 from .fields import URLListModelField
 
-
 User = get_user_model()
 path_datasets = PathAndRename("datasets/")
 
@@ -538,13 +537,47 @@ class Dataset(AbstractDataset):
 
         return {"success": "Regions processed successfully"}
 
+
+    def get_tasks_for_prefix(self, prefix) -> List:
+        return (list(getattr(self, f"{prefix}_tasks").all())
+                if hasattr(self, f"{prefix}_tasks")
+                else [])
+
+
     @property
-    def tasks(self):
+    def tasks(self) -> List:
         t = []
         for task_prefix in settings.DEMO_APPS:
-            if hasattr(self, f"{task_prefix}_tasks"):
-                t += list(getattr(self, f"{task_prefix}_tasks").all())
+            if len(tasks := self.get_tasks_for_prefix(task_prefix)):
+                t += tasks
+            # if hasattr(self, f"{task_prefix}_tasks"):
+            #     t += list(getattr(self, f"{task_prefix}_tasks").all())
         return t
+
+    @property
+    def task_prefixes(self) -> List[str]:
+        """
+        a list of all tasks prefixes on which tasks have been run on this dataset
+        """
+        return [ prefix for prefix in settings.DEMO_APPS
+                 if len(self.get_tasks_for_prefix(prefix)) ]
+
+    @property
+    def tasks_by_prefix(self) -> List[List[str|List]]:
+        """
+        same as `self.tasks`, but tasks are grouped by type/prefix.
+        Returns:
+            [
+                [ task_prefix, [List,of,tasks,for,prefix] ]
+            ]
+        """
+        prefixes = settings.DEMO_APPS
+        grouped_tasks = [ [task_prefix, self.get_tasks_for_prefix(task_prefix)]
+                          for task_prefix in prefixes
+                          if len(self.get_tasks_for_prefix(task_prefix)) ]
+        # order groups by descending number of tasks
+        return sorted(grouped_tasks, key=lambda task_group: -len(task_group[1]))
+
 
     def get_tasks_by_prop(self, prop: str) -> Dict:
         info = {}

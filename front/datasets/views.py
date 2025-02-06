@@ -1,7 +1,8 @@
 from typing import Any
 
 from django.contrib.auth import get_user_model
-from django.views.generic import ListView, DetailView
+from django.db.models.query import QuerySet
+from django.views.generic import ListView, DetailView, DetailView
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -88,3 +89,20 @@ class DatasetDeleteView(DatasetMixin, LoginRequiredIfConfProtectedMixin, DetailV
         if hasattr(self, "success_url"):
             return self.success_url
         return reverse(f"datasets:list")
+
+
+class DatasetMainView(DatasetMixin, DetailView):
+    """
+    main view for a single dataset
+    """
+
+    template_name = "datasets/view.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        # so far, this is purely for debug purposes
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+
+
