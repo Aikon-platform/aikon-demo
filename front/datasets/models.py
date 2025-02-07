@@ -6,7 +6,7 @@ import traceback
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from PIL import Image as PImage
 
 from django.contrib.auth import get_user_model
@@ -563,7 +563,7 @@ class Dataset(AbstractDataset):
                  if len(self.get_tasks_for_prefix(prefix)) ]
 
     @property
-    def tasks_by_prefix(self) -> List[List[str|List]]:
+    def tasks_by_prefix(self) -> List[Tuple[str,List]]:
         """
         same as `self.tasks`, but tasks are grouped by type/prefix.
         Returns:
@@ -572,9 +572,9 @@ class Dataset(AbstractDataset):
             ]
         """
         prefixes = settings.DEMO_APPS
-        grouped_tasks = [ [task_prefix, self.get_tasks_for_prefix(task_prefix)]
+        grouped_tasks = [ (task_prefix, tasks)
                           for task_prefix in prefixes
-                          if len(self.get_tasks_for_prefix(task_prefix)) ]
+                          if len(tasks := self.get_tasks_for_prefix(task_prefix)) ]
         # order groups by descending number of tasks
         return sorted(grouped_tasks, key=lambda task_group: -len(task_group[1]))
 
