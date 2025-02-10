@@ -3,6 +3,7 @@ import requests
 import uuid
 import json
 import traceback
+import os
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -100,8 +101,10 @@ class Document:
         return self._document_tree()
 
     def _document_tree(self):
-        print(self.dtype, self.uid)
-        return "hellooooooo"
+        from .utils import TreeDict
+        tree = TreeDict(os.path.join(self.path, "images/"))
+        return tree.to_html_pre()
+
 
     def to_dict(self) -> Dict:
         return {

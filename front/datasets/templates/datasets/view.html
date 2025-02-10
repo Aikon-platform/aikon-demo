@@ -21,7 +21,7 @@
                 <li>{{ document }}{{ document.src }}</li>
             {% endfor %}</ul>
             <p>Documents for api {{ dataset.documents_for_api }}</p>
-            <p>Tree: {{ dataset.documents.0.document_tree }}</p>
+            <p>Tree: {{ dataset.documents.0.document_tree|safe }}</p>
         </div>
     </div>
 
