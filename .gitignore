@@ -90,3 +90,6 @@ node_modules/
 .idea/
 
 front/shared/static/css/style.css.map
+
+nginx_conf
+nginx_ssl

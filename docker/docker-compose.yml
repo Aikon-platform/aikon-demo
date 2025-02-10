@@ -1,0 +1,65 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        USERID: ${USERID}
+        PORT: ${DJANGO_PORT}
+    volumes:
+      - ${DATA_FOLDER}:/data
+      - ../app:/home/aikon/app
+    env_file:
+      - ../front/.env
+      - ./.env
+    ports:
+      - "${DJANGO_PORT}:8000"
+    depends_on:
+      - db
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  db:
+    image: postgres:13
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - ../front/.env
+      - ./.env
+    networks:
+      - app_network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:latest
+    env_file:
+      - ../front/.env
+      - ./.env
+    ports:
+      - "${NGINX_PORT:-8080}:${NGINX_PORT:-8080}"
+    environment:
+      - PROD_URL=${PROD_URL:-localhost}
+      - NGINX_PORT=${NGINX_PORT:-8080}
+    volumes:
+      - ./nginx_conf:/etc/nginx/nginx.conf:ro
+      - ../front/staticfiles:/home/aikon-demo/app/staticfiles:ro
+      - ${DATA_FOLDER}:/data:ro
+      - /etc/ssl:/etc/ssl:ro
+    depends_on:
+      - web
+    networks:
+      - app_network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
+networks:
+  app_network:
+    driver: bridge
