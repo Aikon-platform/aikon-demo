@@ -2,7 +2,11 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source "$SCRIPT_DIR/utils.sh"
 
+<<<<<<< HEAD
 for ver in 3.{10..12}; do
+=======
+for ver in 3.{12..10}; do
+>>>>>>> main
     if command -v "python$ver" &> /dev/null; then
         python="python$ver"
         break

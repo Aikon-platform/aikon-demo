@@ -74,4 +74,4 @@ for env in "$API_DIR"/.env "$FRONT_DIR"/.env "$ROOT_DIR"/.env.dev; do
     color_echo yellow "\nSetting up $env..."
     update_env "$env"
 done
-copy_env_values "$SCRIPT_DIR"/.env.dev "$API_DIR"/.env.dev
+copy_env_values "$ROOT_DIR"/.env.dev "$API_DIR"/.env.dev
