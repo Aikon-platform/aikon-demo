@@ -3,7 +3,6 @@
 set -e
 
 source /home/aikon-demo/front/.env
-source /home/aikon-demo/.env
 
 manage="/home/aikon/venv/bin/python /home/aikon-demo/front/manage.py"
 
@@ -20,10 +19,14 @@ $manage migrate
 echo "
 from django.contrib.auth import get_user_model;
 User = get_user_model();
-username = '$ADMIN_USER';
+username = '$ADMIN_NAME';
 if not User.objects.filter(username=username).exists():
-    User.objects.create_superuser(username, '$ADMIN_EMAIL', '$ADMIN_PSW');
+    User.objects.create_superuser(username, '$ADMIN_EMAIL', '$DB_PASSWORD');
     print('Superuser created.');
 else:
     print('Superuser already exists.');
 " | $manage shell
+
+colorEcho blue '\nConnect to app using:'
+echo -e "          👤 $ADMIN_NAME"
+echo -e "          🔑 $DB_PASSWORD"
