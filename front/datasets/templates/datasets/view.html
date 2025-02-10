@@ -11,6 +11,18 @@
 
     <div class="">
         <h2>Dataset contents</h2>
+        <div>
+            <p>Format: {{ dataset.format }}</p>
+            <p>Contents: {{ dataset.documents|length }}
+                document{% if dataset.documents|length > 1 %}s{% endif %},
+               {{ dataset.image_count }} images.
+            </p>
+            <ul>{% for document in dataset.documents %}
+                <li>{{ document }}{{ document.src }}</li>
+            {% endfor %}</ul>
+            <p>Documents for api {{ dataset.documents_for_api }}</p>
+            <p>Tree: {{ dataset.documents.0.document_tree }}</p>
+        </div>
     </div>
 
     <div class="">
@@ -45,55 +57,11 @@
                     {#<h3>{{prefix}} ({{ tasks|length }} tasks)</h3></dt>#}
 {# TODO generalize "tasking/templates/includes/list-item.html" #}
 {# so it can be used here ? what's below is just a cheap copy of it #}
-                    <ul>
+                    <div class="task-list">
                         {% for task in tasks %}
-                            <li class="task-list"><div class="row columns">
-                                <div class="column task-ref is-10 p">
-                                    <h4 class="task-ref">
-                                        <a href="{{ task.get_absolute_url }}">
-                                            <span class="id-main">{{ task }}</span>
-                                            <span class="id-suffix">{{ task.id }}</span>
-                                        </a>
-                                    </h4>
-{#                                    {% if not filter and task.dataset %} #}
-{#                                        <p>└ dataset #}
-{#                                            <a href="{% url app_name|add:':list_perdataset' task.dataset.pk %}"> #}
-{#                                                <span class="id-main">{{ task.dataset.name }}</span> #}
-{#                                                <span class="id-suffix">{{ task.dataset.id }}</span> #}
-{#                                            </a> #}
-{#                                        </p> #}
-{#                                    {% endif %} #}
-                                    {% for saved_task in task.task.all %}
-                                        <p>└ manual clustering
-                                            <a href="{{ task.get_absolute_url }}">
-                                                <span class="id-main">{{ task.name }}</span>
-                                                <span class="id-suffix">{{ task.id }}</span>
-                                            </a>
-                                        </p>
-                                    {% endfor %}
-                                </div>
-                                <div class="column is-2 p-0 is-left is-top">
-                                    <span class="tag status status-{{ task.status }}">{{ task.status }}</span>
-                                </div>
-                                <p class="user"><span class="iconify" data-icon="mdi:account"></span> {{ task.requested_by.username }}</p>
-                                <p class="date">
-                                    {{ task.requested_on|date:"Y-m-d H:i" }}
-                                    {% if task.task_duration %}
-                                        {% if task.task_duration.eval == 'short' %}
-                                            <span class="tag is-white is-normal has-text-success"
-                                            >{{ task.task_duration.delta|fmt_duration }}</span>
-                                        {% elif task.task_duration.eval == 'mid' %}
-                                            <span class="tag is-white is-normal has-text-warning"
-                                            >{{ task.task_duration.delta|fmt_duration }}</span>
-                                        {% else %}
-                                            <span class="tag is-white is-normal has-text-danger"
-                                            >{{ task.task_duration.delta|fmt_duration }}</span>
-                                        {% endif %}
-                                    {% endif %}
-                                </p>
-                            </div></li>
+                            {% include "includes/list-item.html" %}
                         {% endfor %}
-                    </ul>
+                    </div>
                 </li>
             {% endfor %}
         </ul>

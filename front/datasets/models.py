@@ -95,6 +95,14 @@ class Document:
         """
         return self.path / "images"
 
+    @property
+    def document_tree(self):
+        return self._document_tree()
+
+    def _document_tree(self):
+        print(self.dtype, self.uid)
+        return "hellooooooo"
+
     def to_dict(self) -> Dict:
         return {
             "type": self.dtype,
@@ -310,6 +318,15 @@ class Dataset(AbstractDataset):
         if self.img_documents:
             docs.extend(self.img_documents)
         return docs
+
+    @property
+    def image_count(self) -> int:
+        """
+        number of in a Dataset. `Dataset.get_images()` also allows to get
+        the number of images but may trigger `Dataset.download_and_extract()`,
+        which takes time, while `image_count` is only used in templates
+        """
+        return sum(len(doc.images) for doc in self.documents)
 
     def documents_for_api(self) -> List[Dict]:
         return [doc.to_dict() for doc in self.documents]
