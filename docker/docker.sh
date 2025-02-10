@@ -11,7 +11,7 @@ DOCKER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # initialize the .env files and data folder permissions on first initialization
 bash "$DOCKER_DIR"/init.sh
 
-dc="docker-compose  -p aikon-demo"
+dc="docker-compose -p aikondemo"
 
 build_containers() {
     $dc build
