@@ -40,21 +40,56 @@
 
     </div>
 
-    <div class="">
+    <div id="section-content">
         <h2>Dataset contents</h2>
-        <div>
-            <h3>Document tree</h3>
-            <p>Tree: {{ dataset.documents.0.document_tree|safe }}</p>
+        <div class="tabs is-centered is-normal tab-head-list">
+            <ul>
+                <li id="tab-head-tree"
+                    class="tab-head is-active"
+                ><a>Document tree</a></li>
+                <li id="tab-head-images"
+                    class="tab-head"
+                ><a>Images</a></li>
+            </ul>
         </div>
+
+        <div class="tab-body-wrapper">
+            <div id="tab-body-tree"
+                 class="tab-body"
+            >
+                {% for document in dataset.documents %}
+                    <h3 class="id-suffix">Document #{{ forloop.counter }}</h3>
+                    <div>{{ dataset.documents.0.document_tree|safe }}</div>
+                {% endfor %}
+            </div>
+            <div id="tab-body-images"
+                 class="tab-body is-hidden"
+            >
+                <ul>
+                    {% for id_doc, doc in dataset.get_doc_image_mapping.items %}
+                        <li>Document #{{ forloop.counter }}
+                            <ul>
+                                {% for id_img, img in doc.items %}
+                                    <li>Image #{{ forloop.counter }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+
     </div>
 
-    <div class="">
+    <div id="section-task">
         <h2>Applied tasks ({{ dataset.tasks|length }})</h2>
-        <div class="tabs is-centered is-normal">
+        <div class="tabs tab-head-list is-centered is-normal">
             <ul>
                 {% for prefix, tasks in dataset.tasks_by_prefix %}
-                    <li id="task-tab-{{ prefix }}"
-                        class="tab-prefix
+                    <li id="tab-head-{{ prefix }}"
+                        class="tab-head
                             {% if dataset.tasks_by_prefix.0.0 == prefix %}
                                 is-active
                             {% endif %}"
@@ -65,21 +100,19 @@
             </ul>
         </div>
         <!-- TODO find a better way to style than inline CSS -->
-        <ul style="list-style: none;
+        <ul class="tab-body-wrapper"
+            style="list-style: none;
                    padding-left: 0;
                    margin-bottom: 0;
                    margin-top: 0;"
         >
             {% for prefix, tasks in dataset.tasks_by_prefix %}
-                <li id="{{prefix}}-tasks"
-                    class="task-group
+                <li id="tab-body-{{prefix}}"
+                    class="tab-body
                         {% if dataset.tasks_by_prefix.0.0 != prefix %}
                             is-hidden
                         {% endif %}"
                 >
-                    {#<h3>{{prefix}} ({{ tasks|length }} tasks)</h3></dt>#}
-{# TODO generalize "tasking/templates/includes/list-item.html" #}
-{# so it can be used here ? what's below is just a cheap copy of it #}
                     <div class="task-list">
                         {% for task in tasks %}
                             {% include "includes/list-item.html" %}
@@ -96,38 +129,64 @@
         id="tasks-tab-manager"
 >
     /**
-     * when clicking on one of the `.tab-prefix` elements, toggle the
-     * group of tasks being displayed based on their "prefix"
-     * (aka, the type of task: similarity, regions....)
+     * handle switching between tabs: when clicking on a `.tab-head`,
+     * toggle the corresponding `.tab-body` element. those are identified
+     * by corresponding HTML IDs, which have the structure:
+     *      > `#tab-head-{slug}` for the `.tab-head` element
+     *      > `#tab-body-{slug}` for the `.tab-body` element
+     * this function can be run several times for different tabs on a single
+     * HTML page. to isolate them, each tab+body block must be enclosed
+     * with a wrapper block that has an HTML ID, passed as the argument: `wrapperId`
+     *
+     * @param {String} wrapperId:
+     *      the HTML ID of the block wrapping .tab-head and .tab-body
+     *      elements. wrapperId is NOT written as a CSS selector (`#htmlId`)
+     * @param {Array<String>} slugArray:
+     *      the array of "slugs", used to create linked html IDs between
+     *      `.tab-head` and `.tab-body` elements/
      */
-    const
-        prefixList = JSON.parse(document.getElementById('tasks-tab-manager').textContent),
-        tabIdArray = prefixList.map(x => `#task-tab-${x}`),
-        tabElArray = document.querySelectorAll(".tab-prefix"),
-        taskGroupArray = document.querySelectorAll(".task-group"),
-        getPrefixFromTabId = (tabId) =>
-            prefixList.filter(x => tabId ===`task-tab-${x}`)[0],
-        switchActiveTab = (el) =>
-            tabElArray.forEach(tabEl =>
-                tabEl.id === el.id
-                ? tabEl.classList.add("is-active")
-                : tabEl.classList.remove("is-active")),
-        switchTabGroup = (el) => {
-            let prefix = getPrefixFromTabId(el.id);
-            console.log("switchTabGroup", el.id, prefix);
-            taskGroupArray.forEach(taskGroup =>
-                taskGroup.id === `${prefix}-tasks`
-                ? taskGroup.classList.remove("is-hidden")
-                : taskGroup.classList.add("is-hidden")); },
-        onClick = (e) => {
-            switchActiveTab(e.currentTarget);
-            switchTabGroup(e.currentTarget);
-        };
+    const switchTabHook = (wrapperId, slugArray) => {
+        // variables and functions
+        const
+            tabHeadIdArray = slugArray.map(x => `#tab-head-${x}`),
+            tabHeadElArray = document.querySelectorAll(`#${wrapperId} .tab-head`),
+            tabBodyElArray = document.querySelectorAll(`#${wrapperId} .tab-body`),
+            getSlugFromTabId = (tabId) =>
+                slugArray.filter(x => tabId ===`tab-head-${x}`)[0],
+            switchActiveTab = (el) =>
+                tabHeadElArray.forEach(tabEl =>
+                    tabEl.id === el.id
+                    ? tabEl.classList.add("is-active")
+                    : tabEl.classList.remove("is-active")),
+            switchTabBody = (el) => {
+                let slug = getSlugFromTabId(el.id);
+                console.log("switchTabBody", el.id, slug);
+                tabBodyElArray.forEach(tabBodyEl =>
+                    tabBodyEl.id === `tab-body-${slug}`
+                    ? tabBodyEl.classList.remove("is-hidden")
+                    : tabBodyEl.classList.add("is-hidden")); },
+            onClick = (e) => {
+                switchActiveTab(e.currentTarget);
+                switchTabBody(e.currentTarget);
+            };
 
-    tabElArray.forEach((tabEl) =>
-        tabEl.addEventListener("click", onClick));
-    window.onbeforeunload = (e) =>
-        tabElArray.forEach((tabEl) =>
-            tabEl.removeEventListener("click", onClick));
+        console.log(tabHeadElArray);
+
+        // lifecycle
+        tabHeadElArray.forEach((tabEl) =>
+            tabEl.addEventListener("click", onClick));
+        window.onbeforeunload = (e) =>
+            tabHeadElArray.forEach((tabEl) =>
+                tabEl.removeEventListener("click", onClick));
+    }
+
+    const taskSlugArray = JSON.parse(document.getElementById('tasks-tab-manager').textContent),
+          contentSlugArray = ["tree", "images"],
+          taskWrapperId = "section-task",
+          contentWrapperId = "section-content";
+
+    switchTabHook(taskWrapperId, taskSlugArray);
+    switchTabHook(contentWrapperId, contentSlugArray);
+
 </script>
 {% endblock %}
