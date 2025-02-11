@@ -51,6 +51,7 @@ if [ ! -f "$FRONT_ROOT"/docker/nginx_ssl ]; then
     cp "$FRONT_ROOT"/docker/nginx.conf.ssl_template "$FRONT_ROOT"/docker/nginx_ssl
 
     sed -i -e "s~SSL_CERTIFICATE~$SSL_CERTIFICATE~" "$FRONT_ROOT"/docker/nginx_ssl
+    sed -i -e "s~SSL_KEY~$SSL_KEY~" "$FRONT_ROOT"/docker/nginx_ssl
     sed -i -e "s~NGINX_PORT~$NGINX_PORT~" "$FRONT_ROOT"/docker/nginx_ssl
     sed -i -e "s~PROD_URL~$PROD_URL~" "$FRONT_ROOT"/docker/nginx_ssl
 fi

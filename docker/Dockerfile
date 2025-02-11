@@ -57,7 +57,7 @@ RUN mkdir -p /home/${USER}/front/staticfiles && chown ${USER}:${USER} /home/${US
 COPY --chown=${USER} docker/manage.sh /home/aikon/manage.sh
 RUN chmod +x /home/aikon/manage.sh
 
-# Launch gunicorn
+# Launch app
 CMD export LC_ALL=C.UTF-8 && export LANG=C.UTF-8 && \
     source venv/bin/activate && \
     supervisord -c /home/${USER}/supervisord.conf

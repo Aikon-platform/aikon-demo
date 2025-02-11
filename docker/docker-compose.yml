@@ -1,3 +1,8 @@
+x-proxy-settings: &proxy-settings
+  HTTP_PROXY: ${HTTP_PROXY}
+  HTTPS_PROXY: ${HTTPS_PROXY}
+  NO_PROXY: "localhost,127.0.0.1,web,nginx,redis,db,.demo_network"
+
 services:
   web:
     build:
@@ -12,12 +17,15 @@ services:
     env_file:
       - ../front/.env
       - ./.env
+    environment:
+      <<: *proxy-settings
     ports:
       - "${DJANGO_PORT}:8000"
     depends_on:
       - db
+      - redis
     networks:
-      - app_network
+      - demo_network
     restart: unless-stopped
 
   db:
@@ -28,7 +36,7 @@ services:
       - ../front/.env
       - ./.env
     networks:
-      - app_network
+      - demo_network
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
@@ -44,8 +52,9 @@ services:
     ports:
       - "${NGINX_PORT:-8080}:${NGINX_PORT:-8080}"
     environment:
-      - PROD_URL=${PROD_URL:-localhost}
-      - NGINX_PORT=${NGINX_PORT:-8080}
+      <<: *proxy-settings
+      PROD_URL: ${PROD_URL:-localhost}
+      NGINX_PORT: ${NGINX_PORT:-8080}
     volumes:
       - ./nginx_conf:/etc/nginx/nginx.conf:ro
       - ../front/staticfiles:/home/aikon-demo/app/staticfiles:ro
@@ -54,12 +63,26 @@ services:
     depends_on:
       - web
     networks:
-      - app_network
+      - demo_network
     restart: unless-stopped
+
+  redis:
+    image: redis:6
+    volumes:
+      - redisdata:/data
+    networks:
+      - demo_network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
+  redisdata:
 
 networks:
-  app_network:
+  demo_network:
     driver: bridge
