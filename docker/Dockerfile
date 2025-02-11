@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     curl \
     ca-certificates \
+    supervisor \
     ffmpeg \
     libsm6 \
     libxext6 \
