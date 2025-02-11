@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     curl \
     ca-certificates \
+    redis-server \
     supervisor \
     ffmpeg \
     libsm6 \
