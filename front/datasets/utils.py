@@ -131,6 +131,7 @@ class TreeDict:
                 </ul>
             </li>
         """ if len(files) else ""
+
         subdirarray_to_html = lambda subdirs: f"""
             <li>Directories:
                 <ul>
@@ -138,6 +139,7 @@ class TreeDict:
                 </ul>
             </li>
         """ if len(subdirs) else ""
+
         dir_to_html = lambda dir: f"""
             <li>{dir["curdir"]}/
                 <ul>
@@ -154,13 +156,11 @@ class TreeDict:
         indent = lambda lvl,spaces: " " * (lvl * spaces)
 
         filearray_to_html = lambda files,lvl: (
-            f"{indent(num_spaces, lvl+1)}Files:\n"
-            + "".join(f"{indent(num_spaces, lvl+2)}{f}\n" for f in files)
+            "".join(f"{indent(num_spaces, lvl+1)}{f}\n" for f in files)
         ) if len(files) else ""
 
         subdirarray_to_html = lambda subdirs, lvl: (
-            f"{indent(num_spaces, lvl+1)}Directories:\n"
-            +"".join(f"{dir_to_html(d.tree, lvl+2)}\n" for d in subdirs)
+            "".join(f"{dir_to_html(d.tree, lvl+1)}\n" for d in subdirs)
         ) if len(subdirs) else ""
 
         dir_to_html = lambda dir, lvl: (

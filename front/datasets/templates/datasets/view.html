@@ -5,22 +5,45 @@
 
 {% block content %}
 <div class="centerwrap">
-    <h1 class="is-title is-size-2 py-3">
-        <span class="id-main">Dataset {{ dataset.name }}</span>
-        <span class="id-suffix">{{ dataset.id }}</span></h1>
+    <div class="columns is-vcentered">
+        <div class="column is-four-fifths">
+            <h1 class=" is-title is-size-2 py-3 mb-0">
+                <span class="id-main">Dataset {{ dataset.name }}</span>
+                <span class="id-suffix">{{ dataset.id }}</span>
+            </h1>
+
+        </div>
+        <div class="column">
+            <span class="tag status content is-large">{{ dataset.format }}</span>
+            <span class="tag status content icon-text is-large"
+                  title="{{ dataset.document|length }} document{% if dataset.document|length > 1 %}s{% endif %}"
+            >
+                <span>{{ dataset.documents|length }}</span>
+                <span class="icon has-text-white">
+                    <i class="iconify" data-icon="mdi:file-document-multiple"></i>
+                </span>
+            </span>
+            <span class="tag status content icon-text is-large"
+                  title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
+                <span>{{ dataset.image_count }}</span>
+                <span class="icon has-text-white">
+                    <i class="iconify" data-icon="mdi:file-image"
+                    ></i>
+                </span>
+            </span>
+        </div>
+        <div class="column">
+            <a href="{% url 'datasets:delete' dataset.pk %}"
+              class="button is-light is-content is-large"
+            ><span class="iconify" data-icon="mdi:delete"></span></a>
+        </div>
+
+    </div>
 
     <div class="">
         <h2>Dataset contents</h2>
         <div>
-            <p>Format: {{ dataset.format }}</p>
-            <p>Contents: {{ dataset.documents|length }}
-                document{% if dataset.documents|length > 1 %}s{% endif %},
-               {{ dataset.image_count }} images.
-            </p>
-            <ul>{% for document in dataset.documents %}
-                <li>{{ document }}{{ document.src }}</li>
-            {% endfor %}</ul>
-            <p>Documents for api {{ dataset.documents_for_api }}</p>
+            <h3>Document tree</h3>
             <p>Tree: {{ dataset.documents.0.document_tree|safe }}</p>
         </div>
     </div>
