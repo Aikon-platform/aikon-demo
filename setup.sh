@@ -29,4 +29,4 @@ run_script "var_env.sh" "Environment variables configuration"
 run_script "database.sh" "Database configuration"
 # run_script "webpack.sh" "Webpack setup"
 
-echo_title "SUCCESSFUL INSTALL"
+echo_title "🥳 ALL SETUP!"
