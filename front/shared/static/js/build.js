@@ -35721,12 +35721,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _shared_ImageDisplay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared/ImageDisplay */ "./src/shared/ImageDisplay.tsx");
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
 /* harmony import */ var _iconify_react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @iconify/react */ "./node_modules/@iconify/react/dist/iconify.mjs");
-/* harmony import */ var _shared_IconBtn__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../shared/IconBtn */ "./src/shared/IconBtn.tsx");
-/* harmony import */ var _shared_naming__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../shared/naming */ "./src/shared/naming.tsx");
-/* harmony import */ var _ImageSimBrowser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ImageSimBrowser */ "./src/SimilarityApp/components/ImageSimBrowser.tsx");
-/* harmony import */ var _shared_ImageIdentification__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../shared/ImageIdentification */ "./src/shared/ImageIdentification.tsx");
+/* harmony import */ var _shared_naming__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../shared/naming */ "./src/shared/naming.tsx");
+/* harmony import */ var _ImageSimBrowser__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ImageSimBrowser */ "./src/SimilarityApp/components/ImageSimBrowser.tsx");
 
 
 
@@ -35741,12 +35739,12 @@ function MatchGroup({ matches, grouped, threshold, wref }) {
     */
     // expand the group or not
     const [expanded, toggleExpand] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useReducer)((expanded) => !expanded, false);
-    const nameProvider = react__WEBPACK_IMPORTED_MODULE_1___default().useContext(_shared_naming__WEBPACK_IMPORTED_MODULE_5__.NameProviderContext);
-    const matchesRef = react__WEBPACK_IMPORTED_MODULE_1___default().useContext(_ImageSimBrowser__WEBPACK_IMPORTED_MODULE_6__.SimilarityHrefContext).matchesHref || (() => undefined);
+    const nameProvider = react__WEBPACK_IMPORTED_MODULE_1___default().useContext(_shared_naming__WEBPACK_IMPORTED_MODULE_4__.NameProviderContext);
+    const matchesRef = react__WEBPACK_IMPORTED_MODULE_1___default().useContext(_ImageSimBrowser__WEBPACK_IMPORTED_MODULE_5__.SimilarityHrefContext).matchesHref || (() => undefined);
     return ((!threshold || matches[0].similarity >= threshold) &&
         (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "column match-group", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: expanded ? "match-expanded" : "match-excerpt", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { children: grouped ?
-                            (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_3__.Icon, { icon: "mdi:folder" }), (0,_shared_naming__WEBPACK_IMPORTED_MODULE_5__.getSourceName)(nameProvider, matches[0].image.document)] }) :
-                            (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared_ImageIdentification__WEBPACK_IMPORTED_MODULE_7__.ImageIdentification, { image: matches[0].image }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "columns is-multiline match-items", children: matches.map((match, idx) => ((expanded || idx == 0) && (!threshold || match.similarity >= threshold) && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared_ImageDisplay__WEBPACK_IMPORTED_MODULE_2__.ImageDisplay, Object.assign({ comparison: wref, href: matchesRef(match.image) }, match), idx))) }), matches.length > 1 && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared_IconBtn__WEBPACK_IMPORTED_MODULE_4__.IconBtn, { icon: expanded ? "mdi:close" : "mdi:animation-plus", onClick: toggleExpand, label: expanded ? "Collapse" : `+${matches.length - 1}` })] }) }));
+                            (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_3__.Icon, { icon: "mdi:folder" }), (0,_shared_naming__WEBPACK_IMPORTED_MODULE_4__.getSourceName)(nameProvider, matches[0].image.document)] }) :
+                            (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_2__.ImageIdentification, { image: matches[0].image }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "columns is-multiline match-items", children: matches.map((match, idx) => ((expanded || idx == 0) && (!threshold || match.similarity >= threshold) && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_2__.ImageDisplay, Object.assign({ comparison: wref, href: matchesRef(match.image) }, match), idx))) }), matches.length > 1 && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_2__.IconBtn, { icon: expanded ? "mdi:close" : "mdi:animation-plus", onClick: toggleExpand, label: expanded ? "Collapse" : `+${matches.length - 1}` })] }) }));
 }
 
 
@@ -36646,6 +36644,69 @@ function ImageDisplay({ image, similarity, transpositions, comparison, href, dis
 
 /***/ }),
 
+/***/ "./src/shared/ImageGeneric.tsx":
+/*!*************************************!*\
+  !*** ./src/shared/ImageGeneric.tsx ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ImageGeneric: () => (/* binding */ ImageGeneric)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
+
+/**
+ * a generic display for an Image and its metadata.
+ * inspired by SimilarityApp.components.MatchGroup
+ *
+ * TODO fuse with SimilarityApp.components.MatchGroup ?
+ */
+
+
+function ImageGeneric(props) {
+    const image = props.image;
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "column match-group", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "match-expanded", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)((react__WEBPACK_IMPORTED_MODULE_1___default().Fragment), { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageIdentification, { image: image }) }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "columns is-multiline match-items", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageDisplay, { image: image }) })] }));
+}
+
+
+/***/ }),
+
+/***/ "./src/shared/ImageGenericList.tsx":
+/*!*****************************************!*\
+  !*** ./src/shared/ImageGenericList.tsx ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ImageGenericList: () => (/* binding */ ImageGenericList)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
+
+
+// .list-invisible {
+//     list-style: none;
+//     padding-left: 0;
+//     margin-bottom: 0;
+//     margin-top: 0;
+//
+// }
+function ImageGenericList(props) {
+    const imageArray = props.imageArray;
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "grid", style: { listStyle: "none",
+            paddingLeft: 0,
+            marginBottom: 0,
+            marginTop: 0, }, children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageGeneric, { image: image }) }))) }));
+}
+
+
+/***/ }),
+
 /***/ "./src/shared/ImageIdentification.tsx":
 /*!********************************************!*\
   !*** ./src/shared/ImageIdentification.tsx ***!
@@ -36767,6 +36828,41 @@ function ImageTooltip({ image, transpositions }) {
     }, []);
     return image && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "tooltip", ref: refTooltip, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "display-image", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("img", { src: image.url, alt: image.id, className: "display-img " + (transpositions === null || transpositions === void 0 ? void 0 : transpositions.join(" ")) }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageIdentification__WEBPACK_IMPORTED_MODULE_2__.ImageIdentification, { image: image, isTitle: true })] }));
 }
+
+
+/***/ }),
+
+/***/ "./src/shared/index.tsx":
+/*!******************************!*\
+  !*** ./src/shared/index.tsx ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   IconBtn: () => (/* reexport safe */ _IconBtn__WEBPACK_IMPORTED_MODULE_0__.IconBtn),
+/* harmony export */   ImageDisplay: () => (/* reexport safe */ _ImageDisplay__WEBPACK_IMPORTED_MODULE_1__.ImageDisplay),
+/* harmony export */   ImageGeneric: () => (/* reexport safe */ _ImageGeneric__WEBPACK_IMPORTED_MODULE_2__.ImageGeneric),
+/* harmony export */   ImageGenericList: () => (/* reexport safe */ _ImageGenericList__WEBPACK_IMPORTED_MODULE_3__.ImageGenericList),
+/* harmony export */   ImageIdentification: () => (/* reexport safe */ _ImageIdentification__WEBPACK_IMPORTED_MODULE_4__.ImageIdentification),
+/* harmony export */   ImageMagnifier: () => (/* reexport safe */ _ImageMagnifier__WEBPACK_IMPORTED_MODULE_5__.ImageMagnifier),
+/* harmony export */   ImageTooltip: () => (/* reexport safe */ _ImageTooltip__WEBPACK_IMPORTED_MODULE_6__.ImageTooltip)
+/* harmony export */ });
+/* harmony import */ var _IconBtn__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./IconBtn */ "./src/shared/IconBtn.tsx");
+/* harmony import */ var _ImageDisplay__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ImageDisplay */ "./src/shared/ImageDisplay.tsx");
+/* harmony import */ var _ImageGeneric__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ImageGeneric */ "./src/shared/ImageGeneric.tsx");
+/* harmony import */ var _ImageGenericList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ImageGenericList */ "./src/shared/ImageGenericList.tsx");
+/* harmony import */ var _ImageIdentification__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ImageIdentification */ "./src/shared/ImageIdentification.tsx");
+/* harmony import */ var _ImageMagnifier__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ImageMagnifier */ "./src/shared/ImageMagnifier.tsx");
+/* harmony import */ var _ImageTooltip__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ImageTooltip */ "./src/shared/ImageTooltip.tsx");
+
+
+
+
+
+
+
+
 
 
 /***/ }),
@@ -39012,12 +39108,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var _ClusterApp_components_ClusterApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ClusterApp/components/ClusterApp */ "./src/ClusterApp/components/ClusterApp.tsx");
 /* harmony import */ var _ProgressTracker__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ProgressTracker */ "./src/ProgressTracker/index.tsx");
-/* harmony import */ var _sass_style_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./sass/style.scss */ "./src/sass/style.scss");
-/* harmony import */ var _WatermarkMatches__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./WatermarkMatches */ "./src/WatermarkMatches/index.tsx");
-/* harmony import */ var _WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./WatermarkMatches/types */ "./src/WatermarkMatches/types.tsx");
-/* harmony import */ var _SimilarityApp__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./SimilarityApp */ "./src/SimilarityApp/index.tsx");
+/* harmony import */ var _WatermarkMatches__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./WatermarkMatches */ "./src/WatermarkMatches/index.tsx");
+/* harmony import */ var _WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./WatermarkMatches/types */ "./src/WatermarkMatches/types.tsx");
+/* harmony import */ var _SimilarityApp__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./SimilarityApp */ "./src/SimilarityApp/index.tsx");
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./shared */ "./src/shared/index.tsx");
 /* harmony import */ var _SimilarityApp_utils_serialization__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./SimilarityApp/utils/serialization */ "./src/SimilarityApp/utils/serialization.tsx");
 /* harmony import */ var _ClusterApp_types__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./ClusterApp/types */ "./src/ClusterApp/types.tsx");
+/* harmony import */ var _sass_style_scss__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./sass/style.scss */ "./src/sass/style.scss");
+
 
 
 
@@ -39031,7 +39129,7 @@ __webpack_require__.r(__webpack_exports__);
 function initClusterViewer(target_root, clustering_data, base_media_url, editable, editing, formfield) {
     /*
     Main entry point for the clustering viewer app.
-  
+
     target_root: the root element to render the app in
     clustering_data: the clustering data to render
     base_media_url: the base url for media files
@@ -39044,7 +39142,7 @@ function initClusterViewer(target_root, clustering_data, base_media_url, editabl
 function initProgressTracker(target_root, tracking_url) {
     /*
     Main entry point for the progress tracker app.
-  
+
     target_root: the root element to render the app in
     tracking_url: the url to track
     */
@@ -39053,7 +39151,7 @@ function initProgressTracker(target_root, tracking_url) {
 function initSimilaritySimBrowser(target_root, source_index_url, sim_matrix_url, mode) {
     /*
     Main entry point for the similarity browser app.
-  
+
     target_root: the root element to render the app in
     source_index_url: the url to fetch the sources from
     sim_matrix_url: the url to fetch the similarity matrix from
@@ -39061,37 +39159,44 @@ function initSimilaritySimBrowser(target_root, source_index_url, sim_matrix_url,
     fetch(source_index_url).then(response => response.json()).then(source_index => {
         fetch(sim_matrix_url).then(response => response.json()).then(sim_matrix => {
             const all_matches = (0,_SimilarityApp_utils_serialization__WEBPACK_IMPORTED_MODULE_8__.unserializeSimilarityMatrix)(sim_matrix, source_index);
-            (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_SimilarityApp__WEBPACK_IMPORTED_MODULE_7__.SimilarityApp, { index: all_matches.index, matches: all_matches.matches, mode: mode || "browse" }));
+            (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_SimilarityApp__WEBPACK_IMPORTED_MODULE_6__.SimilarityApp, { index: all_matches.index, matches: all_matches.matches, mode: mode || "browse" }));
         });
     });
 }
 function initWatermarkMatches(target_root, query_image, matches, source_url) {
     /*
     Main entry point for the watermark matches app.
-  
+
     target_root: the root element to render the app in
     query_image: the image url used as a query
     matches: the matches to render
     source_url: the url of the folder of the index files (index.json, images)
     */
     fetch(source_url + "index.json").then(response => response.json()).then(index => {
-        const all_matches = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_6__.unserializeSingleWatermarkMatches)(query_image, matches, index, source_url);
-        (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_WatermarkMatches__WEBPACK_IMPORTED_MODULE_5__.MatchViewer, { all_matches: all_matches }));
+        const all_matches = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_5__.unserializeSingleWatermarkMatches)(query_image, matches, index, source_url);
+        (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_WatermarkMatches__WEBPACK_IMPORTED_MODULE_4__.MatchViewer, { all_matches: all_matches }));
     });
 }
 function initWatermarkSimBrowser(target_root, source_url) {
     /*
     Main entry point for the watermark similarity browser app.
-  
+
     target_root: the root element to render the app in
     source_url: the url to fetch the images and index from
     */
     fetch(source_url + "similarity.json").then(response => response.json()).then(raw_matches => {
         fetch(source_url + "index.json").then(response => response.json()).then(raw_index => {
-            const { matches, index } = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_6__.unserializeWatermarkSimilarity)(raw_matches, raw_index, source_url);
-            (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_WatermarkMatches__WEBPACK_IMPORTED_MODULE_5__.WatermarkSimBrowser, { matches: matches, index: index }));
+            const { matches, index } = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_5__.unserializeWatermarkSimilarity)(raw_matches, raw_index, source_url);
+            (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_WatermarkMatches__WEBPACK_IMPORTED_MODULE_4__.WatermarkSimBrowser, { matches: matches, index: index }));
         });
     });
+}
+/**
+ * initiarlize an ImageGenericList component inserted at targetRoot.
+ * components are passed from the Django template.
+ */
+function initImageGenericList(targetRoot, imageArray) {
+    (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(targetRoot).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_7__.ImageGenericList, { imageArray: imageArray }));
 }
 
 

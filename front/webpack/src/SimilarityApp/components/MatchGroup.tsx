@@ -1,12 +1,12 @@
 import React, { useReducer } from "react";
 import { SimilarityMatch } from "../types";
 import { ImageInfo } from "../../shared/types";
-import { ImageDisplay } from "../../shared/ImageDisplay";
+import { ImageDisplay } from "../../shared";
 import { Icon } from "@iconify/react";
-import { IconBtn } from "../../shared/IconBtn";
+import { IconBtn } from "../../shared";
 import { NameProviderContext, getImageName, getSourceName } from "../../shared/naming";
 import { SimilarityHrefContext } from "./ImageSimBrowser";
-import {ImageIdentification} from "../../shared/ImageIdentification";
+import {ImageIdentification} from "../../shared";
 
 interface MatchGroupProps {
     matches: SimilarityMatch[];

@@ -65,20 +65,30 @@
             <div id="tab-body-images"
                  class="tab-body is-hidden"
             >
-                <ul>
-                    {% for id_doc, doc in dataset.get_doc_image_mapping.items %}
-                        <li>Document #{{ forloop.counter }}
-                            <ul>
-                                {% for id_img, img in doc.items %}
-                                    <li>Image #{{ forloop.counter }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
+                <div id="image-generic-list-root"></div>
+
+{#                <ul> #}
+{#                    {% for id_doc, doc in dataset.get_doc_image_mapping.items %} #}
+{#                        <li>Document #{{ forloop.counter }} #}
+{#                            <div class="grid"> #}
+{#                                {% for id_img, img in doc.items %} #}
+{#                                    <div class="cell" #}
+{#                                         style="border: solid red 10px; border-radius: 1rem" #}
+{#                                    > #}
+{#                                        <div style="margin: 20px"> #}
+{#                                            <span class="tag is-info">Image #{{ forloop.counter }}</span> #}
+{#                                            <img style="object-fit: contain; max-height: 30vh" #}
+{#                                                src="{{img.url}}" #}
+{#                                            > #}
+{#                                        </div> #}
+{#                                    </div> #}
+{#                                {% endfor %} #}
+{#                            </div>#}
+{#                        </li>#}
+{#                    {% endfor %}#}
+{#                </ul>#}
+{#            </div>#}
+{#        </div>#}
 
 
     </div>
@@ -123,6 +133,27 @@
         </ul>
     </div>
 </div>
+
+{{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}
+<script type="text/javascript"
+        id="generic-image-array-script"
+>
+    const targetHtmlId = "image-generic-list-root";
+    const docsToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent)
+    const modelToReact = (img, imgIdx) => ({
+        id: img.id,
+        num: imgIdx,
+        url: img.url,
+        src: img.src,
+    })
+    const imageArray = Object.keys(docsToImageArray).map(docUid =>
+        Object.keys(docsToImageArray[docUid]).map((imgUid, idx) =>
+            modelToReact(docsToImageArray[docUid][imgUid], idx))
+    );
+    //TODO : imageArray seems OK (fit ImageInfo[]), now we need to connect to React.
+    console.log(imageArray);
+</script>
+
 
 {{ dataset.task_prefixes|json_script:"tasks-tab-manager" }}
 <script type="text/javascript"

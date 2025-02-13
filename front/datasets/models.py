@@ -113,6 +113,17 @@ class Document:
             "uid": str(self.uid),
         }
 
+    def to_json_with_images(self) -> Dict:
+        print({ "type": self.dtype,
+                "src": str(self.src),
+                "uid": str(self.uid),
+                "images": [ image.to_dict() for image in self.images ]  })
+        return {
+            "type": self.dtype,
+            "src": str(self.src),
+            "uid": str(self.uid),
+            "images": [ image.to_dict() for image in self.images ]  }
+
     def is_extracted(self) -> bool:
         if not self.path.exists():
             self.path.mkdir(parents=True, exist_ok=True)
@@ -193,6 +204,7 @@ class Image:
             "src": str(self.src),
             "path": str(self.path.relative_to(relpath)),
             "metadata": self.metadata,
+            "url": self.url
         }
 
     @classmethod
@@ -429,8 +441,16 @@ class Dataset(AbstractDataset):
         """
         if not self._images:
             self.get_images()
-
         return {doc.uid: {im.id: im for im in doc.images} for doc in self.documents}
+
+
+    def get_doc_image_mapping_json(self) -> Dict[str, Dict]:
+        """
+        same as ``get_doc_image_mapping``, but returns a valid JSON instead of python types.
+        """
+        print({doc.uid: {im.id: im.to_dict() for im in doc.images} for doc in self.documents})
+
+        return {doc.uid: {im.id: im.to_dict() for im in doc.images} for doc in self.documents}
 
     def clear_dataset(self) -> Dict:
         """
