@@ -131,6 +131,7 @@ class SimilarityForm(AbstractTaskOnCropsForm):
             for algo in SimilarityAlgorithm
             if algo.name in list(AVAILABLE_SIMILARITY_ALGORITHMS.keys())
         ]
+
         self.fields["algorithm"].choices += [
             (algo.name, algo.config.display_name) for algo in available_algos
         ]
@@ -139,7 +140,6 @@ class SimilarityForm(AbstractTaskOnCropsForm):
             algo.name: algo.config.form_class(prefix=f"{algo.name}_", *args)
             for algo in available_algos
         }
-
         for name, form in self.algorithm_forms.items():
             for field_name, field in form.fields.items():
                 full_field_name = f"{name}_{field_name}"
