@@ -5,6 +5,7 @@
 
 {% block content %}
 <div class="centerwrap">
+    <!-- TITLE SECTION -->
     <div class="columns is-vcentered">
         <div class="column is-four-fifths">
             <h1 class=" is-title is-size-2 py-3 mb-0">
@@ -40,6 +41,7 @@
 
     </div>
 
+    <!-- CONTENTS SECTION -->
     <div id="section-content">
         <h2>Dataset contents</h2>
         <div class="tabs is-centered is-normal tab-head-list">
@@ -66,33 +68,11 @@
                  class="tab-body is-hidden"
             >
                 <div id="image-generic-list-root"></div>
-
-{#                <ul> #}
-{#                    {% for id_doc, doc in dataset.get_doc_image_mapping.items %} #}
-{#                        <li>Document #{{ forloop.counter }} #}
-{#                            <div class="grid"> #}
-{#                                {% for id_img, img in doc.items %} #}
-{#                                    <div class="cell" #}
-{#                                         style="border: solid red 10px; border-radius: 1rem" #}
-{#                                    > #}
-{#                                        <div style="margin: 20px"> #}
-{#                                            <span class="tag is-info">Image #{{ forloop.counter }}</span> #}
-{#                                            <img style="object-fit: contain; max-height: 30vh" #}
-{#                                                src="{{img.url}}" #}
-{#                                            > #}
-{#                                        </div> #}
-{#                                    </div> #}
-{#                                {% endfor %} #}
-{#                            </div>#}
-{#                        </li>#}
-{#                    {% endfor %}#}
-{#                </ul>#}
-{#            </div>#}
-{#        </div>#}
-
-
+            </div>
+        </div>
     </div>
 
+    <!-- TASKS SECTION -->
     <div id="section-task">
         <h2>Applied tasks ({{ dataset.tasks|length }})</h2>
         <div class="tabs tab-head-list is-centered is-normal">
@@ -134,13 +114,15 @@
     </div>
 </div>
 
-{{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}
+{#{{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}#}
+<!--
 <script type="text/javascript"
         id="generic-image-array-script"
 >
     const targetHtmlId = "image-generic-list-root";
     const docsToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent)
-    const modelToReact = (img, imgIdx) => ({
+    // converts `Image.to_dict()` to `ImageInfo` interface
+    const modelToInterface = (img, imgIdx) => ({
         id: img.id,
         num: imgIdx,
         url: img.url,
@@ -148,11 +130,12 @@
     })
     const imageArray = Object.keys(docsToImageArray).map(docUid =>
         Object.keys(docsToImageArray[docUid]).map((imgUid, idx) =>
-            modelToReact(docsToImageArray[docUid][imgUid], idx))
+            modelToInterface(docsToImageArray[docUid][imgUid], idx))
     );
     //TODO : imageArray seems OK (fit ImageInfo[]), now we need to connect to React.
     console.log(imageArray);
 </script>
+-->
 
 
 {{ dataset.task_prefixes|json_script:"tasks-tab-manager" }}
@@ -201,7 +184,9 @@
                 switchTabBody(e.currentTarget);
             };
 
-        console.log(tabHeadElArray);
+        // console.log(tabHeadElArray);
+        console.log("tabHeadElArray", tabHeadElArray);
+        console.log("tabBodyElArray", tabBodyElArray);
 
         // lifecycle
         tabHeadElArray.forEach((tabEl) =>
@@ -221,3 +206,27 @@
 
 </script>
 {% endblock %}
+
+
+<!--
+{#                <ul> #}
+{#                    {% for id_doc, doc in dataset.get_doc_image_mapping.items %} #}
+{#                        <li>Document #{{ forloop.counter }} #}
+{#                            <div class="grid"> #}
+{#                                {% for id_img, img in doc.items %} #}
+{#                                    <div class="cell" #}
+{#                                         style="border: solid red 10px; border-radius: 1rem" #}
+{#                                    > #}
+{#                                        <div style="margin: 20px"> #}
+{#                                            <span class="tag is-info">Image #{{ forloop.counter }}</span> #}
+{#                                            <img style="object-fit: contain; max-height: 30vh" #}
+{#                                                src="{{img.url}}" #}
+{#                                            > #}
+{#                                        </div> #}
+{#                                    </div> #}
+{#                                {% endfor %} #}
+{#                            </div>#}
+{#                        </li>#}
+{#                    {% endfor %}#}
+{#                </ul>#}
+-->
