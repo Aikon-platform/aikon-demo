@@ -28,19 +28,19 @@ export function MatchGroup({ matches, grouped, threshold, wref }: MatchGroupProp
         (!threshold || matches[0].similarity >= threshold) &&
         <div className="column match-group">
             <div className={expanded ? "match-expanded" : "match-excerpt"}>
-            <p>{grouped ?
-                <React.Fragment>
-                    <Icon icon="mdi:folder"></Icon>
-                    {getSourceName(nameProvider, matches[0].image.document)}
-                </React.Fragment> :
-                <ImageIdentification image={matches[0].image}/>
-                }</p>
-            <div className="columns is-multiline match-items">
-                {matches.map((match, idx) => (
-                    (expanded || idx==0) && (!threshold || match.similarity >= threshold) && <ImageDisplay key={idx} comparison={wref} href={matchesRef(match.image)} {...match} />
-                ))}
-            </div>
-            {matches.length > 1 && <IconBtn icon={expanded ? "mdi:close" : "mdi:animation-plus"} onClick={toggleExpand} label={expanded ? "Collapse" : `+${matches.length -1}`}/>}
+                <p>{grouped ?
+                    <React.Fragment>
+                        <Icon icon="mdi:folder"></Icon>
+                        {getSourceName(nameProvider, matches[0].image.document)}
+                    </React.Fragment> :
+                    <ImageIdentification image={matches[0].image}/>
+                    }</p>
+                <div className="columns is-multiline match-items">
+                    {matches.map((match, idx) => (
+                        (expanded || idx==0) && (!threshold || match.similarity >= threshold) && <ImageDisplay key={idx} comparison={wref} href={matchesRef(match.image)} {...match} />
+                    ))}
+                </div>
+                {matches.length > 1 && <IconBtn icon={expanded ? "mdi:close" : "mdi:animation-plus"} onClick={toggleExpand} label={expanded ? "Collapse" : `+${matches.length -1}`}/>}
             </div>
         </div>
     );

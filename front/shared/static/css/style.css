@@ -22520,3 +22520,12 @@ ul.messages li.warning, ul.messages li.error {
 .toolbar .toolbar-content .toolbar-item.toolbar-btn {
   background: none;
 }
+
+.list-invisible {
+  list-style: none !important;
+  padding-left: 0 !important;
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+
+/*# sourceMappingURL=style.css.map */

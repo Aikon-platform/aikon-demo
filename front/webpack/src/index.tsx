@@ -117,5 +117,6 @@ export {
     initProgressTracker,
     initSimilaritySimBrowser,
     initWatermarkMatches,
-    initWatermarkSimBrowser
+    initWatermarkSimBrowser,
+    initImageGenericList
 };

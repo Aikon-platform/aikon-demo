@@ -1,5 +1,5 @@
 {% extends "demowebsite/base.html" %}
-{% load shared_tags %}
+{% load static shared_tags %}
 
 {% block title %}Dataset {{ dataset.id }}{% endblock %}
 
@@ -60,15 +60,18 @@
                  class="tab-body"
             >
                 {% for document in dataset.documents %}
-                    <h3 class="id-suffix">Document #{{ forloop.counter }}</h3>
+                    <h3 class="id-suffix">File structure of document #{{ forloop.counter }}</h3>
                     <div>{{ dataset.documents.0.document_tree|safe }}</div>
                 {% endfor %}
             </div>
             <div id="tab-body-images"
                  class="tab-body is-hidden"
             >
-                <div id="image-generic-list-root"></div>
-            </div>
+            {% for document in dataset.documents %}
+                <h3 class="id-suffix">Images of document #{{ forloop.counter }}</h3>
+                <div id="document-images-{{ document.uid }}"></div>
+            {% endfor %}
+    </div>
         </div>
     </div>
 
@@ -114,28 +117,45 @@
     </div>
 </div>
 
-{#{{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}#}
-<!--
+{{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}
+<script type="text/javascript" src="{% static "js/build.js" %}"></script>
 <script type="text/javascript"
         id="generic-image-array-script"
 >
-    const targetHtmlId = "image-generic-list-root";
-    const docsToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent)
-    // converts `Image.to_dict()` to `ImageInfo` interface
+    /**
+     * @typedef DocToImagesArray
+     *      maps an HTML id (root for react component) to an array of images to display
+     * @type {object}
+     * @property {string} htmlId
+     *      target element's id. follows the structure: `document-images-${docUid}`
+     * @property {ImageInfo[]} imageArray
+     *      array of images to display with ImageGenericList
+     */
+
+    const data = JSON.parse(document.getElementById('generic-image-array-script').textContent)
+
+    /**
+     * converts `Image.to_dict()` to `ImageInfo` interface
+     * @returns {ImageInfo}
+     */
     const modelToInterface = (img, imgIdx) => ({
         id: img.id,
         num: imgIdx,
         url: img.url,
         src: img.src,
     })
-    const imageArray = Object.keys(docsToImageArray).map(docUid =>
-        Object.keys(docsToImageArray[docUid]).map((imgUid, idx) =>
-            modelToInterface(docsToImageArray[docUid][imgUid], idx))
-    );
-    //TODO : imageArray seems OK (fit ImageInfo[]), now we need to connect to React.
-    console.log(imageArray);
+    /**
+     * @type { DocToImagesArray[] }
+     */
+    const docImagesArray = Object.entries(data).map(([docUid, docImages]) =>
+        ({ "htmlId": `document-images-${docUid}`,
+           "imageArray": Object.entries(docImages)
+                               .map(([imgId, imgJson], idx) => modelToInterface(imgJson, idx))
+        }))
+
+    docImagesArray.map(({htmlId, imageArray}) =>
+        DemoTools.initImageGenericList(document.getElementById(htmlId), imageArray));
 </script>
--->
 
 
 {{ dataset.task_prefixes|json_script:"tasks-tab-manager" }}
@@ -152,10 +172,10 @@
      * HTML page. to isolate them, each tab+body block must be enclosed
      * with a wrapper block that has an HTML ID, passed as the argument: `wrapperId`
      *
-     * @param {String} wrapperId:
+     * @param {String} wrapperId
      *      the HTML ID of the block wrapping .tab-head and .tab-body
      *      elements. wrapperId is NOT written as a CSS selector (`#htmlId`)
-     * @param {Array<String>} slugArray:
+     * @param {Array<String>} slugArray
      *      the array of "slugs", used to create linked html IDs between
      *      `.tab-head` and `.tab-body` elements/
      */
@@ -185,8 +205,8 @@
             };
 
         // console.log(tabHeadElArray);
-        console.log("tabHeadElArray", tabHeadElArray);
-        console.log("tabBodyElArray", tabBodyElArray);
+        // console.log("tabHeadElArray", tabHeadElArray);
+        // console.log("tabBodyElArray", tabBodyElArray);
 
         // lifecycle
         tabHeadElArray.forEach((tabEl) =>

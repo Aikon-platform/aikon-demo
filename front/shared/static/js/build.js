@@ -36689,19 +36689,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
 
 
-// .list-invisible {
-//     list-style: none;
-//     padding-left: 0;
-//     margin-bottom: 0;
-//     margin-top: 0;
-//
-// }
 function ImageGenericList(props) {
     const imageArray = props.imageArray;
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "grid", style: { listStyle: "none",
-            paddingLeft: 0,
-            marginBottom: 0,
-            marginTop: 0, }, children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageGeneric, { image: image }) }))) }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "grid list-invisible", children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageGeneric, { image: image }) }, image.id))) }));
 }
 
 
@@ -39099,6 +39089,7 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   initClusterViewer: () => (/* binding */ initClusterViewer),
+/* harmony export */   initImageGenericList: () => (/* binding */ initImageGenericList),
 /* harmony export */   initProgressTracker: () => (/* binding */ initProgressTracker),
 /* harmony export */   initSimilaritySimBrowser: () => (/* binding */ initSimilaritySimBrowser),
 /* harmony export */   initWatermarkMatches: () => (/* binding */ initWatermarkMatches),

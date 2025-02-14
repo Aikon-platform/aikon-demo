@@ -1,4 +1,4 @@
-import { Icon } from "@iconify/react";
+    import { Icon } from "@iconify/react";
 import { MatchTransposition } from "../SimilarityApp/types";
 import { ImageInfo } from "./types";
 import React from "react";

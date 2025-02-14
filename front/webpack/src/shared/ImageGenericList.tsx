@@ -7,28 +7,14 @@ import React from "react";
 import { ImageGeneric } from ".";
 import { ImageInfo } from "./types";
 
-// .list-invisible {
-//     list-style: none;
-//     padding-left: 0;
-//     margin-bottom: 0;
-//     margin-top: 0;
-//
-// }
-
 
 export function ImageGenericList(props: { imageArray:ImageInfo[] }) {
     const imageArray = props.imageArray;
 
     return (
-        <ul className="grid"
-            style={{ listStyle: "none",
-                     paddingLeft: 0,
-                     marginBottom: 0,
-                     marginTop: 0, }}
-        >
-            {/* imageArray.map(image => (<li>{image.id} X {image.url}</li>) ) */}
+        <ul className="grid list-invisible">
         { imageArray.map(image =>
-            (<li><ImageGeneric image={image} /></li>)) }
+            (<li key={image.id}><ImageGeneric image={image} /></li>)) }
         </ul>
     )
 }
