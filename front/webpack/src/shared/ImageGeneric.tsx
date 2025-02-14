@@ -15,14 +15,14 @@ export function ImageGeneric(props: { image: ImageInfo }) {
     const image = props.image;
 
     return (
-        <div className="column match-group">
-            <div className="match-expanded">
-                <React.Fragment>
+        <div className="column image-generic-outer-wrapper">
+            <div className="image-generic-inner-wrapper">
+                <div className="image-generic-title">
                     <ImageIdentification image={image}/>
-                </React.Fragment>
-            </div>
-            <div className="columns is-multiline match-items">
-                <ImageDisplay image={image}></ImageDisplay>
+                </div>
+                <div className="image-generic-content">
+                    <ImageDisplay image={image}></ImageDisplay>
+                </div>
             </div>
         </div>
     )

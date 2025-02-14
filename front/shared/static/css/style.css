@@ -22353,6 +22353,34 @@ ul.messages li.warning, ul.messages li.error {
   display: none;
 }
 
+.image-generic-outer-wrapper {
+  border: 8px solid hsl(233, 100%, 93%);
+  border-radius: 20px;
+  padding: 0.5em;
+  margin: 0.5rem;
+  min-width: 200px;
+  min-height: 270px;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 30% 70%;
+  grid-template-columns: 100%;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper > * {
+  height: 100%;
+  width: 100%;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content {
+  margin-bottom: 0;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-image {
+  height: 100%;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-image img {
+  object-fit: contain;
+}
+
 .display-image {
   position: relative;
 }
@@ -22527,5 +22555,3 @@ ul.messages li.warning, ul.messages li.error {
   margin-bottom: 0 !important;
   margin-top: 0 !important;
 }
-
-/*# sourceMappingURL=style.css.map */

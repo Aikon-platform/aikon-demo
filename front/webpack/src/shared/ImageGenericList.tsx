@@ -12,7 +12,7 @@ export function ImageGenericList(props: { imageArray:ImageInfo[] }) {
     const imageArray = props.imageArray;
 
     return (
-        <ul className="grid list-invisible">
+        <ul className="columns is-mobile is-multiline list-invisible">
         { imageArray.map(image =>
             (<li key={image.id}><ImageGeneric image={image} /></li>)) }
         </ul>
