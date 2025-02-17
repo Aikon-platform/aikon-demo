@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "/home/evarin/Doctorat/dti-demo/app/iiif-download/src"
+    ]
+}

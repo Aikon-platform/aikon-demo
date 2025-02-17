@@ -5,6 +5,7 @@ import { ClusterInfo, ClusterProps } from "../types";
 import { BasicImageList, SelectableImageList } from "./ImageLists";
 import { IconBtn } from "../../shared/IconBtn";
 import { ClusterCSVExporter } from "./ClusterExporter";
+import { NameProviderContext, sortImages } from "../../shared/naming";
 
 const N_SHOWN = {"grid": 8, "rows": 18};
 
@@ -45,6 +46,7 @@ export function ClusterElement(props: ClusterProps) {
   const nameInput = React.createRef<HTMLInputElement>();
   const editorContext = React.useContext(ClusterEditorContext);
   const elRef = React.useRef<HTMLDivElement>(null);
+  const nameContext = React.useContext(NameProviderContext);
 
   const cluster = props.info;
   const editable = editorContext?.state.editing;
@@ -151,8 +153,8 @@ export function ClusterElement(props: ClusterProps) {
       </div>
       <div className="cl-samples">
           {props.editing ?
-          <SelectableImageList images={cluster.images} transformed={transformed} /> :
-          <BasicImageList images={cluster.images} transformed={transformed} limit={expanded ? undefined : n_shown} expander={btnMore}/>
+          <SelectableImageList images={sortImages(nameContext, cluster.images)} transformed={transformed} /> :
+          <BasicImageList images={sortImages(nameContext, cluster.images)} transformed={transformed} limit={expanded ? undefined : n_shown} expander={btnMore}/>
           }
       </div>
     </div>
