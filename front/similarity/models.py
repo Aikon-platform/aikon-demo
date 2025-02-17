@@ -12,9 +12,20 @@ class Similarity(AbstractAPITaskOnCrops("similarity")):
         if not self.dataset:
             return
 
-        # TODO save annotations using results_url instead
-        # output.get("results_url", [])
-        similarity = output.get("similarity", {})
+        # TODO remove use of annotation to keep only results_url
+        similarity = output.get("annotations", {})
+        result_urls = output.get("results_url", [])
+        for result in result_urls:
+            if result.get("doc_pair") != self.dataset.id:
+                continue
+
+            result_url = result.get("result_url", "")
+            try:
+                response = requests.get(result_url, stream=True)
+                response.raise_for_status()
+                similarity = response.json()
+            except Exception:
+                raise ValueError(f"Could not retrieve annotation from {result_url}")
 
         with open(self.task_full_path / f"{self.dataset.id}.json", "wb") as f:
             f.write(orjson.dumps(similarity))
