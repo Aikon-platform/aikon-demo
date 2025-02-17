@@ -134,6 +134,7 @@
 
     const data = JSON.parse(document.getElementById('generic-image-array-script').textContent)
 
+    console.log(data);
     /**
      * converts `Image.to_dict()` to `ImageInfo` interface
      * @returns {ImageInfo}
@@ -147,10 +148,14 @@
     /**
      * @type { DocToImagesArray[] }
      */
+    // const docImagesArray = Object.entries(data).map(([docUid, docImages]) =>
+    //     ({ "htmlId": `document-images-${docUid}`,
+    //        "imageArray": Object.entries(docImages)
+    //                            .map(([imgId, imgJson], idx) => modelToInterface(imgJson, idx))
+    //     }))
     const docImagesArray = Object.entries(data).map(([docUid, docImages]) =>
         ({ "htmlId": `document-images-${docUid}`,
-           "imageArray": Object.entries(docImages)
-                               .map(([imgId, imgJson], idx) => modelToInterface(imgJson, idx))
+           "imageArray": docImages.map(([imgId, imgJson], idx) => modelToInterface(imgJson, idx))
         }))
 
     docImagesArray.map(({htmlId, imageArray}) =>
@@ -194,7 +199,6 @@
                     : tabEl.classList.remove("is-active")),
             switchTabBody = (el) => {
                 let slug = getSlugFromTabId(el.id);
-                console.log("switchTabBody", el.id, slug);
                 tabBodyElArray.forEach(tabBodyEl =>
                     tabBodyEl.id === `tab-body-${slug}`
                     ? tabBodyEl.classList.remove("is-hidden")
@@ -203,10 +207,6 @@
                 switchActiveTab(e.currentTarget);
                 switchTabBody(e.currentTarget);
             };
-
-        // console.log(tabHeadElArray);
-        // console.log("tabHeadElArray", tabHeadElArray);
-        // console.log("tabBodyElArray", tabBodyElArray);
 
         // lifecycle
         tabHeadElArray.forEach((tabEl) =>

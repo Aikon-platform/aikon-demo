@@ -102,9 +102,9 @@ class Document:
 
     def _document_tree(self):
         from .utils import TreeDict
+
         tree = TreeDict(os.path.join(self.path, "images/"))
         return tree.to_html_pre()
-
 
     def to_dict(self) -> Dict:
         return {
@@ -114,15 +114,20 @@ class Document:
         }
 
     def to_json_with_images(self) -> Dict:
-        print({ "type": self.dtype,
+        print(
+            {
+                "type": self.dtype,
                 "src": str(self.src),
                 "uid": str(self.uid),
-                "images": [ image.to_dict() for image in self.images ]  })
+                "images": [image.to_dict() for image in self.images],
+            }
+        )
         return {
             "type": self.dtype,
             "src": str(self.src),
             "uid": str(self.uid),
-            "images": [ image.to_dict() for image in self.images ]  }
+            "images": [image.to_dict() for image in self.images],
+        }
 
     def is_extracted(self) -> bool:
         if not self.path.exists():
@@ -204,7 +209,7 @@ class Image:
             "src": str(self.src),
             "path": str(self.path.relative_to(relpath)),
             "metadata": self.metadata,
-            "url": self.url
+            "url": self.url,
         }
 
     @classmethod
@@ -443,14 +448,18 @@ class Dataset(AbstractDataset):
             self.get_images()
         return {doc.uid: {im.id: im for im in doc.images} for doc in self.documents}
 
-
-    def get_doc_image_mapping_json(self) -> Dict[str, Dict]:
+    def get_doc_image_mapping_json(self) -> Dict[str, List[Tuple[str, Dict]]]:
         """
         same as ``get_doc_image_mapping``, but returns a valid JSON instead of python types.
+        the contents of each `document` are returned as a list of tuples to be able to order
+        images by their filename alphanumerically.
         """
-        print({doc.uid: {im.id: im.to_dict() for im in doc.images} for doc in self.documents})
-
-        return {doc.uid: {im.id: im.to_dict() for im in doc.images} for doc in self.documents}
+        sorted_document_images = lambda doc: (
+            sorted(
+                [(im.id, im.to_dict()) for im in doc.images], key=lambda t: t[1]["path"]
+            )
+        )
+        return {doc.uid: sorted_document_images(doc) for doc in self.documents}
 
     def clear_dataset(self) -> Dict:
         """
@@ -577,12 +586,12 @@ class Dataset(AbstractDataset):
 
         return {"success": "Regions processed successfully"}
 
-
     def get_tasks_for_prefix(self, prefix) -> List:
-        return (list(getattr(self, f"{prefix}_tasks").all())
-                if hasattr(self, f"{prefix}_tasks")
-                else [])
-
+        return (
+            list(getattr(self, f"{prefix}_tasks").all())
+            if hasattr(self, f"{prefix}_tasks")
+            else []
+        )
 
     @property
     def tasks(self) -> List:
@@ -599,11 +608,14 @@ class Dataset(AbstractDataset):
         """
         a list of all tasks prefixes on which tasks have been run on this dataset
         """
-        return [ prefix for prefix in settings.DEMO_APPS
-                 if len(self.get_tasks_for_prefix(prefix)) ]
+        return [
+            prefix
+            for prefix in settings.DEMO_APPS
+            if len(self.get_tasks_for_prefix(prefix))
+        ]
 
     @property
-    def tasks_by_prefix(self) -> List[Tuple[str,List]]:
+    def tasks_by_prefix(self) -> List[Tuple[str, List]]:
         """
         same as `self.tasks`, but tasks are grouped by type/prefix.
         Returns:
@@ -612,12 +624,13 @@ class Dataset(AbstractDataset):
             ]
         """
         prefixes = settings.DEMO_APPS
-        grouped_tasks = [ (task_prefix, tasks)
-                          for task_prefix in prefixes
-                          if len(tasks := self.get_tasks_for_prefix(task_prefix)) ]
+        grouped_tasks = [
+            (task_prefix, tasks)
+            for task_prefix in prefixes
+            if len(tasks := self.get_tasks_for_prefix(task_prefix))
+        ]
         # order groups by descending number of tasks
         return sorted(grouped_tasks, key=lambda task_group: -len(task_group[1]))
-
 
     def get_tasks_by_prop(self, prop: str) -> Dict:
         info = {}
