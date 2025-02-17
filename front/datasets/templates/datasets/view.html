@@ -7,38 +7,44 @@
 <div class="centerwrap">
     <!-- TITLE SECTION -->
     <div class="columns is-vcentered">
-        <div class="column is-four-fifths">
+        <div class="column is-two-thirds">
             <h1 class=" is-title is-size-2 py-3 mb-0">
                 <span class="id-main">Dataset {{ dataset.name }}</span>
                 <span class="id-suffix">{{ dataset.id }}</span>
             </h1>
 
         </div>
-        <div class="column">
-            <span class="tag status content is-large">{{ dataset.format }}</span>
-            <span class="tag status content icon-text is-large"
-                  title="{{ dataset.document|length }} document{% if dataset.document|length > 1 %}s{% endif %}"
-            >
-                <span>{{ dataset.documents|length }}</span>
-                <span class="icon has-text-white">
-                    <i class="iconify" data-icon="mdi:file-document-multiple"></i>
-                </span>
-            </span>
-            <span class="tag status content icon-text is-large"
-                  title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
-                <span>{{ dataset.image_count }}</span>
-                <span class="icon has-text-white">
-                    <i class="iconify" data-icon="mdi:file-image"
-                    ></i>
-                </span>
-            </span>
-        </div>
-        <div class="column">
-            <a href="{% url 'datasets:delete' dataset.pk %}"
-              class="button is-light is-content is-large"
-            ><span class="iconify" data-icon="mdi:delete"></span></a>
-        </div>
+        <div class="column is-one-third">
+            <div class="columns is-vcentered">
 
+                <span class="column tag status content is-large m-1"
+                      title="Dataset format: {{ dataset.format }}"
+                >
+                    {{ dataset.format }}
+                </span>
+                <span class="column tag status content icon-text is-large m-1"
+                      title="{{ dataset.document|length }} document{% if dataset.document|length > 1 %}s{% endif %}"
+                >
+                    <span>{{ dataset.documents|length }}</span>
+                    <span class="icon has-text-white m-1">
+                        <i class="iconify" data-icon="mdi:file-document-multiple"></i>
+                    </span>
+                </span>
+                <span class="column tag status content icon-text is-large m-1"
+                    title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
+                    <span>{{ dataset.image_count }}</span>
+                    <span class="icon has-text-white">
+                        <i class="iconify" data-icon="mdi:file-image"
+                        ></i>
+                    </span>
+                </span>
+                <a class="button is-light is-content is-large m-1"
+                   href="{% url 'datasets:delete' dataset.pk %}"
+                >
+                    <span class="iconify" data-icon="mdi:delete"></span>
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- CONTENTS SECTION -->
@@ -67,16 +73,16 @@
             <div id="tab-body-images"
                  class="tab-body is-hidden"
             >
-            {% for document in dataset.documents %}
-                <h3 class="id-suffix">Images of document #{{ forloop.counter }}</h3>
-                <div id="document-images-{{ document.uid }}"></div>
-            {% endfor %}
-    </div>
+                {% for document in dataset.documents %}
+                    <h3 class="id-suffix">Images of document #{{ forloop.counter }}</h3>
+                    <div id="document-images-{{ document.uid }}"></div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
     <!-- TASKS SECTION -->
-    <div id="section-task">
+    <div id="section-task" class="mt-6">
         <h2>Applied tasks ({{ dataset.tasks|length }})</h2>
         <div class="tabs tab-head-list is-centered is-normal">
             <ul>
@@ -148,11 +154,6 @@
     /**
      * @type { DocToImagesArray[] }
      */
-    // const docImagesArray = Object.entries(data).map(([docUid, docImages]) =>
-    //     ({ "htmlId": `document-images-${docUid}`,
-    //        "imageArray": Object.entries(docImages)
-    //                            .map(([imgId, imgJson], idx) => modelToInterface(imgJson, idx))
-    //     }))
     const docImagesArray = Object.entries(data).map(([docUid, docImages]) =>
         ({ "htmlId": `document-images-${docUid}`,
            "imageArray": docImages.map(([imgId, imgJson], idx) => modelToInterface(imgJson, idx))
@@ -226,27 +227,3 @@
 
 </script>
 {% endblock %}
-
-
-<!--
-{#                <ul> #}
-{#                    {% for id_doc, doc in dataset.get_doc_image_mapping.items %} #}
-{#                        <li>Document #{{ forloop.counter }} #}
-{#                            <div class="grid"> #}
-{#                                {% for id_img, img in doc.items %} #}
-{#                                    <div class="cell" #}
-{#                                         style="border: solid red 10px; border-radius: 1rem" #}
-{#                                    > #}
-{#                                        <div style="margin: 20px"> #}
-{#                                            <span class="tag is-info">Image #{{ forloop.counter }}</span> #}
-{#                                            <img style="object-fit: contain; max-height: 30vh" #}
-{#                                                src="{{img.url}}" #}
-{#                                            > #}
-{#                                        </div> #}
-{#                                    </div> #}
-{#                                {% endfor %} #}
-{#                            </div>#}
-{#                        </li>#}
-{#                    {% endfor %}#}
-{#                </ul>#}
--->
