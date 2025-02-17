@@ -36680,12 +36680,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ImageGenericList: () => (/* binding */ ImageGenericList)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
+/* harmony import */ var _ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ImageMagnifier */ "./src/shared/ImageMagnifier.tsx");
+
+/**
+ * an array of images displayed as a bulma `columns` inside an invisible `html:ul`
+ */
+
 
 
 function ImageGenericList(props) {
     const imageArray = props.imageArray;
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "columns is-mobile is-multiline list-invisible", children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageGeneric, { image: image }) }, image.id))) }));
+    const [magnifying, setMagnifying] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(null);
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext.Provider, { value: { magnify: setMagnifying }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "columns is-mobile is-multiline list-invisible", children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageGeneric, { image: image }) }, image.id))) }), magnifying && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.ImageMagnifier, Object.assign({}, magnifying))] }));
 }
 
 
@@ -36737,6 +36746,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _IconBtn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./IconBtn */ "./src/shared/IconBtn.tsx");
 /* harmony import */ var _ImageIdentification__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ImageIdentification */ "./src/shared/ImageIdentification.tsx");
 
+/**
+ * a component to render a magnified (zoomed) view
+ * of an image, a watermark or a comparison.
+ *
+ * it can be used:
+ *      - with a single image (MagnifyProps.image is defined,
+ *          but MagnifyProps.comparison is undefined)
+ *      - with an image and its comparison (MagnifyProps.image
+ *          and MagnifyProps.comparison are defined.)
+ *
+ * it is meant to be used as a provider:
+ * ```
+ *      <MagnifyingContext.Provider value={{ magnify: setMagnifying }}>
+ *          <!-- ... -->
+ *      </MagnifyingContext.Provider>
+ * ```
+ */
 
 
 
@@ -36748,6 +36774,8 @@ function ImageMagnifier({ image, transpositions, comparison }) {
     const context = react__WEBPACK_IMPORTED_MODULE_1___default().useContext(MagnifyingContext);
     const setMagnifying = context.magnify;
     const [transf, setTransf] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(transpositions || []);
+    // when clicking on one of the "rotate" buttons, generate a new CSS class to trigger the rotation:
+    // the CSS class is one of the values of MatchTransposition.
     const manualTransform = (deltaRot, hflip) => {
         const curRotStr = transf.find(t => t && t.startsWith("rot")), prevHflip = transf.includes("hflip"), curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
         let newRot = curRot;
@@ -36760,6 +36788,7 @@ function ImageMagnifier({ image, transpositions, comparison }) {
         if (hflip !== prevHflip)
             newTransf.push("hflip");
         setTransf(newTransf);
+        console.log("newTransf", newTransf);
     };
     react__WEBPACK_IMPORTED_MODULE_1___default().useEffect(() => {
         setTransf(transpositions || []);

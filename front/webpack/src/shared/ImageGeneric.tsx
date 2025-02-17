@@ -2,6 +2,10 @@
  * a generic display for an Image and its metadata.
  * inspired by SimilarityApp.components.MatchGroup
  *
+ * ImageDisplay focuses only on displaying the image file
+ * itself, while ImageGeneric is a fully-fledged component
+ * with metadata (title...).
+ *
  * TODO fuse with SimilarityApp.components.MatchGroup ?
  */
 

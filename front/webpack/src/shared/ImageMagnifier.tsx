@@ -1,3 +1,21 @@
+/**
+ * a component to render a magnified (zoomed) view
+ * of an image, a watermark or a comparison.
+ *
+ * it can be used:
+ *      - with a single image (MagnifyProps.image is defined,
+ *          but MagnifyProps.comparison is undefined)
+ *      - with an image and its comparison (MagnifyProps.image
+ *          and MagnifyProps.comparison are defined.)
+ *
+ * it is meant to be used as a provider:
+ * ```
+ *      <MagnifyingContext.Provider value={{ magnify: setMagnifying }}>
+ *          <!-- ... -->
+ *      </MagnifyingContext.Provider>
+ * ```
+ */
+
 import React from "react";
 import { IconBtn } from "./IconBtn";
 import { MatchTransposition } from "../SimilarityApp/types";
@@ -27,6 +45,8 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
     const setMagnifying = context.magnify!;
     const [transf, setTransf] = React.useState<MatchTransposition[]>(transpositions || []);
 
+    // when clicking on one of the "rotate" buttons, generate a new CSS class to trigger the rotation:
+    // the CSS class is one of the values of MatchTransposition.
     const manualTransform = (deltaRot: 0 | 90 | -90, hflip: boolean) => {
         const curRotStr = transf.find(t => t && t.startsWith("rot")),
               prevHflip = transf.includes("hflip"),
@@ -38,6 +58,7 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
         if (newRot) newTransf.push(`rot${newRot}`);
         if (hflip !== prevHflip) newTransf.push("hflip");
         setTransf(newTransf as MatchTransposition[]);
+        console.log("newTransf", newTransf);
     }
 
     React.useEffect(() => {

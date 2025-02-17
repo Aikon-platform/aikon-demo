@@ -1,9 +1,8 @@
 import React from "react";
 import { SimilarityIndex, SimilarityMatches } from "../types";
 import { NameProvider } from "../../shared/types";
-import { ImageInfo } from "../../shared/types";
 import { ImageMagnifier, MagnifyingContext, MagnifyProps } from "../../shared/ImageMagnifier";
-import { fetchIIIFNames, getImageName, getSourceName, NameProviderContext } from "../../shared/naming";
+import { fetchIIIFNames, NameProviderContext } from "../../shared/naming";
 import { IconBtn } from "../../shared/IconBtn";
 import { ImageSimBrowser } from "./ImageSimBrowser";
 import { ClusteringTool } from "./ClusteringTool";
