@@ -8,9 +8,26 @@ from regions.models import AbstractAPITaskOnCrops
 
 
 class Similarity(AbstractAPITaskOnCrops("similarity")):
-    def save_similarity(self, similarity: dict):
+    def save_similarity(self, output: dict):
         if not self.dataset:
             return
+
+        # TODO remove use of annotation to keep only results_url
+        similarity = output.get("annotations", {})
+        result_urls = output.get("results_url", [])
+        for result in result_urls:
+            if result.get("doc_pair") != "dataset":
+                # only save global results
+                continue
+
+            result_url = result.get("result_url", "")
+            try:
+                response = requests.get(result_url, stream=True)
+                response.raise_for_status()
+                similarity = response.json()
+            except Exception:
+                raise ValueError(f"Could not retrieve annotation from {result_url}")
+
         with open(self.task_full_path / f"{self.dataset.id}.json", "wb") as f:
             f.write(orjson.dumps(similarity))
         self._similarity = similarity
@@ -36,9 +53,7 @@ class Similarity(AbstractAPITaskOnCrops("similarity")):
             if not output:
                 self.on_task_error({"error": "No output data"})
                 return
-
-            # TODO download annotations file
-            # self.save_similarity(output.get("annotations", {}))
+            self.save_similarity(output)
 
             dataset_url = output.get("dataset_url")
             if dataset_url:
