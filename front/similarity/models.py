@@ -16,7 +16,8 @@ class Similarity(AbstractAPITaskOnCrops("similarity")):
         similarity = output.get("annotations", {})
         result_urls = output.get("results_url", [])
         for result in result_urls:
-            if result.get("doc_pair") != self.dataset.id:
+            if result.get("doc_pair") != "dataset":
+                # only save global results
                 continue
 
             result_url = result.get("result_url", "")
