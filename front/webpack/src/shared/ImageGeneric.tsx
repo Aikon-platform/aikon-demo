@@ -2,7 +2,7 @@
  * a generic display for an Image and its metadata.
  * inspired by SimilarityApp.components.MatchGroup
  *
- * ImageDisplay focuses only on displaying the image file
+ * ImageFileDisplay focuses only on displaying the image file
  * itself, while ImageGeneric is a fully-fledged component
  * with metadata (title...).
  *
@@ -12,7 +12,7 @@
 import React from "react";
 
 import { ImageInfo } from "./types";
-import { ImageIdentification, ImageDisplay } from ".";
+import { ImageIdentification, ImageFileDisplay } from ".";
 
 
 export function ImageGeneric(props: { image: ImageInfo }) {
@@ -25,7 +25,7 @@ export function ImageGeneric(props: { image: ImageInfo }) {
                     <ImageIdentification image={image}/>
                 </div>
                 <div className="image-generic-content">
-                    <ImageDisplay image={image}></ImageDisplay>
+                    <ImageFileDisplay image={image}></ImageFileDisplay>
                 </div>
             </div>
         </div>

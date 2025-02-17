@@ -1,5 +1,5 @@
 import { IconBtn } from "./IconBtn";
-import { ImageDisplay } from "./ImageDisplay";
+import { ImageFileDisplay } from "./ImageFileDisplay";
 import { ImageGeneric } from "./ImageGeneric";
 import { ImageGenericList } from "./ImageGenericList";
 import { ImageIdentification } from "./ImageIdentification";
@@ -9,7 +9,7 @@ import { ImageTooltip } from "./ImageTooltip";
 
 export {
     IconBtn,
-    ImageDisplay,
+    ImageFileDisplay,
     ImageGeneric,
     ImageIdentification,
     ImageMagnifier,

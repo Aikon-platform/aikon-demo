@@ -1,7 +1,7 @@
 import React, { useReducer } from "react";
 import { SimilarityMatch } from "../types";
 import { ImageInfo } from "../../shared/types";
-import { ImageDisplay } from "../../shared";
+import { ImageFileDisplay } from "../../shared";
 import { Icon } from "@iconify/react";
 import { IconBtn } from "../../shared";
 import { NameProviderContext, getImageName, getSourceName } from "../../shared/naming";
@@ -37,7 +37,7 @@ export function MatchGroup({ matches, grouped, threshold, wref }: MatchGroupProp
                     }</p>
                 <div className="columns is-multiline match-items">
                     {matches.map((match, idx) => (
-                        (expanded || idx==0) && (!threshold || match.similarity >= threshold) && <ImageDisplay key={idx} comparison={wref} href={matchesRef(match.image)} {...match} />
+                        (expanded || idx==0) && (!threshold || match.similarity >= threshold) && <ImageFileDisplay key={idx} comparison={wref} href={matchesRef(match.image)} {...match} />
                     ))}
                 </div>
                 {matches.length > 1 && <IconBtn icon={expanded ? "mdi:close" : "mdi:animation-plus"} onClick={toggleExpand} label={expanded ? "Collapse" : `+${matches.length -1}`}/>}

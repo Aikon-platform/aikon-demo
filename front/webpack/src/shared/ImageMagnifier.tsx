@@ -19,20 +19,20 @@
 import React from "react";
 import { IconBtn } from "./IconBtn";
 import { MatchTransposition } from "../SimilarityApp/types";
-import { ImageToDisplay } from "./ImageDisplay";
+import { ImageFileToDisplay } from "./ImageFileDisplay";
 import { ImageIdentification } from "./ImageIdentification";
 
 
 export interface MagnifyProps {
-    image?: ImageToDisplay;
+    image?: ImageFileToDisplay;
     transpositions?: MatchTransposition[];
-    comparison?: ImageToDisplay;
+    comparison?: ImageFileToDisplay;
 }
 
 export interface MagnifyingContext {
     // Context to manage focusing on a Watermark
     magnify?: ({image, transpositions, comparison}:MagnifyProps) => void;
-    setComparison?: (comparison?: ImageToDisplay | undefined, setPinned?: (pinned: boolean) => void) => void;
+    setComparison?: (comparison?: ImageFileToDisplay | undefined, setPinned?: (pinned: boolean) => void) => void;
 }
 
 export const MagnifyingContext = React.createContext<MagnifyingContext>({});

@@ -5,7 +5,7 @@ import React from "react";
 import { MagnifyingContext } from "./ImageMagnifier";
 import { TooltipContext } from "./ImageTooltip";
 
-export interface ImageToDisplay {
+export interface ImageFileToDisplay {
     id: string;
     num: number;
     url: string;
@@ -14,16 +14,16 @@ export interface ImageToDisplay {
     subtitle?: string;
 }
 
-interface ImageDisplayProps {
-    image: ImageToDisplay;
+interface ImageFileDisplayProps {
+    image: ImageFileToDisplay;
     similarity?: number;
     transpositions?: MatchTransposition[];
-    comparison?: ImageToDisplay;
+    comparison?: ImageFileToDisplay;
     href?: string;
     disable_magnify?: boolean;
 }
 
-export function ImageDisplay({image, similarity, transpositions, comparison, href, disable_magnify}: ImageDisplayProps) {
+export function ImageFileDisplay({image, similarity, transpositions, comparison, href, disable_magnify}: ImageFileDisplayProps) {
     /*
     Component to render a single watermark match.
     */
