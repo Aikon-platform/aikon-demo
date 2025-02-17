@@ -2,7 +2,7 @@ import React from "react";
 import { IconBtn } from "./IconBtn";
 import { MatchTransposition } from "../SimilarityApp/types";
 import { ImageToDisplay } from "./ImageDisplay";
-import {ImageIdentification} from "./ImageIdentification";
+import { ImageIdentification } from "./ImageIdentification";
 
 
 export interface MagnifyProps {
@@ -28,9 +28,9 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
     const [transf, setTransf] = React.useState<MatchTransposition[]>(transpositions || []);
 
     const manualTransform = (deltaRot: 0 | 90 | -90, hflip: boolean) => {
-        const curRotStr = transf.find(t => t && t.startsWith("rot"));
-        const prevHflip = transf.includes("hflip");
-        const curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
+        const curRotStr = transf.find(t => t && t.startsWith("rot")),
+              prevHflip = transf.includes("hflip"),
+              curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
         let newRot = curRot;
         if (hflip && curRot % 180) newRot += 180;
         newRot = (newRot + deltaRot + 360) % 360;

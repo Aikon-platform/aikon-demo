@@ -35814,6 +35814,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _MatchRow__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MatchRow */ "./src/SimilarityApp/components/MatchRow.tsx");
 /* harmony import */ var _shared_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../shared/ImageMagnifier */ "./src/shared/ImageMagnifier.tsx");
 
+/**
+ * TODO DELETE ??? it seems unused, copied from WatermarkMatches.
+ */
 
 
 
@@ -36746,9 +36749,7 @@ function ImageMagnifier({ image, transpositions, comparison }) {
     const setMagnifying = context.magnify;
     const [transf, setTransf] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(transpositions || []);
     const manualTransform = (deltaRot, hflip) => {
-        const curRotStr = transf.find(t => t && t.startsWith("rot"));
-        const prevHflip = transf.includes("hflip");
-        const curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
+        const curRotStr = transf.find(t => t && t.startsWith("rot")), prevHflip = transf.includes("hflip"), curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
         let newRot = curRot;
         if (hflip && curRot % 180)
             newRot += 180;

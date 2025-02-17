@@ -1,3 +1,7 @@
+/**
+ * TODO DELETE ??? it seems unused, copied from WatermarkMatches.
+ */
+
 import React, { useReducer } from "react";
 import { SimilarityMatches } from "../types";
 import { MatchRow } from "./MatchRow";
