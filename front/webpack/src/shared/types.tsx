@@ -28,3 +28,5 @@ export interface NameProvider {
         images: { [image_id: string]: string; };
     };
 }
+
+export type DatasetFormat = "zip" | "iiif" | "pdf";

@@ -31,7 +31,7 @@
                     </span>
                 </span>
                 <span class="column tag status content icon-text is-large m-1"
-                    title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
+                      title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
                     <span>{{ dataset.image_count }}</span>
                     <span class="icon has-text-white">
                         <i class="iconify" data-icon="mdi:file-image"
@@ -73,10 +73,7 @@
             <div id="tab-body-images"
                  class="tab-body is-hidden"
             >
-                {% for document in dataset.documents %}
-                    <h3 class="id-suffix">Images of document #{{ forloop.counter }}</h3>
-                    <div id="document-images-{{ document.uid }}"></div>
-                {% endfor %}
+                <div id="document-image-browser"></div>
             </div>
         </div>
     </div>
@@ -128,39 +125,11 @@
 <script type="text/javascript"
         id="generic-image-array-script"
 >
-    /**
-     * @typedef DocToImagesArray
-     *      maps an HTML id (root for react component) to an array of images to display
-     * @type {object}
-     * @property {string} htmlId
-     *      target element's id. follows the structure: `document-images-${docUid}`
-     * @property {ImageInfo[]} imageArray
-     *      array of images to display with ImageGenericList
-     */
+    const docToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent),
+          datasetFormat = "{{ dataset.format }}",
+          htmlId = "document-image-browser";
 
-    const data = JSON.parse(document.getElementById('generic-image-array-script').textContent)
-
-    console.log(data);
-    /**
-     * converts `Image.to_dict()` to `ImageInfo` interface
-     * @returns {ImageInfo}
-     */
-    const modelToInterface = (img, imgIdx) => ({
-        id: img.id,
-        num: imgIdx,
-        url: img.url,
-        src: img.src,
-    })
-    /**
-     * @type { DocToImagesArray[] }
-     */
-    const docImagesArray = Object.entries(data).map(([docUid, docImages]) =>
-        ({ "htmlId": `document-images-${docUid}`,
-           "imageArray": docImages.map(([imgId, imgJson], idx) => modelToInterface(imgJson, idx))
-        }))
-
-    docImagesArray.map(({htmlId, imageArray}) =>
-        DemoTools.initImageGenericList(document.getElementById(htmlId), imageArray));
+    DemoTools.initDatasetImageBrowser(document.getElementById(htmlId), docToImageArray, datasetFormat);
 </script>
 
 

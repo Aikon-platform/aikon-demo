@@ -448,18 +448,21 @@ class Dataset(AbstractDataset):
             self.get_images()
         return {doc.uid: {im.id: im for im in doc.images} for doc in self.documents}
 
-    def get_doc_image_mapping_json(self) -> Dict[str, List[Tuple[str, Dict]]]:
+    def get_doc_image_mapping_json(self) -> Dict[str, Dict[str, Dict]]:
         """
         same as ``get_doc_image_mapping``, but returns a valid JSON instead of python types.
         the contents of each `document` are returned as a list of tuples to be able to order
         images by their filename alphanumerically.
         """
-        sorted_document_images = lambda doc: (
-            sorted(
-                [(im.id, im.to_dict()) for im in doc.images], key=lambda t: t[1]["path"]
-            )
-        )
-        return {doc.uid: sorted_document_images(doc) for doc in self.documents}
+        # sorted_document_images = lambda doc: (
+        #     sorted(
+        #         [(im.id, im.to_dict()) for im in doc.images], key=lambda t: t[1]["path"]
+        #     )
+        # )
+        return {
+            doc.uid: {im.id: im.to_dict() for im in doc.images}
+            for doc in self.documents
+        }
 
     def clear_dataset(self) -> Dict:
         """

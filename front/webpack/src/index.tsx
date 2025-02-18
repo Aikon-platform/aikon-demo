@@ -3,12 +3,15 @@ import { createRoot } from 'react-dom/client';
 import { ClusterApp } from "./ClusterApp/components/ClusterApp";
 import { TaskProgressTracker } from './ProgressTracker';
 import { MatchViewer, WatermarkSimBrowser } from './WatermarkMatches';
-import { unserializeSingleWatermarkMatches, unserializeWatermarkSimilarity } from './WatermarkMatches/types';
 import { SimilarityApp } from './SimilarityApp';
 import { SimilarityMode } from './SimilarityApp/components/SimilarityApp';
 import { ImageGenericList } from "./shared";
+import { DatasetImageBrowser } from "./DatasetApp";
+import { DjangoDatasetImagesInterface } from './DatasetApp/types';
 
+import { unserializeSingleWatermarkMatches, unserializeWatermarkSimilarity } from './WatermarkMatches/types';
 import { ImageInfo } from "./shared/types";
+import { DatasetFormat } from "./shared/types";
 import { unserializeSimilarityMatrix } from "./SimilarityApp/utils/serialization";
 import { unserializeClusterFile } from './ClusterApp/types';
 
@@ -112,11 +115,21 @@ function initImageGenericList(targetRoot:HTMLElement, imageArray:ImageInfo[]) {
     createRoot(targetRoot).render(<ImageGenericList imageArray={imageArray} />)
 }
 
+
+function initDatasetImageBrowser(
+    targetRoot:HTMLElement,
+    dataset:DjangoDatasetImagesInterface,
+    datasetFormat:DatasetFormat
+) {
+    createRoot(targetRoot).render(<DatasetImageBrowser dataset={dataset} datasetFormat={datasetFormat} />)
+}
+
 export {
     initClusterViewer,
     initProgressTracker,
     initSimilaritySimBrowser,
     initWatermarkMatches,
     initWatermarkSimBrowser,
-    initImageGenericList
+    initImageGenericList,
+    initDatasetImageBrowser
 };

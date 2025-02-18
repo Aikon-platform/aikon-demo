@@ -35396,6 +35396,90 @@ function serializeClusterFile(file) {
 
 /***/ }),
 
+/***/ "./src/DatasetApp/components/DatasetImageBrowser.tsx":
+/*!***********************************************************!*\
+  !*** ./src/DatasetApp/components/DatasetImageBrowser.tsx ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DatasetImageBrowser: () => (/* binding */ DatasetImageBrowser)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
+
+
+/**********************************************/
+// converters
+const imgToImageInfo = (img, imgIdx) => ({
+    id: img.id,
+    num: imgIdx,
+    url: img.url,
+    src: img.src,
+});
+// the returned FolderImagesInterface[] is sorted alphanuerically by folder name
+const toFolderImagesInterfaceArray = (docContents) => {
+    const folderPathExtracter = (filePath) => filePath.split("/").slice(0, -1).join("/");
+    let documentImageArray = Object.entries(docContents).map(([imgUid, img], idx) => imgToImageInfo(img, idx));
+    let folderPathArray = [...new Set(documentImageArray.map(img => folderPathExtracter(img.url)))];
+    return folderPathArray.map(folderPath => ({
+        folderPath: folderPath,
+        folderImages: documentImageArray.filter(documentImage => folderPathExtracter(documentImage.url) === folderPath)
+    })).sort((a, b) => a.folderPath.localeCompare(b.folderPath));
+};
+const toDocumentImagesInterface = (docUid, docContents) => ({
+    documentUid: docUid,
+    documentFolders: toFolderImagesInterfaceArray(docContents)
+});
+// the returned DatasetImageBrowserInterface is sorted by each document's UUID.
+const toDatasetImageBrowserInterface = (dataset) => Object
+    .entries(dataset)
+    .map(([docUid, docContents]) => toDocumentImagesInterface(docUid, docContents))
+    .sort((a, b) => a.documentUid.localeCompare(b.documentUid));
+const toDatasetBrowserAgnostic = (dataset, datasetFormat) => datasetFormat === "iiif"
+    // dataset may contain several documents, but no subfolders
+    ? dataset.map(({ documentUid, documentFolders }) => ({
+        name: documentUid,
+        images: documentFolders.map(({ folderPath, folderImages }) => folderImages).reduce((previousVal, currentVal) => previousVal.concat(currentVal))
+    }))
+    // dataset contains only one document, but may contain folders
+    : dataset[0].documentFolders.map(({ folderPath, folderImages }) => ({
+        name: folderPath,
+        images: folderImages
+    }));
+// TODO cleanup : homogenize interfaces, clarify names, see if we can do without `toDatasetImageBrowserInterface`.
+/**********************************************/
+// component
+function DatasetImageBrowser({ dataset, datasetFormat }) {
+    // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
+    const folderPathCleaner = (folderPath) => folderPath.split("/").slice(5).join("/") + "/";
+    const datasetRetyped1 = toDatasetImageBrowserInterface(dataset), datasetRetyped2 = toDatasetBrowserAgnostic(datasetRetyped1, datasetFormat);
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: datasetRetyped2.map(({ name, images }, idx) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { id: name, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", { className: "id-suffix", children: ["Images of ", datasetFormat === "iiif"
+                            ? `document #${idx + 1}`
+                            : `folder ${folderPathCleaner(name)}`] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_1__.ImageGenericList, { imageArray: images }) })] }, name))) }));
+}
+
+
+/***/ }),
+
+/***/ "./src/DatasetApp/index.tsx":
+/*!**********************************!*\
+  !*** ./src/DatasetApp/index.tsx ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DatasetImageBrowser: () => (/* reexport safe */ _components_DatasetImageBrowser__WEBPACK_IMPORTED_MODULE_0__.DatasetImageBrowser)
+/* harmony export */ });
+/* harmony import */ var _components_DatasetImageBrowser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./components/DatasetImageBrowser */ "./src/DatasetApp/components/DatasetImageBrowser.tsx");
+
+
+
+
+/***/ }),
+
 /***/ "./src/ProgressTracker/index.tsx":
 /*!***************************************!*\
   !*** ./src/ProgressTracker/index.tsx ***!
@@ -39110,6 +39194,7 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   initClusterViewer: () => (/* binding */ initClusterViewer),
+/* harmony export */   initDatasetImageBrowser: () => (/* binding */ initDatasetImageBrowser),
 /* harmony export */   initImageGenericList: () => (/* binding */ initImageGenericList),
 /* harmony export */   initProgressTracker: () => (/* binding */ initProgressTracker),
 /* harmony export */   initSimilaritySimBrowser: () => (/* binding */ initSimilaritySimBrowser),
@@ -39121,12 +39206,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ClusterApp_components_ClusterApp__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ClusterApp/components/ClusterApp */ "./src/ClusterApp/components/ClusterApp.tsx");
 /* harmony import */ var _ProgressTracker__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ProgressTracker */ "./src/ProgressTracker/index.tsx");
 /* harmony import */ var _WatermarkMatches__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./WatermarkMatches */ "./src/WatermarkMatches/index.tsx");
-/* harmony import */ var _WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./WatermarkMatches/types */ "./src/WatermarkMatches/types.tsx");
-/* harmony import */ var _SimilarityApp__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./SimilarityApp */ "./src/SimilarityApp/index.tsx");
-/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./shared */ "./src/shared/index.tsx");
-/* harmony import */ var _SimilarityApp_utils_serialization__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./SimilarityApp/utils/serialization */ "./src/SimilarityApp/utils/serialization.tsx");
-/* harmony import */ var _ClusterApp_types__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./ClusterApp/types */ "./src/ClusterApp/types.tsx");
-/* harmony import */ var _sass_style_scss__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./sass/style.scss */ "./src/sass/style.scss");
+/* harmony import */ var _SimilarityApp__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./SimilarityApp */ "./src/SimilarityApp/index.tsx");
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./shared */ "./src/shared/index.tsx");
+/* harmony import */ var _DatasetApp__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./DatasetApp */ "./src/DatasetApp/index.tsx");
+/* harmony import */ var _WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./WatermarkMatches/types */ "./src/WatermarkMatches/types.tsx");
+/* harmony import */ var _SimilarityApp_utils_serialization__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./SimilarityApp/utils/serialization */ "./src/SimilarityApp/utils/serialization.tsx");
+/* harmony import */ var _ClusterApp_types__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./ClusterApp/types */ "./src/ClusterApp/types.tsx");
+/* harmony import */ var _sass_style_scss__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./sass/style.scss */ "./src/sass/style.scss");
+
 
 
 
@@ -39149,7 +39236,7 @@ function initClusterViewer(target_root, clustering_data, base_media_url, editabl
     editing: whether the app should be in editing mode
     formfield: the form field to update with the current clustering data
     */
-    (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ClusterApp_components_ClusterApp__WEBPACK_IMPORTED_MODULE_2__.ClusterApp, { clustering_data: (0,_ClusterApp_types__WEBPACK_IMPORTED_MODULE_9__.unserializeClusterFile)(clustering_data), base_url: base_media_url, editable: editable, editing: editing, formfield: formfield }));
+    (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ClusterApp_components_ClusterApp__WEBPACK_IMPORTED_MODULE_2__.ClusterApp, { clustering_data: (0,_ClusterApp_types__WEBPACK_IMPORTED_MODULE_10__.unserializeClusterFile)(clustering_data), base_url: base_media_url, editable: editable, editing: editing, formfield: formfield }));
 }
 function initProgressTracker(target_root, tracking_url) {
     /*
@@ -39170,8 +39257,8 @@ function initSimilaritySimBrowser(target_root, source_index_url, sim_matrix_url,
     */
     fetch(source_index_url).then(response => response.json()).then(source_index => {
         fetch(sim_matrix_url).then(response => response.json()).then(sim_matrix => {
-            const all_matches = (0,_SimilarityApp_utils_serialization__WEBPACK_IMPORTED_MODULE_8__.unserializeSimilarityMatrix)(sim_matrix, source_index);
-            (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_SimilarityApp__WEBPACK_IMPORTED_MODULE_6__.SimilarityApp, { index: all_matches.index, matches: all_matches.matches, mode: mode || "browse" }));
+            const all_matches = (0,_SimilarityApp_utils_serialization__WEBPACK_IMPORTED_MODULE_9__.unserializeSimilarityMatrix)(sim_matrix, source_index);
+            (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_SimilarityApp__WEBPACK_IMPORTED_MODULE_5__.SimilarityApp, { index: all_matches.index, matches: all_matches.matches, mode: mode || "browse" }));
         });
     });
 }
@@ -39185,7 +39272,7 @@ function initWatermarkMatches(target_root, query_image, matches, source_url) {
     source_url: the url of the folder of the index files (index.json, images)
     */
     fetch(source_url + "index.json").then(response => response.json()).then(index => {
-        const all_matches = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_5__.unserializeSingleWatermarkMatches)(query_image, matches, index, source_url);
+        const all_matches = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_8__.unserializeSingleWatermarkMatches)(query_image, matches, index, source_url);
         (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_WatermarkMatches__WEBPACK_IMPORTED_MODULE_4__.MatchViewer, { all_matches: all_matches }));
     });
 }
@@ -39198,7 +39285,7 @@ function initWatermarkSimBrowser(target_root, source_url) {
     */
     fetch(source_url + "similarity.json").then(response => response.json()).then(raw_matches => {
         fetch(source_url + "index.json").then(response => response.json()).then(raw_index => {
-            const { matches, index } = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_5__.unserializeWatermarkSimilarity)(raw_matches, raw_index, source_url);
+            const { matches, index } = (0,_WatermarkMatches_types__WEBPACK_IMPORTED_MODULE_8__.unserializeWatermarkSimilarity)(raw_matches, raw_index, source_url);
             (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(target_root).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_WatermarkMatches__WEBPACK_IMPORTED_MODULE_4__.WatermarkSimBrowser, { matches: matches, index: index }));
         });
     });
@@ -39208,7 +39295,10 @@ function initWatermarkSimBrowser(target_root, source_url) {
  * components are passed from the Django template.
  */
 function initImageGenericList(targetRoot, imageArray) {
-    (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(targetRoot).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_7__.ImageGenericList, { imageArray: imageArray }));
+    (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(targetRoot).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_6__.ImageGenericList, { imageArray: imageArray }));
+}
+function initDatasetImageBrowser(targetRoot, dataset, datasetFormat) {
+    (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(targetRoot).render((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_DatasetApp__WEBPACK_IMPORTED_MODULE_7__.DatasetImageBrowser, { dataset: dataset, datasetFormat: datasetFormat }));
 }
 
 
