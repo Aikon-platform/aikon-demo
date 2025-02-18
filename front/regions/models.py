@@ -49,17 +49,30 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                     extraction_ref = annotation_url.split("/")[-1]
                     self.regions[extraction_ref] = response.json()
                 except Exception:
-                    raise ValueError(
-                        f"Could not retrieve annotation from {annotation_url}"
+                    self.on_task_error(
+                        {"error": f"Could not retrieve regions from {annotation_url}"}
                     )
+                    return
 
-            with open(self.task_full_path / f"{self.dataset.id}.json", "w") as f:
-                json.dump(self.regions, f)
+            try:
+                with open(self.task_full_path / f"{self.dataset.id}.json", "w") as f:
+                    json.dump(self.regions, f)
+            except Exception:
+                self.on_task_error(
+                    {"error": f"Could not save extracted regions for {self.dataset.id}"}
+                )
+                return
 
-            dataset_url = output.get("dataset_url")
-            if dataset_url:
-                self.dataset.api_url = dataset_url
-                self.dataset.save()
+            try:
+                dataset_url = output.get("dataset_url")
+                if dataset_url:
+                    self.dataset.api_url = dataset_url
+                    self.dataset.save()
+            except Exception:
+                self.on_task_error(
+                    {"error": f"Could not save dataset from {dataset_url}"}
+                )
+                return
 
             result = self.dataset.apply_cropping(self.get_bounding_boxes())
             if "error" in result:
