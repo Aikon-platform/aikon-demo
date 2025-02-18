@@ -26,7 +26,7 @@ const toImageInfo = (img:DjangoImageInterface, imgIdx:number): ImageInfo => ({
     src: img.src,
 })
 
-const nonIiifDatasetToImagesInterfaceArray = (dataset:DjangoDatasetInterface):DatasetContentsInterface[] => {
+const nonIiifToDatasetContentsInterface = (dataset:DjangoDatasetInterface):DatasetContentsInterface[] => {
     const folderPathExtracter = (filePath:string):string =>
         filePath.split("/").slice(0,-1).join("/"),
           docContents =  Object.values(dataset)[0];
@@ -45,7 +45,7 @@ const nonIiifDatasetToImagesInterfaceArray = (dataset:DjangoDatasetInterface):Da
     );
 }
 
-const iiifDatasetToImagesInterfaceArray = (dataset:DjangoDatasetInterface):DatasetContentsInterface[] =>
+const iiifToDatasetContentsInterface = (dataset:DjangoDatasetInterface):DatasetContentsInterface[] =>
     Object.entries(dataset).map(([docUid, docImages]) => ({
         name: docUid,
         images:
@@ -61,8 +61,8 @@ const toDatasetImageBrowserInterface = (dataset:DjangoDatasetInterface, datasetF
     datasetHierarchy: datasetFormat === "iiif" ? "document" : "folder",
     datasetContents:
         datasetFormat === "iiif"
-        ? iiifDatasetToImagesInterfaceArray(dataset)
-        : nonIiifDatasetToImagesInterfaceArray(dataset)
+        ? iiifToDatasetContentsInterface(dataset)
+        : nonIiifToDatasetContentsInterface(dataset)
         .sort((a,b) => a.name.localeCompare(b.name))
 })
 
