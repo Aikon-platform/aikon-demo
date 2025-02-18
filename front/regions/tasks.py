@@ -10,6 +10,6 @@ All dramatiq tasks related to images regions extraction
 """
 
 
-@dramatiq.actor
-def collect_results(experiment_id: str, result_url: str):
-    pass
+# @dramatiq.actor
+# def collect_results(experiment_id: str, result_url: str):
+#     pass
