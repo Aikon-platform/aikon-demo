@@ -48,18 +48,22 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                     # self.regions[doc_uid] = response.json()
                     extraction_ref = annotation_url.split("/")[-1]
                     self.regions[extraction_ref] = response.json()
-                except Exception:
+                except Exception as e:
                     self.on_task_error(
-                        {"error": f"Could not retrieve regions from {annotation_url}"}
+                        {
+                            "error": f"Could not retrieve regions from {annotation_url}:\n{e}"
+                        }
                     )
                     return
 
             try:
                 with open(self.task_full_path / f"{self.dataset.id}.json", "w") as f:
                     json.dump(self.regions, f)
-            except Exception:
+            except Exception as e:
                 self.on_task_error(
-                    {"error": f"Could not save extracted regions for {self.dataset.id}"}
+                    {
+                        "error": f"Could not save extracted regions for {self.dataset.id}:\n{e}"
+                    }
                 )
                 return
 
@@ -68,9 +72,9 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                 if dataset_url:
                     self.dataset.api_url = dataset_url
                     self.dataset.save()
-            except Exception:
+            except Exception as e:
                 self.on_task_error(
-                    {"error": f"Could not save dataset from {dataset_url}"}
+                    {"error": f"Could not save dataset from {dataset_url}:\n{e}"}
                 )
                 return
 
