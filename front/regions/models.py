@@ -35,11 +35,8 @@ class Regions(AbstractAPITaskOnDataset("regions")):
             if not output:
                 self.on_task_error({"error": f"Incorrect output data:\n{pprint(data)}"})
                 return
-            # self.regions = output.get("annotations", {})
-            # with open(self.task_full_path / f"{self.dataset.id}.json", "w") as f:
-            #     json.dump(self.regions, f)
-
-            for doc_annotations in output.get("annotations", []):
+            self.regions = output.get("annotations", {})
+            for doc_annotations in output.get("results_url", []):
                 # digit_annotations is supposed to be {doc.uid: result_url}
                 doc_uid, annotation_url = next(iter(doc_annotations.items()))
                 try:
@@ -49,12 +46,13 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                     extraction_ref = annotation_url.split("/")[-1]
                     self.regions[extraction_ref] = response.json()
                 except Exception as e:
-                    self.on_task_error(
-                        {
-                            "error": f"Could not retrieve regions from {annotation_url}:\n{e}"
-                        }
-                    )
-                    return
+                    # self.on_task_error(
+                    #     {
+                    #         "error": f"Could not retrieve regions from {annotation_url}:\n{e}"
+                    #     }
+                    # )
+                    # return
+                    continue
 
             try:
                 with open(self.task_full_path / f"{self.dataset.id}.json", "w") as f:
