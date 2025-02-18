@@ -11,6 +11,9 @@ export interface DjangoImageInterface {
     metadata: string|undefined
 }
 
+/**
+ * a single document within DjangoDatasetInterface
+ */
 export interface DjangoDocumentInterface {
     [imgUid:string]: DjangoImageInterface
 }
@@ -18,29 +21,42 @@ export interface DjangoDocumentInterface {
 /**
  * an entire dataset as sent from the Django backend.
  * each document is identified by its UUID and mapped
- * to an object mappign image uids to DjangoImageInterface
+ * to an object mapping image uids to DjangoImageInterface
  */
-export interface DjangoDatasetImagesInterface {
+export interface DjangoDatasetInterface {
     [docUid:string]: DjangoDocumentInterface
 }
 
 /**
- * single folder structure expected by the DatasetImageBrowser component
+ * to qualify the hierarchy
  */
-export interface FolderImagesInterface {
-    folderPath: string,
-    folderImages: ImageInfo[]
+export type DocumentHierarchyType = "folder"|"document";
+
+/**
+ * allowed dataset formats
+ */
+export type DatasetFormatType = "zip" | "iiif" | "pdf";
+
+/**
+ * a container mapped to the images it contains.
+ */
+export interface DatasetContentsInterface {
+    name: string,
+    images: ImageInfo[]
 }
 
 /**
- * single document structure expected by the DatasetImageBrowser component
+ * frontend representation of a dataset. depending on `datasetFormat`,
+ * `datasetHierarchy` will vary. `datasetHierarchy` qualifies the different
+ * elements in `datasetContents`:
+ * - if the datasetFormat is IIIF, then datasetContents will have
+ *      one DatasetContentsInterface  per document)
+ * - otherwise, datasetContents will have one DatasetContentsInterface
+ *      per folder)
  */
-export interface DocumentImagesInterface {
-    documentUid: string,
-    documentFolders: FolderImagesInterface[]
-}
 
-/**
- * data structure expected by the DatasetImageBrowser component
- */
-export interface DatasetImageBrowserInterface extends Array<DocumentImagesInterface> { }
+export interface DatasetImageBrowserInterface {
+    datasetHierarchy: DocumentHierarchyType,
+    datasetFormat: DatasetFormatType,
+    datasetContents: DatasetContentsInterface[]
+}

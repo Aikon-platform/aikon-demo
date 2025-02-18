@@ -35412,50 +35412,43 @@ __webpack_require__.r(__webpack_exports__);
 
 /**********************************************/
 // converters
-const imgToImageInfo = (img, imgIdx) => ({
+const toImageInfo = (img, imgIdx) => ({
     id: img.id,
     num: imgIdx,
     url: img.url,
     src: img.src,
 });
-// the returned FolderImagesInterface[] is sorted alphanuerically by folder name
-const toFolderImagesInterfaceArray = (docContents) => {
-    const folderPathExtracter = (filePath) => filePath.split("/").slice(0, -1).join("/");
-    let documentImageArray = Object.entries(docContents).map(([imgUid, img], idx) => imgToImageInfo(img, idx));
+const nonIiifDatasetToImagesInterfaceArray = (dataset) => {
+    const folderPathExtracter = (filePath) => filePath.split("/").slice(0, -1).join("/"), docContents = Object.values(dataset)[0];
+    let documentImageArray = Object.entries(docContents).map(([imgUid, img], idx) => toImageInfo(img, idx));
     let folderPathArray = [...new Set(documentImageArray.map(img => folderPathExtracter(img.url)))];
     return folderPathArray.map(folderPath => ({
-        folderPath: folderPath,
-        folderImages: documentImageArray.filter(documentImage => folderPathExtracter(documentImage.url) === folderPath)
-    })).sort((a, b) => a.folderPath.localeCompare(b.folderPath));
-};
-const toDocumentImagesInterface = (docUid, docContents) => ({
-    documentUid: docUid,
-    documentFolders: toFolderImagesInterfaceArray(docContents)
-});
-// the returned DatasetImageBrowserInterface is sorted by each document's UUID.
-const toDatasetImageBrowserInterface = (dataset) => Object
-    .entries(dataset)
-    .map(([docUid, docContents]) => toDocumentImagesInterface(docUid, docContents))
-    .sort((a, b) => a.documentUid.localeCompare(b.documentUid));
-const toDatasetBrowserAgnostic = (dataset, datasetFormat) => datasetFormat === "iiif"
-    // dataset may contain several documents, but no subfolders
-    ? dataset.map(({ documentUid, documentFolders }) => ({
-        name: documentUid,
-        images: documentFolders.map(({ folderPath, folderImages }) => folderImages).reduce((previousVal, currentVal) => previousVal.concat(currentVal))
-    }))
-    // dataset contains only one document, but may contain folders
-    : dataset[0].documentFolders.map(({ folderPath, folderImages }) => ({
         name: folderPath,
-        images: folderImages
+        images: documentImageArray.filter(documentImage => folderPathExtracter(documentImage.url) === folderPath)
     }));
-// TODO cleanup : homogenize interfaces, clarify names, see if we can do without `toDatasetImageBrowserInterface`.
+};
+const iiifDatasetToImagesInterfaceArray = (dataset) => Object.entries(dataset).map(([docUid, docImages]) => ({
+    name: docUid,
+    images: Object
+        .entries(docImages)
+        .map(([imgUid, img], idx) => toImageInfo(img, idx))
+}));
+// to preserve structure, datasetContents is sorted by the `name` key of each item.
+const toDatasetImageBrowserInterface = (dataset, datasetFormat) => ({
+    datasetFormat: datasetFormat,
+    datasetHierarchy: datasetFormat === "iiif" ? "document" : "folder",
+    datasetContents: datasetFormat === "iiif"
+        ? iiifDatasetToImagesInterfaceArray(dataset)
+        : nonIiifDatasetToImagesInterfaceArray(dataset)
+            .sort((a, b) => a.name.localeCompare(b.name))
+});
 /**********************************************/
 // component
 function DatasetImageBrowser({ dataset, datasetFormat }) {
     // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
     const folderPathCleaner = (folderPath) => folderPath.split("/").slice(5).join("/") + "/";
-    const datasetRetyped1 = toDatasetImageBrowserInterface(dataset), datasetRetyped2 = toDatasetBrowserAgnostic(datasetRetyped1, datasetFormat);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: datasetRetyped2.map(({ name, images }, idx) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { id: name, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", { className: "id-suffix", children: ["Images of ", datasetFormat === "iiif"
+    const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat);
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: datasetAsInterface.datasetContents.map(({ name, images }, idx) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { id: name, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", { className: "id-suffix", children: ["Images in ", datasetFormat === "iiif"
                             ? `document #${idx + 1}`
                             : `folder ${folderPathCleaner(name)}`] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_1__.ImageGenericList, { imageArray: images }) })] }, name))) }));
 }

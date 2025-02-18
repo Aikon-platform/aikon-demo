@@ -7,11 +7,11 @@ import { SimilarityApp } from './SimilarityApp';
 import { SimilarityMode } from './SimilarityApp/components/SimilarityApp';
 import { ImageGenericList } from "./shared";
 import { DatasetImageBrowser } from "./DatasetApp";
-import { DjangoDatasetImagesInterface } from './DatasetApp/types';
+import { DjangoDatasetInterface } from './DatasetApp/types';
 
 import { unserializeSingleWatermarkMatches, unserializeWatermarkSimilarity } from './WatermarkMatches/types';
 import { ImageInfo } from "./shared/types";
-import { DatasetFormat } from "./shared/types";
+import { DatasetFormatType } from "./DatasetApp/types";
 import { unserializeSimilarityMatrix } from "./SimilarityApp/utils/serialization";
 import { unserializeClusterFile } from './ClusterApp/types';
 
@@ -118,8 +118,8 @@ function initImageGenericList(targetRoot:HTMLElement, imageArray:ImageInfo[]) {
 
 function initDatasetImageBrowser(
     targetRoot:HTMLElement,
-    dataset:DjangoDatasetImagesInterface,
-    datasetFormat:DatasetFormat
+    dataset:DjangoDatasetInterface,
+    datasetFormat:DatasetFormatType
 ) {
     createRoot(targetRoot).render(<DatasetImageBrowser dataset={dataset} datasetFormat={datasetFormat} />)
 }
