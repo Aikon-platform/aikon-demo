@@ -6,7 +6,7 @@ from django.db import models
 from django.conf import settings
 import requests
 
-from shared.utils import zip_on_the_fly
+from shared.utils import zip_on_the_fly, pprint
 from tasking.models import AbstractAPITaskOnDataset
 
 
@@ -33,7 +33,7 @@ class Regions(AbstractAPITaskOnDataset("regions")):
         if data is not None:
             output = data.get("output", {})
             if not output:
-                self.on_task_error({"error": "No output data"})
+                self.on_task_error({"error": f"Incorrect output data:\n{pprint(data)}"})
                 return
             # self.regions = output.get("annotations", {})
             # with open(self.task_full_path / f"{self.dataset.id}.json", "w") as f:
