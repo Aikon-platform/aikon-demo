@@ -36,6 +36,9 @@ export function fetchIIIFNames(sources: Document[], callback: (context: NameProv
                 if (metadata.title === undefined)
                     metadata.title = source.name;
 
+                if (metadata.classmark !== undefined)
+                    metadata.title = metadata.classmark + " " + metadata.title;
+
                 // extract image names?
                 const canvases = manifest.sequences && manifest.sequences[0]?.canvases;
                 const image_labels = canvases && Object.fromEntries(canvases.map((canvas: any) => {
@@ -52,4 +55,16 @@ export function fetchIIIFNames(sources: Document[], callback: (context: NameProv
             await new Promise(resolve => setTimeout(resolve, 300));
         }
     });
+}
+
+export function sortImages(context: NameProvider, images: ImageInfo[]): ImageInfo[] {
+    const sortfn = (a: ImageInfo, b: ImageInfo) => {
+        const source_a = getSourceName(context, a.document);
+        const source_b = getSourceName(context, b.document);
+        if (source_a === source_b) {
+            return getImageName(context, a).localeCompare(getImageName(context, b));
+        }
+        return (source_a || "").localeCompare(source_b || "");
+    }
+    return images.sort(sortfn);
 }

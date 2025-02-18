@@ -1,7 +1,7 @@
 import React from "react";
 import { SimilarityIndex, SimilarityMatches } from "../types";
 import { NameProvider } from "../../shared/types";
-import { fetchIIIFNames, NameProviderContext } from "../../shared/naming";
+import { fetchIIIFNames, NameProviderContext, sortImages } from "../../shared/naming";
 import { ImageMagnifier, MagnifyingContext, MagnifyProps } from "../../shared/ImageMagnifier";
 import { Cluster, connectedComponents, convertToClusteringFile, graphFromSimilarityMatches } from "../utils/clustering";
 import { ImageDisplay, ImageToDisplay } from "../../shared/ImageDisplay";
@@ -105,7 +105,8 @@ function ClusterMiniElement ({cluster, index}: {cluster: Cluster, index: Similar
         {expanded ? "–" : "+"}{cluster.members.length - n_shown}
         </a>
     );
-    const images = cluster.members.map((i) => index.images[i]);
+    const context = React.useContext(NameProviderContext);
+    const images = sortImages(context, cluster.members.map((i) => index.images[i]));
 
     return (
     <div className="cl-cluster box">

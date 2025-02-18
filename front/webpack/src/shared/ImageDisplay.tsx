@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { MatchTransposition } from "../SimilarityApp/types";
-import { ImageInfo } from "./types";
+import { Document, ImageInfo } from "./types";
 import React from "react";
 import { MagnifyingContext } from "./ImageMagnifier";
 import { TooltipContext } from "./ImageTooltip";
@@ -12,6 +12,8 @@ export interface ImageToDisplay {
     link?: string;
     title?: string;
     subtitle?: string;
+    document?: Document;
+    metadata?: any;
 }
 
 interface ImageDisplayProps {
