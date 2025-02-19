@@ -36735,12 +36735,31 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ImageGeneric: () => (/* binding */ ImageGeneric)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
+/* harmony import */ var _ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ImageMagnifier */ "./src/shared/ImageMagnifier.tsx");
+/* harmony import */ var _ImageTooltip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ImageTooltip */ "./src/shared/ImageTooltip.tsx");
+
+/**
+ * a generic display for an Image and its metadata.
+ * inspired by SimilarityApp.components.MatchGroup
+ *
+ * ImageFileDisplay focuses only on displaying the image file
+ * itself, while ImageGeneric is a fully-fledged component
+ * with metadata (title...).
+ *
+ * TODO fuse with SimilarityApp.components.MatchGroup ?
+ */
+
+
 
 
 function ImageGeneric(props) {
     const image = props.image;
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-outer-wrapper", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "image-generic-inner-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-title", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageIdentification, { image: image, filenameDisplay: false }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-content mb-1", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageFileDisplay, { image: image }) })] }) }));
+    const [magnifying, setMagnifying] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(null);
+    const [tooltip, setTooltip] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(undefined);
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext.Provider, { value: { magnify: setMagnifying }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_ImageTooltip__WEBPACK_IMPORTED_MODULE_4__.TooltipContext.Provider, { value: { setTooltip }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-outer-wrapper", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "image-generic-inner-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-title", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageIdentification, { image: image, filenameDisplay: false }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-content mb-1", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageFileDisplay, { image: image }) })] }) }), magnifying && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.ImageMagnifier, Object.assign({}, magnifying)), tooltip && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageTooltip__WEBPACK_IMPORTED_MODULE_4__.ImageTooltip, Object.assign({}, tooltip))] }) }));
 }
 
 
@@ -36757,21 +36776,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ImageGenericList: () => (/* binding */ ImageGenericList)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
-/* harmony import */ var _ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ImageMagnifier */ "./src/shared/ImageMagnifier.tsx");
-
-/**
- * an array of images displayed as a bulma `columns` inside an invisible `html:ul`
- */
-
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! . */ "./src/shared/index.tsx");
 
 
 function ImageGenericList(props) {
     const imageArray = props.imageArray;
-    const [magnifying, setMagnifying] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(null);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext.Provider, { value: { magnify: setMagnifying }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "columns is-mobile is-multiline list-invisible", children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { className: "column is-flex", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageGeneric, { image: image }) }, image.id))) }), magnifying && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.ImageMagnifier, Object.assign({}, magnifying))] }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "columns is-mobile is-multiline list-invisible", children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { className: "column is-flex", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageGeneric, { image: image }) }, image.id))) }));
 }
 
 
