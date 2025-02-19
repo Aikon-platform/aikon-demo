@@ -35,10 +35,12 @@ export function ImageFileDisplay({image, similarity, transpositions, comparison,
         <div className="display-item"
             onMouseEnter={() => tooltip.setTooltip && tooltip.setTooltip({image: image, transpositions})}
             onMouseLeave={() => tooltip.setTooltip && tooltip.setTooltip()}
-            >
+        >
             <div className="display-image">
-                <img src={image.url} alt={image.id} className={"display-img "+(transpositions || []).join(" ")}
-                onClick={!disable_magnify ? (() => magnifier.magnify && magnifier.magnify({image: image, transpositions, comparison})) : undefined}
+                <img src={image.url}
+                     alt={image.id}
+                     className={"image display-img "+(transpositions || []).join(" ")}
+                     onClick={!disable_magnify ? (() => magnifier.magnify && magnifier.magnify({image: image, transpositions, comparison})) : undefined}
                 />
             </div>
             <div className="display-tools" onClick={(e) => e.stopPropagation()}>

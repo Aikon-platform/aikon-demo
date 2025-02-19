@@ -35418,7 +35418,7 @@ const toImageInfo = (img, imgIdx) => ({
     url: img.url,
     src: img.src,
 });
-const nonIiifDatasetToImagesInterfaceArray = (dataset) => {
+const nonIiifToDatasetContentsInterface = (dataset) => {
     const folderPathExtracter = (filePath) => filePath.split("/").slice(0, -1).join("/"), docContents = Object.values(dataset)[0];
     let documentImageArray = Object.entries(docContents).map(([imgUid, img], idx) => toImageInfo(img, idx));
     let folderPathArray = [...new Set(documentImageArray.map(img => folderPathExtracter(img.url)))];
@@ -35427,7 +35427,7 @@ const nonIiifDatasetToImagesInterfaceArray = (dataset) => {
         images: documentImageArray.filter(documentImage => folderPathExtracter(documentImage.url) === folderPath)
     }));
 };
-const iiifDatasetToImagesInterfaceArray = (dataset) => Object.entries(dataset).map(([docUid, docImages]) => ({
+const iiifToDatasetContentsInterface = (dataset) => Object.entries(dataset).map(([docUid, docImages]) => ({
     name: docUid,
     images: Object
         .entries(docImages)
@@ -35438,8 +35438,8 @@ const toDatasetImageBrowserInterface = (dataset, datasetFormat) => ({
     datasetFormat: datasetFormat,
     datasetHierarchy: datasetFormat === "iiif" ? "document" : "folder",
     datasetContents: datasetFormat === "iiif"
-        ? iiifDatasetToImagesInterfaceArray(dataset)
-        : nonIiifDatasetToImagesInterfaceArray(dataset)
+        ? iiifToDatasetContentsInterface(dataset)
+        : nonIiifToDatasetContentsInterface(dataset)
             .sort((a, b) => a.name.localeCompare(b.name))
 });
 /**********************************************/
@@ -36715,7 +36715,7 @@ function ImageFileDisplay({ image, similarity, transpositions, comparison, href,
     const magnifier = react__WEBPACK_IMPORTED_MODULE_2___default().useContext(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext);
     const tooltip = react__WEBPACK_IMPORTED_MODULE_2___default().useContext(_ImageTooltip__WEBPACK_IMPORTED_MODULE_4__.TooltipContext);
     const [pinned, setPinned] = react__WEBPACK_IMPORTED_MODULE_2___default().useState(false);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "display-item", onMouseEnter: () => tooltip.setTooltip && tooltip.setTooltip({ image: image, transpositions }), onMouseLeave: () => tooltip.setTooltip && tooltip.setTooltip(), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "display-image", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("img", { src: image.url, alt: image.id, className: "display-img " + (transpositions || []).join(" "), onClick: !disable_magnify ? (() => magnifier.magnify && magnifier.magnify({ image: image, transpositions, comparison })) : undefined }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "display-tools", onClick: (e) => e.stopPropagation(), children: [image.link && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", { href: image.link, className: "image-source", target: "_blank", title: "See in context", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_1__.Icon, { icon: "mdi:book-open-blank-variant" }) }), magnifier.setComparison &&
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "display-item", onMouseEnter: () => tooltip.setTooltip && tooltip.setTooltip({ image: image, transpositions }), onMouseLeave: () => tooltip.setTooltip && tooltip.setTooltip(), children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "display-image", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("img", { src: image.url, alt: image.id, className: "image display-img " + (transpositions || []).join(" "), onClick: !disable_magnify ? (() => magnifier.magnify && magnifier.magnify({ image: image, transpositions, comparison })) : undefined }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "display-tools", onClick: (e) => e.stopPropagation(), children: [image.link && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", { href: image.link, className: "image-source", target: "_blank", title: "See in context", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_1__.Icon, { icon: "mdi:book-open-blank-variant" }) }), magnifier.setComparison &&
                         (!pinned ?
                             (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", { href: "javascript:void(0)", className: "image-pin", title: "Pin as comparison", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_1__.Icon, { icon: "mdi:pin", onClick: () => magnifier.setComparison(image, setPinned) }) }) :
                             (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", { href: "javascript:void(0)", className: "image-pin always-visible", title: "Pin as comparison", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_1__.Icon, { icon: "mdi:pin-off", onClick: () => magnifier.setComparison(undefined) }) })), magnifier.magnify && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", { href: "javascript:void(0)", className: "image-magnify", title: "Magnify", onClick: () => magnifier.magnify({ image: image, transpositions: transpositions, comparison }), children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_1__.Icon, { icon: "mdi:arrow-expand" }) }), href && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("a", { href: href, className: "image-focus", title: "Show detail", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_iconify_react__WEBPACK_IMPORTED_MODULE_1__.Icon, { icon: "mdi:image-search" }) })] }), similarity && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { className: "similarity", children: similarity })] }));
@@ -36740,7 +36740,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function ImageGeneric(props) {
     const image = props.image;
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "column image-generic-outer-wrapper", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "image-generic-inner-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-title", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageIdentification, { image: image }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-content", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageFileDisplay, { image: image }) })] }) }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-outer-wrapper", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "image-generic-inner-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-title", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageIdentification, { image: image, filenameDisplay: false }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-content mb-1", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.ImageFileDisplay, { image: image }) })] }) }));
 }
 
 
@@ -36771,7 +36771,7 @@ __webpack_require__.r(__webpack_exports__);
 function ImageGenericList(props) {
     const imageArray = props.imageArray;
     const [magnifying, setMagnifying] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(null);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext.Provider, { value: { magnify: setMagnifying }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "columns is-mobile is-multiline list-invisible", children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageGeneric, { image: image }) }, image.id))) }), magnifying && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.ImageMagnifier, Object.assign({}, magnifying))] }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext.Provider, { value: { magnify: setMagnifying }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("ul", { className: "columns is-mobile is-multiline list-invisible", children: imageArray.map(image => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("li", { className: "column is-flex", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageGeneric, { image: image }) }, image.id))) }), magnifying && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.ImageMagnifier, Object.assign({}, magnifying))] }));
 }
 
 
@@ -36794,13 +36794,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function ImageIdentification({ image, isTitle = false, prefix = "" }) {
+function ImageIdentification({ image, isTitle = false, prefix = "", filenameDisplay = true }) {
     var _a, _b;
     const nameProvider = react__WEBPACK_IMPORTED_MODULE_2___default().useContext(_naming__WEBPACK_IMPORTED_MODULE_1__.NameProviderContext);
     const fallbackName = isTitle ? ((_a = image.document) === null || _a === void 0 ? void 0 : _a.name) || image.id : image.name;
     const Tag = isTitle ? 'h4' : 'span';
-    const classes = isTitle ? "mt-2" : "";
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(Tag, { className: classes, title: (0,_naming__WEBPACK_IMPORTED_MODULE_1__.getImageName)(nameProvider, image) || fallbackName, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "tag is-light is-bold mb-3", children: [prefix ? `${prefix} ` : "", "Image #", image.num] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("br", {}), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: (0,_naming__WEBPACK_IMPORTED_MODULE_1__.getImageName)(nameProvider, image, !isTitle) || fallbackName })] }), isTitle && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { children: (0,_naming__WEBPACK_IMPORTED_MODULE_1__.getSourceName)(nameProvider, image.document) || ((_b = image.document) === null || _b === void 0 ? void 0 : _b.name) || image.subtitle || "" })] }));
+    const classes = `title-identification ${isTitle ? "mt-2" : ""}`;
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(Tag, { className: classes, title: (0,_naming__WEBPACK_IMPORTED_MODULE_1__.getImageName)(nameProvider, image) || fallbackName, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("span", { className: "tag is-light is-bold mb-3", children: [prefix ? `${prefix} ` : "", "Image #", image.num] }), filenameDisplay &&
+                        (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)((react__WEBPACK_IMPORTED_MODULE_2___default().Fragment), { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("br", {}), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: (0,_naming__WEBPACK_IMPORTED_MODULE_1__.getImageName)(nameProvider, image, !isTitle) || fallbackName })] })] }), isTitle && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", { children: (0,_naming__WEBPACK_IMPORTED_MODULE_1__.getSourceName)(nameProvider, image.document) || ((_b = image.document) === null || _b === void 0 ? void 0 : _b.name) || image.subtitle || "" })] }));
 }
 
 

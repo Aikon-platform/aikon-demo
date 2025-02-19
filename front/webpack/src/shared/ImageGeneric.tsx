@@ -19,12 +19,13 @@ export function ImageGeneric(props: { image: ImageInfo }) {
     const image = props.image;
 
     return (
-        <div className="column image-generic-outer-wrapper">
+        <div className="image-generic-outer-wrapper">
             <div className="image-generic-inner-wrapper">
                 <div className="image-generic-title">
-                    <ImageIdentification image={image}/>
+                    {<ImageIdentification image={image} filenameDisplay={false}/>}
+
                 </div>
-                <div className="image-generic-content">
+                <div className="image-generic-content mb-1">
                     <ImageFileDisplay image={image}></ImageFileDisplay>
                 </div>
             </div>

@@ -85,6 +85,7 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
                         <img src={image.url} alt={image.id} className={"display-img " + (transf.join(" "))} />
                     </div>
                     <div className="magnifying-info">
+
                         <ImageIdentification image={image} isTitle={true}/>
                         <p className="actions my-2">
                             <IconBtn icon="mdi:rotate-left" onClick={() => manualTransform(-90, false)} />
@@ -92,6 +93,7 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
                             <IconBtn icon="mdi:flip-horizontal" onClick={() => manualTransform(0, true)} />
                         </p>
                         {image.link && <p><a href={image.link} target="_blank">See in context</a></p>}
+
                     </div>
                 </div>
             </div>

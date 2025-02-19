@@ -18,7 +18,9 @@ export function ImageGenericList(props: { imageArray:ImageInfo[] }) {
         <MagnifyingContext.Provider value={{ magnify: setMagnifying }}>
             <ul className="columns is-mobile is-multiline list-invisible">
             { imageArray.map(image =>
-                (<li key={image.id}><ImageGeneric image={image}/></li>)) }
+                (<li key={image.id} className="column is-flex">
+                    <ImageGeneric image={image}/>
+                </li>)) }
             </ul>
             {magnifying && <ImageMagnifier {...magnifying} />}
         </MagnifyingContext.Provider>
