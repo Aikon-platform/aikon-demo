@@ -101,8 +101,5 @@ class DatasetMainView(DatasetMixin, DetailView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         # so far, this is purely for debug purposes
         context = super().get_context_data(**kwargs)
+
         return context
-
-
-
-

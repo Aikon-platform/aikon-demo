@@ -1,5 +1,9 @@
 @import "_variables";
 
+.dataset-view-structure {
+    max-height: 40vh;
+    overflow: scroll;
+}
 
 .image-generic-outer-wrapper {
     outline: 1px solid lighten($faded-color, 5%);

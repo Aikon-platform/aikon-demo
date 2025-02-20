@@ -35396,6 +35396,49 @@ function serializeClusterFile(file) {
 
 /***/ }),
 
+/***/ "./src/DatasetApp/components/DatasetContentsItem.tsx":
+/*!***********************************************************!*\
+  !*** ./src/DatasetApp/components/DatasetContentsItem.tsx ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DatasetContentsItem: () => (/* binding */ DatasetContentsItem)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
+
+/**
+ * display the all the images in a singleDatasetContentsItemInterface
+ * (i.e., either a document or a folder within a dataset).
+ *
+ * a button can toggle between displaying 4 images and displaying
+ * all images, based on `displayLength` and `useDisplayLength`
+ */
+
+
+// itemIndex is the position of `datasetContentsItem` within the `DatasetImageBrowserInterface.datasetContents` array.
+function DatasetContentsItem({ datasetContentsItem, datasetFormat, itemIndex }) {
+    // handle the number of images to display (between 4 and the whole dataset)
+    const defaultDisplayLength = 4, [displayLength, setDisplayLength] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(defaultDisplayLength), updateDisplayLength = () => setDisplayLength(displayLength === defaultDisplayLength
+        ? datasetContentsItem.images.length
+        : defaultDisplayLength),
+    // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
+    folderPathCleaner = (folderPath) => folderPath.split("/").slice(5).join("/") + "/";
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "dci-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "dci-title is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", { className: "id-suffix m-0", children: ["Images in ", datasetFormat === "iiif"
+                                ? `document #${itemIndex + 1}`
+                                : `folder ${folderPathCleaner(datasetContentsItem.name)}`] }), datasetContentsItem.images.length > defaultDisplayLength &&
+                        (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => updateDisplayLength(), className: "button", children: displayLength === defaultDisplayLength
+                                ? "See more"
+                                : "See less" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_2__.ImageGenericList, { imageArray: datasetContentsItem.images.slice(0, displayLength) })] }));
+}
+
+
+/***/ }),
+
 /***/ "./src/DatasetApp/components/DatasetImageBrowser.tsx":
 /*!***********************************************************!*\
   !*** ./src/DatasetApp/components/DatasetImageBrowser.tsx ***!
@@ -35407,7 +35450,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   DatasetImageBrowser: () => (/* binding */ DatasetImageBrowser)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var _DatasetImageList__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DatasetImageList */ "./src/DatasetApp/components/DatasetImageList.tsx");
+/* harmony import */ var _DatasetContentsItem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DatasetContentsItem */ "./src/DatasetApp/components/DatasetContentsItem.tsx");
 
 
 /**********************************************/
@@ -35450,41 +35493,7 @@ const toDatasetImageBrowserInterface = (dataset, datasetFormat) => ({
 // component
 function DatasetImageBrowser({ dataset, datasetFormat }) {
     const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat);
-    // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
-    const folderPathCleaner = (folderPath) => folderPath.split("/").slice(5).join("/") + "/";
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: datasetAsInterface.datasetContents.map(({ name, images }, idx) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { id: name, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", { className: "id-suffix", children: ["Images in ", datasetFormat === "iiif"
-                            ? `document #${idx + 1}`
-                            : `folder ${folderPathCleaner(name)}`] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_DatasetImageList__WEBPACK_IMPORTED_MODULE_1__.DatasetImageList, { imageArray: images })] }, name))) }));
-}
-
-
-/***/ }),
-
-/***/ "./src/DatasetApp/components/DatasetImageList.tsx":
-/*!********************************************************!*\
-  !*** ./src/DatasetApp/components/DatasetImageList.tsx ***!
-  \********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DatasetImageList: () => (/* binding */ DatasetImageList)
-/* harmony export */ });
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
-
-
-
-function DatasetImageList({ imageArray }) {
-    const defaultDisplayLength = 4, [displayLength, setDisplayLength] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(defaultDisplayLength), updateDisplayLength = () => setDisplayLength(displayLength === defaultDisplayLength
-        ? imageArray.length
-        : defaultDisplayLength);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "list-wrapper", children: [imageArray.length > defaultDisplayLength &&
-                (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => updateDisplayLength(), className: "button", children: displayLength === defaultDisplayLength
-                        ? "Voir plus"
-                        : "Voir moins" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_2__.ImageGenericList, { imageArray: imageArray.slice(0, displayLength) })] }));
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: datasetAsInterface.datasetContents.map((datasetContentsItem, idx) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { id: datasetContentsItem.name, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_DatasetContentsItem__WEBPACK_IMPORTED_MODULE_1__.DatasetContentsItem, { datasetContentsItem: datasetContentsItem, datasetFormat: datasetFormat, itemIndex: idx }) }, datasetContentsItem.name))) }));
 }
 
 
@@ -36790,10 +36799,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function ImageGeneric(props) {
-    const image = props.image;
-    const [magnifying, setMagnifying] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(null);
-    const [tooltip, setTooltip] = react__WEBPACK_IMPORTED_MODULE_1___default().useState(undefined);
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext.Provider, { value: { magnify: setMagnifying }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_ImageTooltip__WEBPACK_IMPORTED_MODULE_4__.TooltipContext.Provider, { value: { setTooltip }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-outer-wrapper", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "image-generic-inner-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-title", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageIdentification, { image: image, filenameDisplay: false }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-content mb-1", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageFileDisplay, { image: image }) })] }) }), magnifying && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.ImageMagnifier, Object.assign({}, magnifying)), tooltip && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageTooltip__WEBPACK_IMPORTED_MODULE_4__.ImageTooltip, Object.assign({}, tooltip))] }) }));
+    const image = props.image, [magnifying, setMagnifying] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), [tooltip, setTooltip] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(undefined), [mounted, setMounted] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
+    // toggles the value of `mounted` to `true` when the component is mounted.
+    (0,react__WEBPACK_IMPORTED_MODULE_1__.useEffect)(() => setMounted(true), []);
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.MagnifyingContext.Provider, { value: { magnify: setMagnifying }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(_ImageTooltip__WEBPACK_IMPORTED_MODULE_4__.TooltipContext.Provider, { value: { setTooltip }, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-outer-wrapper", style: { transition: "opacity 1s",
+                        opacity: mounted ? 1 : 0 }, children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "image-generic-inner-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-title", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageIdentification, { image: image, filenameDisplay: false }) }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "image-generic-content mb-1", children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(___WEBPACK_IMPORTED_MODULE_2__.ImageFileDisplay, { image: image }) })] }) }), magnifying && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageMagnifier__WEBPACK_IMPORTED_MODULE_3__.ImageMagnifier, Object.assign({}, magnifying)), tooltip && (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_ImageTooltip__WEBPACK_IMPORTED_MODULE_4__.ImageTooltip, Object.assign({}, tooltip))] }) }));
 }
 
 

@@ -9,7 +9,7 @@
  * TODO fuse with SimilarityApp.components.MatchGroup ?
  */
 
-import React from "react";
+import { useEffect, useState } from "react";
 
 import { ImageInfo } from "./types";
 import { ImageIdentification, ImageFileDisplay } from ".";
@@ -18,15 +18,22 @@ import { ImageTooltip, TooltipContext, TooltipProps } from "./ImageTooltip";
 
 
 export function ImageGeneric(props: { image: ImageInfo }) {
-    const image = props.image;
-    const [magnifying, setMagnifying] = React.useState<MagnifyProps | null>(null);
-    const [tooltip, setTooltip] = React.useState<TooltipProps | undefined>(undefined);
+    const image = props.image,
+          [magnifying, setMagnifying] = useState<MagnifyProps | null>(null),
+          [tooltip, setTooltip] = useState<TooltipProps | undefined>(undefined),
+          [mounted, setMounted] = useState<boolean>(false);
+
+    // toggles the value of `mounted` to `true` when the component is mounted.
+    useEffect(() => setMounted(true), []);
 
     return (
         <MagnifyingContext.Provider value={{ magnify: setMagnifying }}>
             <TooltipContext.Provider value={{ setTooltip }}>
 
-            <div className="image-generic-outer-wrapper">
+            <div className="image-generic-outer-wrapper"
+                 style={{ transition: "opacity 1s",
+                          opacity: mounted ? 1 : 0 }}
+            >
                 <div className="image-generic-inner-wrapper">
                     <div className="image-generic-title">
                         {<ImageIdentification image={image} filenameDisplay={false}/>}

@@ -22353,6 +22353,11 @@ ul.messages li.warning, ul.messages li.error {
   display: none;
 }
 
+.dataset-view-structure {
+  max-height: 40vh;
+  overflow: scroll;
+}
+
 .image-generic-outer-wrapper {
   outline: 1px solid hsl(233, 100%, 93%);
   border-radius: 10px;

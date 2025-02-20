@@ -8,7 +8,7 @@
  */
 
 import { ImageInfo } from "../../shared/types";
-import { DatasetImageList } from "./DatasetImageList";
+import { DatasetContentsItem } from "./DatasetContentsItem";
 
 import { DatasetFormatType,
          DjangoDatasetInterface,
@@ -75,21 +75,15 @@ export function DatasetImageBrowser({ dataset, datasetFormat }: { dataset:Django
 
     const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat) as DatasetImageBrowserInterface;
 
-    // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
-    const folderPathCleaner = (folderPath:string):string =>
-        folderPath.split("/").slice(5,).join("/") + "/";
-
     return (
         <div>
-        { datasetAsInterface.datasetContents.map(({name, images}, idx) =>
-            (<div id={name}
-                  key={name}>
-                <h3 className="id-suffix">Images in {
-                    datasetFormat === "iiif"
-                    ? `document #${idx+1}`
-                    : `folder ${folderPathCleaner(name)}`
-                }</h3>
-                <DatasetImageList imageArray={images} />
+        { datasetAsInterface.datasetContents.map((datasetContentsItem, idx) =>
+            (<div id={datasetContentsItem.name}
+                  key={datasetContentsItem.name}>
+                <DatasetContentsItem datasetContentsItem={datasetContentsItem}
+                                     datasetFormat={datasetFormat}
+                                     itemIndex={idx}
+                />
             </div>)
         )}
         </div>

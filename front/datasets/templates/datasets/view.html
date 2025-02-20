@@ -5,6 +5,9 @@
 
 {% block content %}
 <div class="centerwrap">
+
+    {% include "datasets/includes/breadcrumbs.html" %}
+
     <!-- TITLE SECTION -->
     <div class="columns is-vcentered">
         <div class="column is-two-thirds">
@@ -67,7 +70,7 @@
             >
                 {% for document in dataset.documents %}
                     <h3 class="id-suffix">File structure of document #{{ forloop.counter }}</h3>
-                    <div>{{ dataset.documents.0.document_tree|safe }}</div>
+                    <div class="dataset-view-structure">{{ dataset.documents.0.document_tree|safe }}</div>
                 {% endfor %}
             </div>
             <div id="tab-body-images"
