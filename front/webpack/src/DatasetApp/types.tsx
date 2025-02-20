@@ -40,7 +40,7 @@ export type DatasetFormatType = "zip" | "iiif" | "pdf";
 /**
  * a container mapped to the images it contains.
  */
-export interface DatasetContentsInterface {
+export interface DatasetContentsItemInterface {
     name: string,
     images: ImageInfo[]
 }
@@ -50,13 +50,13 @@ export interface DatasetContentsInterface {
  * `datasetHierarchy` will vary. `datasetHierarchy` qualifies the different
  * elements in `datasetContents`:
  * - if the datasetFormat is IIIF, then datasetContents will have
- *      one DatasetContentsInterface  per document)
- * - otherwise, datasetContents will have one DatasetContentsInterface
+ *      one DatasetContentsItemInterface  per document)
+ * - otherwise, datasetContents will have one DatasetContentsItemInterface
  *      per folder)
  */
 
 export interface DatasetImageBrowserInterface {
     datasetHierarchy: DocumentHierarchyType,
     datasetFormat: DatasetFormatType,
-    datasetContents: DatasetContentsInterface[]
+    datasetContents: DatasetContentsItemInterface[]
 }

@@ -1,17 +1,18 @@
 /**
- * display all images of all documents within a dataset, using ImageGenericList.tsx
+ * display all images of all documents within a dataset.
+ * this component handles dataset-level display. in a
+ * DatasetImageBrowserInterface, images are split in several
+ * "containers" (one for folder/documents, depending on the
+ * DatasetImageBrowserInterface.datasetFormat). each of these
+ * containers is handled by ContainerImageList
  */
 
-import React from "react";
-
 import { ImageInfo } from "../../shared/types";
-import { ImageGenericList } from "../../shared";
+import { DatasetImageList } from "./DatasetImageList";
 
-import { DocumentHierarchyType,
-         DatasetFormatType,
+import { DatasetFormatType,
          DjangoDatasetInterface,
-         DjangoDocumentInterface,
-         DatasetContentsInterface,
+         DatasetContentsItemInterface,
          DjangoImageInterface,
          DatasetImageBrowserInterface } from "../types";
 
@@ -26,26 +27,28 @@ const toImageInfo = (img:DjangoImageInterface, imgIdx:number): ImageInfo => ({
     src: img.src,
 })
 
-const nonIiifToDatasetContentsInterface = (dataset:DjangoDatasetInterface):DatasetContentsInterface[] => {
+// in non-IIIF datasets, images are grouped by folder path (especially useful for zips)
+const nonIiifToDatasetContentsItemInterface = (dataset:DjangoDatasetInterface):DatasetContentsItemInterface[] => {
     const folderPathExtracter = (filePath:string):string =>
         filePath.split("/").slice(0,-1).join("/"),
           docContents =  Object.values(dataset)[0];
 
-    let documentImageArray =
-        Object.entries(docContents).map(([imgUid, img], idx) =>
-            toImageInfo(img as DjangoImageInterface, idx as number));
     let folderPathArray =
-        [ ...new Set(documentImageArray.map(img =>
-            folderPathExtracter(img.url))) ];
+        [ ...new Set(Object.entries(docContents).map(([imgUid, img]) =>
+            folderPathExtracter(img.url)))]
 
     return folderPathArray.map(folderPath => ({
         name: folderPath,
-        images: documentImageArray.filter(documentImage =>
-            folderPathExtracter(documentImage.url) === folderPath) })
-    );
+        images:
+            Object.entries(docContents)
+            .filter(([imgUid, img]) => folderPathExtracter(img.url) === folderPath)
+            .map(([imgUid, img], idx) => toImageInfo(img, idx as number))
+    }));
 }
 
-const iiifToDatasetContentsInterface = (dataset:DjangoDatasetInterface):DatasetContentsInterface[] =>
+// in IIIF datasets, images are grouped by document
+// (since a IIIF dataset can contain multiple manifests, treated as multiple docs)
+const iiifToDatasetContentsItemInterface = (dataset:DjangoDatasetInterface):DatasetContentsItemInterface[] =>
     Object.entries(dataset).map(([docUid, docImages]) => ({
         name: docUid,
         images:
@@ -61,8 +64,8 @@ const toDatasetImageBrowserInterface = (dataset:DjangoDatasetInterface, datasetF
     datasetHierarchy: datasetFormat === "iiif" ? "document" : "folder",
     datasetContents:
         datasetFormat === "iiif"
-        ? iiifToDatasetContentsInterface(dataset)
-        : nonIiifToDatasetContentsInterface(dataset)
+        ? iiifToDatasetContentsItemInterface(dataset)
+        : nonIiifToDatasetContentsItemInterface(dataset)
         .sort((a,b) => a.name.localeCompare(b.name))
 })
 
@@ -70,11 +73,11 @@ const toDatasetImageBrowserInterface = (dataset:DjangoDatasetInterface, datasetF
 // component
 export function DatasetImageBrowser({ dataset, datasetFormat }: { dataset:DjangoDatasetInterface, datasetFormat:DatasetFormatType }) {
 
+    const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat) as DatasetImageBrowserInterface;
+
     // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
     const folderPathCleaner = (folderPath:string):string =>
         folderPath.split("/").slice(5,).join("/") + "/";
-
-    const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat);
 
     return (
         <div>
@@ -86,9 +89,7 @@ export function DatasetImageBrowser({ dataset, datasetFormat }: { dataset:Django
                     ? `document #${idx+1}`
                     : `folder ${folderPathCleaner(name)}`
                 }</h3>
-                <div>
-                    <ImageGenericList imageArray={images} />
-                </div>
+                <DatasetImageList imageArray={images} />
             </div>)
         )}
         </div>

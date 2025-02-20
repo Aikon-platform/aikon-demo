@@ -35407,7 +35407,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   DatasetImageBrowser: () => (/* binding */ DatasetImageBrowser)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
+/* harmony import */ var _DatasetImageList__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DatasetImageList */ "./src/DatasetApp/components/DatasetImageList.tsx");
 
 
 /**********************************************/
@@ -35418,16 +35418,20 @@ const toImageInfo = (img, imgIdx) => ({
     url: img.url,
     src: img.src,
 });
-const nonIiifToDatasetContentsInterface = (dataset) => {
+// in non-IIIF datasets, images are grouped by folder path (especially useful for zips)
+const nonIiifToDatasetContentsItemInterface = (dataset) => {
     const folderPathExtracter = (filePath) => filePath.split("/").slice(0, -1).join("/"), docContents = Object.values(dataset)[0];
-    let documentImageArray = Object.entries(docContents).map(([imgUid, img], idx) => toImageInfo(img, idx));
-    let folderPathArray = [...new Set(documentImageArray.map(img => folderPathExtracter(img.url)))];
+    let folderPathArray = [...new Set(Object.entries(docContents).map(([imgUid, img]) => folderPathExtracter(img.url)))];
     return folderPathArray.map(folderPath => ({
         name: folderPath,
-        images: documentImageArray.filter(documentImage => folderPathExtracter(documentImage.url) === folderPath)
+        images: Object.entries(docContents)
+            .filter(([imgUid, img]) => folderPathExtracter(img.url) === folderPath)
+            .map(([imgUid, img], idx) => toImageInfo(img, idx))
     }));
 };
-const iiifToDatasetContentsInterface = (dataset) => Object.entries(dataset).map(([docUid, docImages]) => ({
+// in IIIF datasets, images are grouped by document
+// (since a IIIF dataset can contain multiple manifests, treated as multiple docs)
+const iiifToDatasetContentsItemInterface = (dataset) => Object.entries(dataset).map(([docUid, docImages]) => ({
     name: docUid,
     images: Object
         .entries(docImages)
@@ -35438,19 +35442,49 @@ const toDatasetImageBrowserInterface = (dataset, datasetFormat) => ({
     datasetFormat: datasetFormat,
     datasetHierarchy: datasetFormat === "iiif" ? "document" : "folder",
     datasetContents: datasetFormat === "iiif"
-        ? iiifToDatasetContentsInterface(dataset)
-        : nonIiifToDatasetContentsInterface(dataset)
+        ? iiifToDatasetContentsItemInterface(dataset)
+        : nonIiifToDatasetContentsItemInterface(dataset)
             .sort((a, b) => a.name.localeCompare(b.name))
 });
 /**********************************************/
 // component
 function DatasetImageBrowser({ dataset, datasetFormat }) {
+    const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat);
     // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
     const folderPathCleaner = (folderPath) => folderPath.split("/").slice(5).join("/") + "/";
-    const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat);
     return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: datasetAsInterface.datasetContents.map(({ name, images }, idx) => ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { id: name, children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", { className: "id-suffix", children: ["Images in ", datasetFormat === "iiif"
                             ? `document #${idx + 1}`
-                            : `folder ${folderPathCleaner(name)}`] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_1__.ImageGenericList, { imageArray: images }) })] }, name))) }));
+                            : `folder ${folderPathCleaner(name)}`] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_DatasetImageList__WEBPACK_IMPORTED_MODULE_1__.DatasetImageList, { imageArray: images })] }, name))) }));
+}
+
+
+/***/ }),
+
+/***/ "./src/DatasetApp/components/DatasetImageList.tsx":
+/*!********************************************************!*\
+  !*** ./src/DatasetApp/components/DatasetImageList.tsx ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DatasetImageList: () => (/* binding */ DatasetImageList)
+/* harmony export */ });
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
+
+
+
+function DatasetImageList({ imageArray }) {
+    const defaultDisplayLength = 4, [displayLength, setDisplayLength] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(defaultDisplayLength), updateDisplayLength = () => setDisplayLength(displayLength === defaultDisplayLength
+        ? imageArray.length
+        : defaultDisplayLength);
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "list-wrapper", children: [imageArray.length > defaultDisplayLength &&
+                (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => updateDisplayLength(), className: "button", children: displayLength === defaultDisplayLength
+                        ? "Voir plus"
+                        : "Voir moins" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_2__.ImageGenericList, { imageArray: imageArray.slice(0, displayLength) })] }));
 }
 
 

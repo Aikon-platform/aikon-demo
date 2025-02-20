@@ -22353,6 +22353,49 @@ ul.messages li.warning, ul.messages li.error {
   display: none;
 }
 
+.image-generic-outer-wrapper {
+  outline: 1px solid hsl(233, 100%, 93%);
+  border-radius: 10px;
+  min-width: 150px;
+  min-height: 220px;
+}
+.image-generic-outer-wrapper:hover {
+  outline: 2px solid hsl(233, 100%, 88%);
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 10% 90%;
+  grid-template-columns: 100%;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper > * {
+  height: 100%;
+  width: 100%;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-title {
+  margin: 10px 0 0 10%;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-item .display-image {
+  height: 90%;
+  width: 90%;
+}
+.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-item .display-image img.display-img {
+  max-height: 100%;
+}
+
 .display-image {
   position: relative;
   display: flex;
@@ -22462,7 +22505,7 @@ ul.messages li.warning, ul.messages li.error {
   text-align: center;
   padding: 1em;
   min-height: 650px;
-  min-width: 350px;
+  min-width: 400px;
   overflow: scroll;
   height: 90%;
   width: 40%;
@@ -22540,49 +22583,6 @@ ul.messages li.warning, ul.messages li.error {
 }
 .toolbar .toolbar-content .toolbar-item.toolbar-btn {
   background: none;
-}
-
-.image-generic-outer-wrapper {
-  outline: 1px solid hsl(233, 100%, 93%);
-  border-radius: 10px;
-  min-width: 150px;
-  min-height: 220px;
-}
-.image-generic-outer-wrapper:hover {
-  outline: 2px solid hsl(233, 100%, 88%);
-}
-.image-generic-outer-wrapper .image-generic-inner-wrapper {
-  height: 100%;
-  display: grid;
-  grid-template-rows: 10% 90%;
-  grid-template-columns: 100%;
-}
-.image-generic-outer-wrapper .image-generic-inner-wrapper > * {
-  height: 100%;
-  width: 100%;
-}
-.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-title {
-  margin: 10px 0 0 10%;
-}
-.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-item {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-item .display-image {
-  height: 90%;
-  width: 90%;
-}
-.image-generic-outer-wrapper .image-generic-inner-wrapper .image-generic-content .display-item .display-image img.display-img {
-  max-height: 100%;
 }
 
 .list-invisible {
