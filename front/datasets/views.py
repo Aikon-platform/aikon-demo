@@ -24,7 +24,6 @@ class DatasetMixin:
     app_name = "datasets"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
-        print(">>>>>>>>>>>>>>", self.model)
         context = super().get_context_data(**kwargs)
         context["task_name"] = "dataset"
         context["app_name"] = self.model.django_app_name
@@ -68,10 +67,6 @@ class DatasetDeleteView(DatasetMixin, LoginRequiredIfConfProtectedMixin, DetailV
         for task in self.object.tasks:
             status = task.status
             task_html += f"<li><span class='tag status status-{status}'>{status}</span> {task} #{task.id}</li>"
-        # for status, task_list in self.object.get_tasks_by_prop("status").items():
-        #     task_list = [f"{task} #{task.id}" for task in task_list]
-        #     task_nb += len(task_list)
-        #     task_html += f"<li><span class='tag status status-{status}'>{status}</span> {'<br>'.join(task_list)}</li>"
         task_html += "</ul>"
         return f"This dataset is used in <b>{len(tasks)} task(s)</b>: {task_html}"
 
@@ -99,9 +94,3 @@ class DatasetMainView(DatasetMixin, DetailView):
     """
 
     template_name = "datasets/view.html"
-
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        # so far, this is purely for debug purposes
-        context = super().get_context_data(**kwargs)
-
-        return context

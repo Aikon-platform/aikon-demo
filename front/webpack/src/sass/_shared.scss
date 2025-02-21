@@ -28,25 +28,25 @@
         justify-content: center;
         // transform: translate(-50%, -50%);
         &.rot270 {
-            transform: translate(-50%, -50%) rotate(270deg);
+            transform: rotate(270deg);
         }
         &.rot180 {
-            transform: translate(-50%, -50%) rotate(180deg);
+            transform: rotate(180deg);
         }
         &.rot90 {
-            transform: translate(-50%, -50%) rotate(90deg);
+            transform: rotate(90deg);
         }
         &.hflip {
-            transform: translate(-50%, -50%) scaleX(-1);
+            transform: scaleX(-1);
         }
         &.hflip.rot270 {
-            transform: translate(-50%, -50%) rotate(270deg) scaleX(-1);
+            transform: rotate(270deg) scaleX(-1);
         }
         &.hflip.rot180 {
-            transform: translate(-50%, -50%) rotate(180deg) scaleX(-1);
+            transform: rotate(180deg) scaleX(-1);
         }
         &.hflip.rot90 {
-            transform: translate(-50%, -50%) rotate(90deg) scaleX(-1);
+            transform: rotate(90deg) scaleX(-1);
         }
     }
 }
@@ -132,7 +132,7 @@
         border-radius: 2*$border-radius;
         text-align: center;
         padding: 1em;
-        // max-height breaks the sizing of child elements......................
+        // setting only max-height without height breaks the sizing of child elements......................
         // max-height: 90%;
         // max-width: 40%;
         min-height: 650px;
@@ -144,6 +144,11 @@
         grid-template-rows: 75% 25%;
         grid-template-columns: 100%;
         gap: .5em;
+
+        &:has(.rot90, .rot270) {
+            // kind of hacky: when the image is in horizontal display, widen its .magnifying-item container
+            min-width: 500px;
+        }
 
         .display-img {
             object-fit: contain;
