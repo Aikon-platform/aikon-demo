@@ -71,6 +71,7 @@ class Document:
             if path is not None
             else Path(settings.MEDIA_ROOT) / "documents" / self.uid
         )
+        self._document_tree = None
 
     @property
     def mapping_path(self):
@@ -98,15 +99,17 @@ class Document:
         """
         return self.path / "images"
 
-    @property
-    def document_tree(self):
-        return self._document_tree()
-
-    def _document_tree(self):
+    def get_document_tree(self) -> str:
         from .utils import TreeDict
 
         tree = TreeDict(os.path.join(self.path, "images/"))
         return tree.to_html_pre()
+
+    @property
+    def document_tree(self) -> str:
+        if self._document_tree is None:
+            self._document_tree = self.get_document_tree()
+        return self._document_tree
 
     def to_dict(self) -> Dict:
         return {
@@ -116,20 +119,9 @@ class Document:
         }
 
     def to_json_with_images(self) -> Dict:
-        print(
-            {
-                "type": self.dtype,
-                "src": str(self.src),
-                "uid": str(self.uid),
-                "images": [image.to_dict() for image in self.images],
-            }
-        )
-        return {
-            "type": self.dtype,
-            "src": str(self.src),
-            "uid": str(self.uid),
-            "images": [image.to_dict() for image in self.images],
-        }
+        document_dict = self.to_dict()
+        document_dict["images"] = [image.to_dict() for image in self.images]
+        return document_dict
 
     def is_extracted(self) -> bool:
         if not self.path.exists():
