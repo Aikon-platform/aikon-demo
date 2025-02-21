@@ -598,8 +598,6 @@ class Dataset(AbstractDataset):
         for task_prefix in settings.DEMO_APPS:
             if len(tasks := self.get_tasks_for_prefix(task_prefix)):
                 t += tasks
-            # if hasattr(self, f"{task_prefix}_tasks"):
-            #     t += list(getattr(self, f"{task_prefix}_tasks").all())
         return t
 
     @property

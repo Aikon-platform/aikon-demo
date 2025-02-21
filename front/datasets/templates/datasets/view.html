@@ -99,12 +99,7 @@
             </ul>
         </div>
         <!-- TODO find a better way to style than inline CSS -->
-        <ul class="tab-body-wrapper"
-            style="list-style: none;
-                   padding-left: 0;
-                   margin-bottom: 0;
-                   margin-top: 0;"
-        >
+        <ul class="tab-body-wrapper list-invisible">
             {% for prefix, tasks in dataset.tasks_by_prefix %}
                 <li id="tab-body-{{prefix}}"
                     class="tab-body
