@@ -91,12 +91,19 @@ MEDIA_ROOT = Path(ENV("MEDIA_ROOT", default=BASE_DIR / "media"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+REDIS_HOST = ENV.str("REDIS_HOST", "localhost")
+REDIS_PORT = ENV.str("REDIS_PORT", "6379")
+REDIS_PASSWORD = ENV.str("REDIS_PASSWORD", default="")
+
+redis_prefix = f"redis://:{REDIS_PASSWORD}@" if REDIS_PASSWORD else "redis://"
+
 DRAMATIQ_BROKER = {
     "BROKER": "dramatiq.brokers.redis.RedisBroker",
     "OPTIONS": {
-        "url": ENV(
-            "REDIS_URL", default="redis:///2"
-        ),  # f"redis://:{ENV('REDIS_PASSWORD')}@localhost:6379/1"
+        "url": f"{redis_prefix}{REDIS_HOST}:{REDIS_PORT}/0",
+        # "url": ENV(
+        #     "REDIS_URL", default="redis:///2"
+        # ),
     },
     "MIDDLEWARE": [],
 }

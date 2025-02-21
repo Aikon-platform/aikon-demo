@@ -1,11 +1,9 @@
+from urllib.parse import urlparse
+
 from .base import *
 
 DEBUG = False
 SECRET_KEY = ENV("SECRET_KEY")
-ALLOWED_HOSTS = [
-    *ENV.list("ALLOWED_HOSTS", default=["discover-demo.enpc.fr"]),
-    "localhost",
-]
 
 ADMIN_EMAIL = ENV("ADMIN_EMAIL")
 ADMINS = [(ENV("ADMIN_NAME"), ADMIN_EMAIL)]
@@ -22,7 +20,13 @@ DATABASES = {
 }
 
 API_URL = ENV("API_URL")
-BASE_URL = ENV("BASE_URL")
+BASE_URL = ENV("BASE_URL", default="https://aikon-demo.enpc.fr/")
+DOMAIN_NAME = urlparse(BASE_URL).netloc
+ALLOWED_HOSTS = [
+    *ENV.list("ALLOWED_HOSTS", default=[]),
+    DOMAIN_NAME,
+    "localhost",
+]
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 

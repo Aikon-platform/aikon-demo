@@ -121,6 +121,8 @@ class TaskStartFromView(TaskStartView):
         if previous_task := self.model.objects.get(id=self.kwargs["pk"]):
             self.from_task = previous_task
 
+            # TODO when dataset is not yours, should work anyway
+
             kwargs["initial"] = {"name": previous_task.name}
             if hasattr(previous_task, "crops"):
                 kwargs["crops"] = previous_task.crops
