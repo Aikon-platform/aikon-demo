@@ -14,7 +14,7 @@ export function ImageGenericList(props: { imageArray:ImageInfo[] }) {
     return (
         <ul className="columns is-mobile is-multiline list-invisible">
         { imageArray.map(image =>
-            (<li key={image.id} className="column is-flex">
+            (<li key={image.id} className="column is-one-fourth is-flex">
                 <ImageGeneric image={image}/>
             </li>)) }
         </ul>
