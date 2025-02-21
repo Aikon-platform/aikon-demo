@@ -35409,7 +35409,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
+/* harmony import */ var _shared_IconBtn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../shared/IconBtn */ "./src/shared/IconBtn.tsx");
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../shared */ "./src/shared/index.tsx");
 
 /**
  * display the all the images in a singleDatasetContentsItemInterface
@@ -35420,10 +35421,12 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 
+
 // itemIndex is the position of `datasetContentsItem` within the `DatasetImageBrowserInterface.datasetContents` array.
 function DatasetContentsItem({ datasetContentsItem, datasetFormat, itemIndex }) {
+    const
     // handle the number of images to display (between 4 and the whole dataset)
-    const defaultDisplayLength = 4, [displayLength, setDisplayLength] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(defaultDisplayLength), updateDisplayLength = () => setDisplayLength(displayLength === defaultDisplayLength
+    defaultDisplayLength = 4, [displayLength, setDisplayLength] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(defaultDisplayLength), updateDisplayLength = () => setDisplayLength(displayLength === defaultDisplayLength
         ? datasetContentsItem.images.length
         : defaultDisplayLength),
     // remove all directories up to the `images/` directory, which is in practice the root of the dataset.
@@ -35431,9 +35434,7 @@ function DatasetContentsItem({ datasetContentsItem, datasetFormat, itemIndex }) 
     return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "dci-wrapper", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", { className: "dci-title is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center", children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", { className: "id-suffix m-0", children: ["Images in ", datasetFormat === "iiif"
                                 ? `document #${itemIndex + 1}`
                                 : `folder ${folderPathCleaner(datasetContentsItem.name)}`] }), datasetContentsItem.images.length > defaultDisplayLength &&
-                        (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", { onClick: () => updateDisplayLength(), className: "button", children: displayLength === defaultDisplayLength
-                                ? "See more"
-                                : "See less" })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_2__.ImageGenericList, { imageArray: datasetContentsItem.images.slice(0, displayLength) })] }));
+                        (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared_IconBtn__WEBPACK_IMPORTED_MODULE_2__.IconBtn, { icon: displayLength === 4 ? "mdi:plus" : "mdi:minus", label: displayLength === 4 ? "See more items" : "See less items", onClick: () => updateDisplayLength() })] }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_shared__WEBPACK_IMPORTED_MODULE_3__.ImageGenericList, { imageArray: datasetContentsItem.images.slice(0, displayLength) })] }));
 }
 
 

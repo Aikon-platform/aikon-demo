@@ -47,6 +47,8 @@ class AbstractDataset(models.Model):
     def full_path(self) -> Path:
         return Path(settings.MEDIA_ROOT) / "datasets" / f"{self.id}"
 
+    django_app_name = "datasets"  # must match INSTALLED_APPS and datasets.url.app_name
+
     class Meta:
         abstract = True
 

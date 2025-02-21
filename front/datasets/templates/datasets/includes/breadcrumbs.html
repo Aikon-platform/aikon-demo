@@ -1,11 +1,8 @@
-<h1>"{{ app_name }}"</h1>
-
-
-{#    {% if request.user.is_authenticated %} #}
-{#    <p class="breadcrumbs"> #}
-{#        <a class="button is-text" href="{% url app_name|add:':list' %}"> #}
-{#            <span class="iconify" data-icon="mdi:arrow-left"></span> #}
-{#            All datasets #}
-{#        </a> #}
-{#    </p> #}
-{#    {% endif %} #}
+{% if request.user.is_authenticated %}
+<p class="breadcrumbs">
+    <a class="button is-text" href="{% url app_name|add:':list' %}">
+        <span class="iconify" data-icon="mdi:arrow-left"></span>
+        All datasets
+    </a>
+</p>
+{% endif %}
