@@ -1,0 +1,196 @@
+{% extends "demowebsite/base.html" %}
+{% load static shared_tags %}
+
+{% block title %}Dataset {{ dataset.id }}{% endblock %}
+
+{% block content %}
+<div class="centerwrap">
+
+    {% include "datasets/includes/breadcrumbs.html" %}
+
+    <!-- TITLE SECTION -->
+    <div class="columns is-vcentered">
+        <div class="column is-two-thirds">
+            <h1 class=" is-title is-size-2 py-3 mb-0">
+                <span class="id-main">Dataset {{ dataset.name }}</span>
+                <span class="id-suffix">{{ dataset.id }}</span>
+            </h1>
+
+        </div>
+        <div class="column is-one-third">
+            <div class="columns is-vcentered">
+
+                <span class="column tag status content is-large m-1"
+                      title="Dataset format: {{ dataset.format }}"
+                >
+                    {{ dataset.format }}
+                </span>
+                <span class="column tag status content icon-text is-large m-1"
+                      title="{{ dataset.document|length }} document{% if dataset.document|length > 1 %}s{% endif %}"
+                >
+                    <span>{{ dataset.documents|length }}</span>
+                    <span class="icon has-text-white m-1">
+                        <i class="iconify" data-icon="mdi:file-document-multiple"></i>
+                    </span>
+                </span>
+                <span class="column tag status content icon-text is-large m-1"
+                      title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
+                    <span>{{ dataset.image_count }}</span>
+                    <span class="icon has-text-white">
+                        <i class="iconify" data-icon="mdi:file-image"
+                        ></i>
+                    </span>
+                </span>
+                <a class="button is-light is-content is-large m-1"
+                   href="{% url 'datasets:delete' dataset.pk %}"
+                >
+                    <span class="iconify" data-icon="mdi:delete"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENTS SECTION -->
+    <div id="section-content">
+        <h2>Dataset contents</h2>
+        <div class="tabs is-centered is-normal tab-head-list">
+            <ul>
+                <li id="tab-head-tree"
+                    class="tab-head is-active"
+                ><a>Document tree</a></li>
+                <li id="tab-head-images"
+                    class="tab-head"
+                ><a>Images</a></li>
+            </ul>
+        </div>
+
+        <div class="tab-body-wrapper">
+            <div id="tab-body-tree"
+                 class="tab-body"
+            >
+                {% for document in dataset.documents %}
+                    <h3 class="id-suffix">File structure of document #{{ forloop.counter }}</h3>
+                    <div class="dataset-view-structure">{{ dataset.documents.0.document_tree|safe }}</div>
+                {% endfor %}
+            </div>
+            <div id="tab-body-images"
+                 class="tab-body is-hidden"
+            >
+                <div id="document-image-browser"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TASKS SECTION -->
+    <div id="section-task" class="mt-6">
+        <h2>Applied tasks ({{ dataset.tasks|length }})</h2>
+        <div class="tabs tab-head-list is-centered is-normal">
+            <ul>
+                {% for prefix, tasks in dataset.tasks_by_prefix %}
+                    <li id="tab-head-{{ prefix }}"
+                        class="tab-head
+                            {% if dataset.tasks_by_prefix.0.0 == prefix %}
+                                is-active
+                            {% endif %}"
+                    >
+                        <a>{{prefix}} ({{ tasks|length }} tasks)</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- TODO find a better way to style than inline CSS -->
+        <ul class="tab-body-wrapper list-invisible">
+            {% for prefix, tasks in dataset.tasks_by_prefix %}
+                <li id="tab-body-{{prefix}}"
+                    class="tab-body
+                        {% if dataset.tasks_by_prefix.0.0 != prefix %}
+                            is-hidden
+                        {% endif %}"
+                >
+                    <div class="task-list">
+                        {% for task in tasks %}
+                            {% include "includes/list-item.html" %}
+                        {% endfor %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+{{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}
+<script type="text/javascript" src="{% static "js/build.js" %}"></script>
+<script type="text/javascript"
+        id="generic-image-array-script"
+>
+    const docToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent),
+          datasetFormat = "{{ dataset.format }}",
+          htmlId = "document-image-browser";
+
+    DemoTools.initDatasetImageBrowser(document.getElementById(htmlId), docToImageArray, datasetFormat);
+</script>
+
+
+{{ dataset.task_prefixes|json_script:"tasks-tab-manager" }}
+<script type="text/javascript"
+        id="tasks-tab-manager"
+>
+    /**
+     * handle switching between tabs: when clicking on a `.tab-head`,
+     * toggle the corresponding `.tab-body` element. those are identified
+     * by corresponding HTML IDs, which have the structure:
+     *      > `#tab-head-{slug}` for the `.tab-head` element
+     *      > `#tab-body-{slug}` for the `.tab-body` element
+     * this function can be run several times for different tabs on a single
+     * HTML page. to isolate them, each tab+body block must be enclosed
+     * with a wrapper block that has an HTML ID, passed as the argument: `wrapperId`
+     *
+     * @param {String} wrapperId
+     *      the HTML ID of the block wrapping .tab-head and .tab-body
+     *      elements. wrapperId is NOT written as a CSS selector (`#htmlId`)
+     * @param {Array<String>} slugArray
+     *      the array of "slugs", used to create linked html IDs between
+     *      `.tab-head` and `.tab-body` elements/
+     */
+    const switchTabHook = (wrapperId, slugArray) => {
+        // variables and functions
+        const
+            tabHeadIdArray = slugArray.map(x => `#tab-head-${x}`),
+            tabHeadElArray = document.querySelectorAll(`#${wrapperId} .tab-head`),
+            tabBodyElArray = document.querySelectorAll(`#${wrapperId} .tab-body`),
+            getSlugFromTabId = (tabId) =>
+                slugArray.filter(x => tabId ===`tab-head-${x}`)[0],
+            switchActiveTab = (el) =>
+                tabHeadElArray.forEach(tabEl =>
+                    tabEl.id === el.id
+                    ? tabEl.classList.add("is-active")
+                    : tabEl.classList.remove("is-active")),
+            switchTabBody = (el) => {
+                let slug = getSlugFromTabId(el.id);
+                tabBodyElArray.forEach(tabBodyEl =>
+                    tabBodyEl.id === `tab-body-${slug}`
+                    ? tabBodyEl.classList.remove("is-hidden")
+                    : tabBodyEl.classList.add("is-hidden")); },
+            onClick = (e) => {
+                switchActiveTab(e.currentTarget);
+                switchTabBody(e.currentTarget);
+            };
+
+        // lifecycle
+        tabHeadElArray.forEach((tabEl) =>
+            tabEl.addEventListener("click", onClick));
+        window.onbeforeunload = (e) =>
+            tabHeadElArray.forEach((tabEl) =>
+                tabEl.removeEventListener("click", onClick));
+    }
+
+    const taskSlugArray = JSON.parse(document.getElementById('tasks-tab-manager').textContent),
+          contentSlugArray = ["tree", "images"],
+          taskWrapperId = "section-task",
+          contentWrapperId = "section-content";
+
+    switchTabHook(taskWrapperId, taskSlugArray);
+    switchTabHook(contentWrapperId, contentSlugArray);
+
+</script>
+{% endblock %}

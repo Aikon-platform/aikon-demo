@@ -62,6 +62,7 @@ celerybeat.pid
 .Trashes
 ehthumbs.db
 Thumbs.db
+.vscode
 
 # Environments
 .env

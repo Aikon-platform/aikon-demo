@@ -1,20 +1,20 @@
 import React from "react";
 import { IconBtn } from "./IconBtn";
 import { MatchTransposition } from "../SimilarityApp/types";
-import { ImageToDisplay } from "./ImageDisplay";
+import { ImageFileToDisplay } from "./ImageFileDisplay";
 import {ImageIdentification} from "./ImageIdentification";
 
 
 export interface TooltipProps {
-    image?: ImageToDisplay;
+    image?: ImageFileToDisplay;
     transpositions?: MatchTransposition[];
 }
 
 export interface TooltipContext {
     // Context to manage focusing on a Watermark
     setTooltip?: (tooltip?:TooltipProps) => void;
-    // getTitle?: (image: ImageToDisplay) => string;
-    // getSubtitle?: (image: ImageToDisplay) => string;
+    // getTitle?: (image: ImageFileToDisplay) => string;
+    // getSubtitle?: (image: ImageFileToDisplay) => string;
 }
 
 export const TooltipContext = React.createContext<TooltipContext>({});

@@ -23,7 +23,7 @@
                 <div class="row columns">
                     <div class="column task-ref is-9 p">
                         <h2 class="task-ref">
-                            <a href="{{ dataset.get_absolute_url }}">
+                            <a href="{% url 'datasets:view' dataset.pk %}">
                                 <span class="id-main">{{ dataset }}</span>
                                 <span class="id-suffix">{{ dataset.id }}</span>
                             </a>

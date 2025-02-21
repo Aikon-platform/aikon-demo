@@ -8,7 +8,7 @@
                 <span class="id-suffix">{{ task.id }}</span>
             </a>
         </h2>
-        {% if not filter and task.dataset %}
+        {% if app_name != "datasets" and not filter and task.dataset %}
             <p>└ dataset
                 <a href="{% url app_name|add:':list_perdataset' task.dataset.pk %}">
                     <span class="id-main">{{ task.dataset.name }}</span>
@@ -29,5 +29,22 @@
         <span class="tag status status-{{ task.status }}">{{ task.status }}</span>
     </div>
     <p class="user"><span class="iconify" data-icon="mdi:account"></span> {{ task.requested_by.username }}</p>
-    <p class="date">{{ task.requested_on|date:"Y-m-d H:i" }}</p>
+    <div class="">
+        <p class="date">{{ task.requested_on|date:"Y-m-d H:i" }}
+            {% if task.task_duration %}
+                <span class="
+                    tag is-white is-normal
+                    {% if task.task_duration.eval == 'short' %}
+                         has-text-success
+                    {% elif task.task_duration.eval == 'mid' %}
+                        has-text-warning
+                    {% else %}
+                        has-text-danger
+                    {% endif %}"
+                >{{ task.task_duration.delta|fmt_duration }}</span>
+            {% endif %}
+        </p>
+
+    </div>
+
 </div>

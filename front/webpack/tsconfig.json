@@ -16,6 +16,11 @@
     "sourceMap": true,
     "jsx": "react-jsx",
     "target": "es2015",
+    "paths": {
+      // doesn't work but let's leave it at that for now
+      "Src": ["./src"],
+      "Shared": ["./src/Shared"]
+    }
   },
   "exclude": ["node_modules", "build", "coverage", "webpack.*.js", "*.config.js", "*.test.ts*"],
   "ts-node": {

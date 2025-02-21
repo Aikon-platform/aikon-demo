@@ -30,7 +30,7 @@ export function MatchRow({matches, group_by_source, highlit, threshold}: MatchRo
             <div className="column match-query">
                 <h4>{matches.query.source?.name || matches.query.name}</h4>
                 <div className="columns is-multiline match-items is-centered">
-                    <WatermarkDisplay watermark={matches.query} />
+                    <WatermarkDisplay watermark={matches.query}/>
                 </div>
                 {groups.length > 5 && <p><a href="javascript:void(0)" onClick={toggleShowAll}>{showAll ? "Show only 5 best" : `Show all results`}</a></p>}
                 <MatchCSVExporter matches={matches} threshold={threshold} />

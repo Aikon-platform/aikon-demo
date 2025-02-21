@@ -3,8 +3,10 @@ import uuid
 import requests
 from requests.exceptions import RequestException
 import traceback
-from typing import Dict, Any
+from typing import Dict, Any, Literal, TypedDict
 from pathlib import Path
+from datetime import datetime, timedelta
+from time import strftime
 
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -34,6 +36,9 @@ User = get_user_model()
 API_URL = getattr(settings, "API_URL", "http://localhost:5000")
 BASE_URL = getattr(settings, "BASE_URL", "http://localhost:8000")
 
+TypeDurationEval = Literal["short", "mid", "long"]
+TypeDuration = TypedDict("TypeDuration", {"delta": str, "eval": TypeDurationEval})
+
 
 def AbstractTask(task_prefix: str):
     class AbstractTask(models.Model):
@@ -62,6 +67,7 @@ def AbstractTask(task_prefix: str):
         requested_by = models.ForeignKey(
             User, null=True, on_delete=models.SET_NULL, editable=False
         )
+        finished_on = models.DateTimeField(editable=False, blank=True, null=True)
 
         django_app_name = task_prefix
 
@@ -133,6 +139,34 @@ def AbstractTask(task_prefix: str):
             """
             return f"{settings.MEDIA_URL}{self.result_media_path}"
 
+        @property
+        def task_duration(self) -> TypeDuration:
+            """
+            Get the duration of a task.
+            Returns:
+                None if the task is finished and finished_on is undefined.
+                TypeDuration else.
+                    delta : the duration, as a datetime.timedelta
+                    eval  : an evaluation of the task duration's badness
+            """
+            delta = (
+                self.finished_on - self.requested_on
+                if self.finished_on and self.requested_on
+                else datetime.now(timezone.utc) - self.requested_on
+                if not self.is_finished and not self.finished_on
+                else None
+            )
+            if delta is None:
+                return delta
+            eval: TypeDurationEval = (
+                "short"
+                if delta < timedelta(minutes=30)
+                else "mid"
+                if delta < timedelta(minutes=120)
+                else "long"
+            )
+            return {"delta": delta, "eval": eval}
+
         @cached_property
         def full_log(self):
             """
@@ -172,6 +206,17 @@ def AbstractTask(task_prefix: str):
         def get_task_files(self):
             return None
 
+        def set_fields_on_terminate(self):
+            """
+            When a task finishes (no matter the reason: success/error/cancel),
+            update fields `is_finished` and `finished_on`
+
+            TOOD:move setting of `self.status` field  and `self.save()`
+            to have all db updates in one place
+            """
+            self.is_finished = True
+            self.finished_on = datetime.now()
+
         def start_task(self, endpoint: str = "start"):
             """
             Start the task
@@ -203,7 +248,7 @@ def AbstractTask(task_prefix: str):
             self.status = status
             if error:
                 self.write_log(error)
-            self.is_finished = True
+            self.set_fields_on_terminate()
             self.save()
 
             if notify and self.notify_email:
@@ -410,7 +455,7 @@ def AbstractAPITaskOnDataset(task_prefix: str):
             except (ConnectionError, RequestException):
                 self.write_log("Connection error when starting task")
                 self.status = "ERROR"
-                self.is_finished = True
+                self.set_fields_on_terminate()
                 self.save()
                 # Send error email to website admins
                 mail_admins(
@@ -433,7 +478,7 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                     f"Request for task failed with {api_query.status_code}: {api_query.text}\n{exc}"
                 )
                 self.status = "ERROR"
-                self.is_finished = True
+                self.set_fields_on_terminate()
 
             self.save()
 
@@ -453,11 +498,11 @@ def AbstractAPITaskOnDataset(task_prefix: str):
             try:
                 print(api_query.text)
                 self.status = "CANCELLED"
-                self.is_finished = True
+                self.set_fields_on_terminate()
             except:
                 self.write_log(f"Error cancelling task: {api_query.text}")
                 self.status = "ERROR"
-                self.is_finished = True
+                self.set_fields_on_terminate()
             self.save()
 
         def get_progress(self):

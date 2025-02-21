@@ -1,12 +1,12 @@
 import React, { useReducer } from "react";
 import { SimilarityMatch } from "../types";
 import { ImageInfo } from "../../shared/types";
-import { ImageDisplay } from "../../shared/ImageDisplay";
+import { ImageFileDisplay } from "../../shared";
 import { Icon } from "@iconify/react";
-import { IconBtn } from "../../shared/IconBtn";
+import { IconBtn } from "../../shared";
 import { NameProviderContext, getImageName, getSourceName } from "../../shared/naming";
 import { SimilarityHrefContext } from "./ImageSimBrowser";
-import {ImageIdentification} from "../../shared/ImageIdentification";
+import {ImageIdentification} from "../../shared";
 
 interface MatchGroupProps {
     matches: SimilarityMatch[];
@@ -28,19 +28,19 @@ export function MatchGroup({ matches, grouped, threshold, wref }: MatchGroupProp
         (!threshold || matches[0].similarity >= threshold) &&
         <div className="column match-group">
             <div className={expanded ? "match-expanded" : "match-excerpt"}>
-            <p>{grouped ?
-                <React.Fragment>
-                    <Icon icon="mdi:folder"></Icon>
-                    {getSourceName(nameProvider, matches[0].image.document)}
-                </React.Fragment> :
-                <ImageIdentification image={matches[0].image}/>
-                }</p>
-            <div className="columns is-multiline match-items">
-                {matches.map((match, idx) => (
-                    (expanded || idx==0) && (!threshold || match.similarity >= threshold) && <ImageDisplay key={idx} comparison={wref} href={matchesRef(match.image)} {...match} />
-                ))}
-            </div>
-            {matches.length > 1 && <IconBtn icon={expanded ? "mdi:close" : "mdi:animation-plus"} onClick={toggleExpand} label={expanded ? "Collapse" : `+${matches.length -1}`}/>}
+                <p>{grouped ?
+                    <React.Fragment>
+                        <Icon icon="mdi:folder"></Icon>
+                        {getSourceName(nameProvider, matches[0].image.document)}
+                    </React.Fragment> :
+                    <ImageIdentification image={matches[0].image}/>
+                    }</p>
+                <div className="columns is-multiline match-items">
+                    {matches.map((match, idx) => (
+                        (expanded || idx==0) && (!threshold || match.similarity >= threshold) && <ImageFileDisplay key={idx} comparison={wref} href={matchesRef(match.image)} {...match} />
+                    ))}
+                </div>
+                {matches.length > 1 && <IconBtn icon={expanded ? "mdi:close" : "mdi:animation-plus"} onClick={toggleExpand} label={expanded ? "Collapse" : `+${matches.length -1}`}/>}
             </div>
         </div>
     );

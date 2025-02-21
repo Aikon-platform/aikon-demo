@@ -4,14 +4,14 @@ import { NameProvider } from "../../shared/types";
 import { fetchIIIFNames, NameProviderContext, sortImages } from "../../shared/naming";
 import { ImageMagnifier, MagnifyingContext, MagnifyProps } from "../../shared/ImageMagnifier";
 import { Cluster, connectedComponents, convertToClusteringFile, graphFromSimilarityMatches } from "../utils/clustering";
-import { ImageDisplay, ImageToDisplay } from "../../shared/ImageDisplay";
+import { ImageFileDisplay, ImageFileToDisplay } from "../../shared/ImageFileDisplay";
 import { IconBtn } from "../../shared/IconBtn";
 import { ClusterApp } from "../../ClusterApp";
 import { ClusterElement } from "../../ClusterApp/components/ClusterElement";
 import { BasicImageList } from "../../ClusterApp/components/ImageLists";
 
 interface Pinned {
-    pinnedImage?: ImageToDisplay;
+    pinnedImage?: ImageFileToDisplay;
     setPinned?: (pinned: boolean) => void;
 }
 
@@ -43,7 +43,7 @@ export function ClusteringTool({ matches, index, visible, extra_toolbar_items}: 
         });
     };
 
-    const setComparison = (image?: ImageToDisplay, setPinned?: (pinned: boolean) => void) => {
+    const setComparison = (image?: ImageFileToDisplay, setPinned?: (pinned: boolean) => void) => {
         try {
             pinnedImage.setPinned && pinnedImage.setPinned(false);
         } catch (e) {
@@ -124,7 +124,7 @@ function ClusterMiniElement ({cluster, index}: {cluster: Cluster, index: Similar
         <div className="cl-images cl-limitheight">
         {images.slice(0, expanded ? undefined : n_shown).map((image, i) => (
              <div className="cl-image card" key={i}>
-                <ImageDisplay image={image} />
+                <ImageFileDisplay image={image} />
             </div>
         ))}
         {images.length === 0 && <p>∅</p>}

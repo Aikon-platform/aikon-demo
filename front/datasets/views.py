@@ -1,7 +1,8 @@
 from typing import Any
 
 from django.contrib.auth import get_user_model
-from django.views.generic import ListView, DetailView
+from django.db.models.query import QuerySet
+from django.views.generic import ListView, DetailView, DetailView
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -25,6 +26,7 @@ class DatasetMixin:
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["task_name"] = "dataset"
+        context["app_name"] = self.model.django_app_name
         return context
 
 
@@ -65,10 +67,6 @@ class DatasetDeleteView(DatasetMixin, LoginRequiredIfConfProtectedMixin, DetailV
         for task in self.object.tasks:
             status = task.status
             task_html += f"<li><span class='tag status status-{status}'>{status}</span> {task} #{task.id}</li>"
-        # for status, task_list in self.object.get_tasks_by_prop("status").items():
-        #     task_list = [f"{task} #{task.id}" for task in task_list]
-        #     task_nb += len(task_list)
-        #     task_html += f"<li><span class='tag status status-{status}'>{status}</span> {'<br>'.join(task_list)}</li>"
         task_html += "</ul>"
         return f"This dataset is used in <b>{len(tasks)} task(s)</b>: {task_html}"
 
@@ -88,3 +86,11 @@ class DatasetDeleteView(DatasetMixin, LoginRequiredIfConfProtectedMixin, DetailV
         if hasattr(self, "success_url"):
             return self.success_url
         return reverse(f"datasets:list")
+
+
+class DatasetMainView(DatasetMixin, DetailView):
+    """
+    main view for a single dataset
+    """
+
+    template_name = "datasets/view.html"

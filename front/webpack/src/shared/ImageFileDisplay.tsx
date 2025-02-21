@@ -5,7 +5,7 @@ import React from "react";
 import { MagnifyingContext } from "./ImageMagnifier";
 import { TooltipContext } from "./ImageTooltip";
 
-export interface ImageToDisplay {
+export interface ImageFileToDisplay {
     id: string;
     num: number;
     url: string;
@@ -16,16 +16,16 @@ export interface ImageToDisplay {
     metadata?: any;
 }
 
-interface ImageDisplayProps {
-    image: ImageToDisplay;
+interface ImageFileDisplayProps {
+    image: ImageFileToDisplay;
     similarity?: number;
     transpositions?: MatchTransposition[];
-    comparison?: ImageToDisplay;
+    comparison?: ImageFileToDisplay;
     href?: string;
     disable_magnify?: boolean;
 }
 
-export function ImageDisplay({image, similarity, transpositions, comparison, href, disable_magnify}: ImageDisplayProps) {
+export function ImageFileDisplay({image, similarity, transpositions, comparison, href, disable_magnify}: ImageFileDisplayProps) {
     /*
     Component to render a single watermark match.
     */
@@ -37,10 +37,12 @@ export function ImageDisplay({image, similarity, transpositions, comparison, hre
         <div className="display-item"
             onMouseEnter={() => tooltip.setTooltip && tooltip.setTooltip({image: image, transpositions})}
             onMouseLeave={() => tooltip.setTooltip && tooltip.setTooltip()}
-            >
+        >
             <div className="display-image">
-                <img src={image.url} alt={image.id} className={"display-img "+(transpositions || []).join(" ")}
-                onClick={!disable_magnify ? (() => magnifier.magnify && magnifier.magnify({image: image, transpositions, comparison})) : undefined}
+                <img src={image.url}
+                     alt={image.id}
+                     className={"image display-img "+(transpositions || []).join(" ")}
+                     onClick={!disable_magnify ? (() => magnifier.magnify && magnifier.magnify({image: image, transpositions, comparison})) : undefined}
                 />
             </div>
             <div className="display-tools" onClick={(e) => e.stopPropagation()}>
