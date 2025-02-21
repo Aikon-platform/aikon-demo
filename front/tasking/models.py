@@ -37,7 +37,7 @@ API_URL = getattr(settings, "API_URL", "http://localhost:5000")
 BASE_URL = getattr(settings, "BASE_URL", "http://localhost:8000")
 
 TypeDurationEval = Literal["short", "mid", "long"]
-TypeDuration = TypedDict("TypeDuration", { "delta":str, "eval":TypeDurationEval })
+TypeDuration = TypedDict("TypeDuration", {"delta": str, "eval": TypeDurationEval})
 
 
 def AbstractTask(task_prefix: str):
@@ -149,16 +149,23 @@ def AbstractTask(task_prefix: str):
                     delta : the duration, as a datetime.timedelta
                     eval  : an evaluation of the task duration's badness
             """
-            delta = (self.finished_on - self.requested_on  if self.finished_on and self.requested_on
-                    else datetime.now(timezone.utc) - self.requested_on if not self.is_finished and not self.finished_on
-                    else None)
+            delta = (
+                self.finished_on - self.requested_on
+                if self.finished_on and self.requested_on
+                else datetime.now(timezone.utc) - self.requested_on
+                if not self.is_finished and not self.finished_on
+                else None
+            )
             if delta is None:
                 return delta
-            eval:TypeDurationEval = ("short" if delta < timedelta(minutes=30)
-                                     else "mid" if delta < timedelta(minutes=120)
-                                     else "long")
-            return { "delta": delta, "eval": eval }
-
+            eval: TypeDurationEval = (
+                "short"
+                if delta < timedelta(minutes=30)
+                else "mid"
+                if delta < timedelta(minutes=120)
+                else "long"
+            )
+            return {"delta": delta, "eval": eval}
 
         @cached_property
         def full_log(self):
@@ -353,6 +360,23 @@ def AbstractTask(task_prefix: str):
             return {
                 "cleared_files": cleared,
             }
+
+        @classmethod
+        def get_available_models(cls):
+            try:
+                response = requests.get(f"{cls.api_endpoint_prefix}/models")
+                response.raise_for_status()
+                models = response.json()
+            except Exception as e:
+                return [("", f"Unable to fetch available models: {e}")]
+            if not models:
+                return [("", "No available models")]
+
+            # models = { "ref": { "name": "Display Name", "model": "filename", "desc": "Description" }, ... }
+            return [
+                (info["model"], f"{info['name']} ({info['desc']})")
+                for info in models.values()
+            ]
 
     @receiver(pre_delete, sender=AbstractTask)
     def pre_delete_task(sender, instance: AbstractTask, **kwargs):

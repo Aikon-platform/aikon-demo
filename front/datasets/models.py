@@ -510,7 +510,7 @@ class Dataset(AbstractDataset):
             docs = self.get_doc_image_mapping()
         except Exception as e:
             return {
-                "error": f"Error extracting images " + traceback.format_exc(limit=2)
+                "error": f"Error extracting images:\n{traceback.format_exc(limit=2)}"
             }
 
         extracted = 0
@@ -573,16 +573,18 @@ class Dataset(AbstractDataset):
 
                     except Exception as e:
                         return {
-                            "error": f"Error during {img_name} processing: {traceback.format_exc(limit=2)}"
+                            "error": f"Error during {img_name} processing:\n{traceback.format_exc(limit=2)}"
                         }
             except Exception as e:
                 return {
-                    "error": f"Error during images processing: {traceback.format_exc(limit=2)}"
+                    "error": f"Error during images processing:\n{traceback.format_exc(limit=2)}"
                 }
 
             # Check if any crops were created
             if extracted == 0:
-                return {"error": "No regions were successfully processed"}
+                return {
+                    "error": f"No regions were successfully processed in:\n{pprint(crops)}"
+                }
 
         except Exception as e:
             return {

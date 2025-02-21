@@ -37,6 +37,16 @@ export interface MagnifyingContext {
 
 export const MagnifyingContext = React.createContext<MagnifyingContext>({});
 
+const guessLink = (image: ImageFileToDisplay) => {
+    if (image.link) return image.link;
+    console.log("Guessing link for", image);
+    if (image.metadata?.page && image.document?.name.startsWith("cudllibcamacuk")) {
+        const url = image.document.src.replace("/iiif/", "/view/");
+        return `${url}/${image.metadata.page}`
+    }
+    return undefined;
+}
+
 export function ImageMagnifier({ image, transpositions, comparison }: MagnifyProps) {
     /*
     Component to render a magnified view of a watermark.
@@ -44,6 +54,8 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
     const context = React.useContext(MagnifyingContext);
     const setMagnifying = context.magnify!;
     const [transf, setTransf] = React.useState<MatchTransposition[]>(transpositions || []);
+    const imlink = image && guessLink(image);
+    const cplink = comparison && guessLink(comparison);
 
     // when clicking on one of the "rotate" buttons, generate a new CSS class to trigger the rotation:
     // the CSS class is one of the values of MatchTransposition.
@@ -76,7 +88,7 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
                         </div>
                         <div className="magnifying-info">
                             <ImageIdentification image={comparison} isTitle={true} prefix={"Query"}/>
-                            {comparison.link && <p><a href={comparison.link} target="_blank">See in context</a></p>}
+                            {cplink && <p><a href={cplink} target="_blank">See in context</a></p>}
                         </div>
                     </div>
                 }
@@ -92,8 +104,7 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
                             <IconBtn icon="mdi:rotate-right" onClick={() => manualTransform(90, false)} />
                             <IconBtn icon="mdi:flip-horizontal" onClick={() => manualTransform(0, true)} />
                         </p>
-                        {image.link && <p><a href={image.link} target="_blank">See in context</a></p>}
-
+                        {imlink && <p><a href={imlink} target="_blank">See in context</a></p>}
                     </div>
                 </div>
             </div>

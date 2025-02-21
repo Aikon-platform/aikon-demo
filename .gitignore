@@ -89,5 +89,6 @@ api/runs/
 node_modules/
 
 .idea/
+.vscode/
 
 front/shared/static/css/style.css.map

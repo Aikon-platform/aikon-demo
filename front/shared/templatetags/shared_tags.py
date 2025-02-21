@@ -1,20 +1,18 @@
-from typing import List,Any
+from typing import List, Any
 from datetime import timedelta
 
 from django import template
 from django.utils.safestring import mark_safe
 
-from ..utils import pprint
-
 register = template.Library()
 
 
-@register.filter("field_type")
+@register.filter
 def field_type(obj):
     return obj.field.widget.__class__.__name__
 
 
-@register.filter("field_classes")
+@register.filter
 def field_classes(obj):
     classes = obj.field.widget.attrs.get("extra-class", "")
     if type(classes) is list:
@@ -55,13 +53,14 @@ def startswith(text, starts):
             return True
     return False
 
+
 @register.filter
 def fmt_duration(delta):
     if delta is None or not isinstance(delta, timedelta):
         return delta
     hours, remainder = divmod(delta.seconds, 3600)
-    minutes,seconds=divmod(remainder, 60)
-    delta = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+    minutes, seconds = divmod(remainder, 60)
+    delta = "{:02}:{:02}:{:02}".format(int(hours), int(minutes), int(seconds))
     return delta
 
 
@@ -104,4 +103,5 @@ def can_monitor(user, app_name):
 
 # @register.filter("dump")
 # def dump(value):
+#     from ..utils import pprint
 #     return f"<pre>{pprint(value)}</pre>"
