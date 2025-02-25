@@ -6,7 +6,7 @@ x-proxy-settings: &proxy-settings
 services:
   web:
     build:
-      context: ..
+      context: ../front
       dockerfile: docker/Dockerfile
       args:
         USERID: ${USERID}

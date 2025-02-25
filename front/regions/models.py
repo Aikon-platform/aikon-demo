@@ -65,8 +65,8 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                 )
                 return
 
+            dataset_url = output.get("dataset_url")
             try:
-                dataset_url = output.get("dataset_url")
                 if dataset_url:
                     self.dataset.api_url = dataset_url
                     self.dataset.save()

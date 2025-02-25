@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/${USER}
 
-COPY --chown=${USER} front/requirements.txt front/requirements-prod.txt ./
+COPY --chown=${USER} ./requirements.txt ./requirements-prod.txt ./
 
 # Install python dependencies
 RUN python3.10 -m venv venv && \

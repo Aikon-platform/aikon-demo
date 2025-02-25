@@ -234,6 +234,8 @@ def AbstractTask(task_prefix: str):
                 self.on_task_success(data)
             elif event == "ERROR":
                 self.on_task_error(data)
+            else:
+                print(event)
 
         def get_progress(self):
             """
@@ -454,8 +456,10 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                 print(api_query.text)
                 self.status = "CANCELLED"
                 self.is_finished = True
-            except:
-                self.write_log(f"Error cancelling task: {api_query.text}")
+            except Exception as e:
+                self.write_log(
+                    f"Error cancelling task: {e}\nAPI response:{api_query.text}"
+                )
                 self.status = "ERROR"
                 self.is_finished = True
             self.save()
