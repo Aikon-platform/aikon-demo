@@ -36,9 +36,9 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                 self.on_task_error({"error": f"Incorrect output data:\n{pprint(data)}"})
                 return
             self.regions = output.get("annotations", {})
-            for doc_annotations in output.get("results_url", []):
-                # digit_annotations is supposed to be {doc.uid: result_url}
-                doc_uid, annotation_url = next(iter(doc_annotations.items()))
+            for doc_results in output.get("results_url", []):
+                doc_uid = doc_results.get("doc_id")
+                annotation_url = doc_results.get("result_url")
                 try:
                     response = requests.get(annotation_url, stream=True)
                     response.raise_for_status()
