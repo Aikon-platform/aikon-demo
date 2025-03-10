@@ -1,6 +1,6 @@
 var path = require('path')
 var webpack = require('webpack')
- 
+
 module.exports = {
   entry: './src/index.tsx',
   output: {
@@ -30,6 +30,12 @@ module.exports = {
     ],
   },
   resolve: {
+    alias: {
+      // doesn't work but let's leave it like that for now.
+      Src: path.resolve(__dirname, "src/"),
+      Shared: path.resolve(__dirname, "src/shared/")
+      // "@*": path.resolve(__dirname, "src/*")
+    },
     extensions: ['.tsx', '.ts', '.js'],
   },
   devtool: 'source-map'

@@ -1,43 +1,52 @@
+@import "_variables";
+
 // IMAGE DISPLAY BOX
 
 .display-image {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    &::before {
-        content: "";
-        display: block;
-        padding-top: 100%;
-        padding-left: 100%;
-    }
+    // &::before {
+    //     content: "";
+    //     display: block;
+    //     padding-top: 100%;
+    //     padding-left: 100%;
+    // }
 
     .display-img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: auto;
+        // position: absolute;
+        position: relative;
+        // top: 50%;
+        // left: 50%;
+        width:  auto;
         height: auto;
         max-height: 100%;
-        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        // transform: translate(-50%, -50%);
         &.rot270 {
-            transform: translate(-50%, -50%) rotate(270deg);
+            transform: rotate(270deg);
         }
         &.rot180 {
-            transform: translate(-50%, -50%) rotate(180deg);
+            transform: rotate(180deg);
         }
         &.rot90 {
-            transform: translate(-50%, -50%) rotate(90deg);
+            transform: rotate(90deg);
         }
         &.hflip {
-            transform: translate(-50%, -50%) scaleX(-1);
+            transform: scaleX(-1);
         }
         &.hflip.rot270 {
-            transform: translate(-50%, -50%) rotate(270deg) scaleX(-1);
+            transform: rotate(270deg) scaleX(-1);
         }
         &.hflip.rot180 {
-            transform: translate(-50%, -50%) rotate(180deg) scaleX(-1);
+            transform: rotate(180deg) scaleX(-1);
         }
         &.hflip.rot90 {
-            transform: translate(-50%, -50%) rotate(90deg) scaleX(-1);
+            transform: rotate(90deg) scaleX(-1);
         }
     }
 }
@@ -89,7 +98,6 @@
     }
 }
 
-
 .magnifier {
     position: fixed;
     z-index: 1000;
@@ -97,6 +105,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+
 
     .magnifier-close {
         position: absolute;
@@ -112,10 +121,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100%;
-        width: 100%;
-        max-width: 100%;
-        max-height: 100%;
+        height: 100vh;
+        width: 100vw;
         overflow: auto;
         gap: 2em;
     }
@@ -124,12 +131,50 @@
         background-color: white;
         border-radius: 2*$border-radius;
         text-align: center;
-        padding: 2em;
+        padding: 1em;
+        // setting only max-height without height breaks the sizing of child elements......................
+        // max-height: 90%;
+        // max-width: 40%;
+        min-height: 650px;
+        min-width: 400px;
+        overflow: scroll;
+        height: 90%;
+        width: 40%;
+        display: grid;
+        grid-template-rows: 75% 25%;
+        grid-template-columns: 100%;
+        gap: .5em;
+
+        &:has(.rot90, .rot270) {
+            // kind of hacky: when the image is in horizontal display, widen its .magnifying-item container
+            min-width: 500px;
+        }
+
+        .display-img {
+            object-fit: contain;
+        }
     }
 
     .magnifying-info {
-        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        &>* {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .title-identification {
+            word-break: break-all;
+            margin: 0;
+
+            .tag {
+                margin-bottom: 0px !important;
+            }
+        }
     }
+
 
     &::before {
         content: "";
@@ -183,4 +228,11 @@
             }
         }
     }
+}
+
+.list-invisible {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
 }

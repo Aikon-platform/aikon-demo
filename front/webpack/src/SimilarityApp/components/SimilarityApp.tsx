@@ -1,9 +1,8 @@
 import React from "react";
 import { SimilarityIndex, SimilarityMatches } from "../types";
 import { NameProvider } from "../../shared/types";
-import { ImageInfo } from "../../shared/types";
 import { ImageMagnifier, MagnifyingContext, MagnifyProps } from "../../shared/ImageMagnifier";
-import { fetchIIIFNames, getImageName, getSourceName, NameProviderContext } from "../../shared/naming";
+import { fetchIIIFNames, NameProviderContext } from "../../shared/naming";
 import { IconBtn } from "../../shared/IconBtn";
 import { ImageSimBrowser } from "./ImageSimBrowser";
 import { ClusteringTool } from "./ClusteringTool";
@@ -35,15 +34,18 @@ export function SimilarityApp(props: SimilarityProps) {
         </div>
     )
 
+
     return (
-    <NameProviderContext.Provider value={nameProvider}>
-        <TooltipContext.Provider value={{ setTooltip }}>
-            <MagnifyingContext.Provider value={{ magnify: setMagnifying }}>
-                {mode === "browse" && <ImageSimBrowser index={props.index} matches={props.matches} extra_toolbar_items={addtitional_toolbar} />}
-                <ClusteringTool index={props.index} matches={props.matches} visible={mode == "cluster"} extra_toolbar_items={addtitional_toolbar} />
-                {magnifying && <ImageMagnifier {...magnifying} />}
-                {tooltip && <ImageTooltip {...tooltip} />}
-            </MagnifyingContext.Provider>
-        </TooltipContext.Provider>
-    </NameProviderContext.Provider>)
+        <NameProviderContext.Provider value={nameProvider}>
+            <TooltipContext.Provider value={{ setTooltip }}>
+                <MagnifyingContext.Provider value={{ magnify: setMagnifying }}>
+                    {mode === "browse" && <ImageSimBrowser index={props.index} matches={props.matches} extra_toolbar_items={addtitional_toolbar} />}
+                    <ClusteringTool index={props.index} matches={props.matches} visible={mode == "cluster"} extra_toolbar_items={addtitional_toolbar} />
+                    {magnifying && <ImageMagnifier {...magnifying} />}
+                    {tooltip && <ImageTooltip {...tooltip} />}
+                </MagnifyingContext.Provider>
+            </TooltipContext.Provider>
+        </NameProviderContext.Provider>
+    )
+
 }

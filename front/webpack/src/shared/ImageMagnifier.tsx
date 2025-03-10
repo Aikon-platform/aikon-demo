@@ -1,25 +1,43 @@
+/**
+ * a component to render a magnified (zoomed) view
+ * of an image, a watermark or a comparison.
+ *
+ * it can be used:
+ *      - with a single image (MagnifyProps.image is defined,
+ *          but MagnifyProps.comparison is undefined)
+ *      - with an image and its comparison (MagnifyProps.image
+ *          and MagnifyProps.comparison are defined.)
+ *
+ * it is meant to be used as a provider:
+ * ```
+ *      <MagnifyingContext.Provider value={{ magnify: setMagnifying }}>
+ *          <!-- ... -->
+ *      </MagnifyingContext.Provider>
+ * ```
+ */
+
 import React from "react";
 import { IconBtn } from "./IconBtn";
 import { MatchTransposition } from "../SimilarityApp/types";
-import { ImageToDisplay } from "./ImageDisplay";
-import {ImageIdentification} from "./ImageIdentification";
+import { ImageFileToDisplay } from "./ImageFileDisplay";
+import { ImageIdentification } from "./ImageIdentification";
 
 
 export interface MagnifyProps {
-    image?: ImageToDisplay;
+    image?: ImageFileToDisplay;
     transpositions?: MatchTransposition[];
-    comparison?: ImageToDisplay;
+    comparison?: ImageFileToDisplay;
 }
 
 export interface MagnifyingContext {
     // Context to manage focusing on a Watermark
     magnify?: ({image, transpositions, comparison}:MagnifyProps) => void;
-    setComparison?: (comparison?: ImageToDisplay | undefined, setPinned?: (pinned: boolean) => void) => void;
+    setComparison?: (comparison?: ImageFileToDisplay | undefined, setPinned?: (pinned: boolean) => void) => void;
 }
 
 export const MagnifyingContext = React.createContext<MagnifyingContext>({});
 
-const guessLink = (image: ImageToDisplay) => {
+const guessLink = (image: ImageFileToDisplay) => {
     if (image.link) return image.link;
     console.log("Guessing link for", image);
     if (image.metadata?.page && image.document?.name.startsWith("cudllibcamacuk")) {
@@ -39,10 +57,12 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
     const imlink = image && guessLink(image);
     const cplink = comparison && guessLink(comparison);
 
+    // when clicking on one of the "rotate" buttons, generate a new CSS class to trigger the rotation:
+    // the CSS class is one of the values of MatchTransposition.
     const manualTransform = (deltaRot: 0 | 90 | -90, hflip: boolean) => {
-        const curRotStr = transf.find(t => t && t.startsWith("rot"));
-        const prevHflip = transf.includes("hflip");
-        const curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
+        const curRotStr = transf.find(t => t && t.startsWith("rot")),
+              prevHflip = transf.includes("hflip"),
+              curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
         let newRot = curRot;
         if (hflip && curRot % 180) newRot += 180;
         newRot = (newRot + deltaRot + 360) % 360;
@@ -50,6 +70,7 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
         if (newRot) newTransf.push(`rot${newRot}`);
         if (hflip !== prevHflip) newTransf.push("hflip");
         setTransf(newTransf as MatchTransposition[]);
+        console.log("newTransf", newTransf);
     }
 
     React.useEffect(() => {
@@ -76,6 +97,7 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
                         <img src={image.url} alt={image.id} className={"display-img " + (transf.join(" "))} />
                     </div>
                     <div className="magnifying-info">
+
                         <ImageIdentification image={image} isTitle={true}/>
                         <p className="actions my-2">
                             <IconBtn icon="mdi:rotate-left" onClick={() => manualTransform(-90, false)} />

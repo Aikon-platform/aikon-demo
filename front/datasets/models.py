@@ -3,10 +3,11 @@ import requests
 import uuid
 import json
 import traceback
+import os
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from PIL import Image as PImage
 
 from django.contrib.auth import get_user_model
@@ -19,7 +20,6 @@ from django.dispatch.dispatcher import receiver
 from shared.utils import pprint
 from .utils import PathAndRename, IMG_EXTENSIONS, unzip_on_the_fly, sanitize_str
 from .fields import URLListModelField
-
 
 User = get_user_model()
 path_datasets = PathAndRename("datasets/")
@@ -47,6 +47,8 @@ class AbstractDataset(models.Model):
     def full_path(self) -> Path:
         return Path(settings.MEDIA_ROOT) / "datasets" / f"{self.id}"
 
+    django_app_name = "datasets"  # must match INSTALLED_APPS and datasets.url.app_name
+
     class Meta:
         abstract = True
 
@@ -69,6 +71,7 @@ class Document:
             if path is not None
             else Path(settings.MEDIA_ROOT) / "documents" / self.uid
         )
+        self._document_tree = None
 
     @property
     def mapping_path(self):
@@ -96,12 +99,29 @@ class Document:
         """
         return self.path / "images"
 
+    def get_document_tree(self) -> str:
+        from .utils import TreeDict
+
+        tree = TreeDict(os.path.join(self.path, "images/"))
+        return tree.to_html_pre()
+
+    @property
+    def document_tree(self) -> str:
+        if self._document_tree is None:
+            self._document_tree = self.get_document_tree()
+        return self._document_tree
+
     def to_dict(self) -> Dict:
         return {
             "type": self.dtype,
             "src": str(self.src),
             "uid": str(self.uid),
         }
+
+    def to_json_with_images(self) -> Dict:
+        document_dict = self.to_dict()
+        document_dict["images"] = [image.to_dict() for image in self.images]
+        return document_dict
 
     def is_extracted(self) -> bool:
         if not self.path.exists():
@@ -183,6 +203,7 @@ class Image:
             "src": str(self.src),
             "path": str(self.path.relative_to(relpath)),
             "metadata": self.metadata,
+            "url": self.url,
         }
 
     @classmethod
@@ -312,6 +333,15 @@ class Dataset(AbstractDataset):
             docs.extend(self.img_documents)
         return docs
 
+    @property
+    def image_count(self) -> int:
+        """
+        number of in a Dataset. `Dataset.get_images()` also allows to get
+        the number of images but may trigger `Dataset.download_and_extract()`,
+        which takes time, while `image_count` is only used in templates
+        """
+        return sum(len(doc.images) for doc in self.documents)
+
     def documents_for_api(self) -> List[Dict]:
         return [doc.to_dict() for doc in self.documents]
 
@@ -410,8 +440,23 @@ class Dataset(AbstractDataset):
         """
         if not self._images:
             self.get_images()
-
         return {doc.uid: {im.id: im for im in doc.images} for doc in self.documents}
+
+    def get_doc_image_mapping_json(self) -> Dict[str, Dict[str, Dict]]:
+        """
+        same as ``get_doc_image_mapping``, but returns a valid JSON instead of python types.
+        the contents of each `document` are returned as a list of tuples to be able to order
+        images by their filename alphanumerically.
+        """
+        # sorted_document_images = lambda doc: (
+        #     sorted(
+        #         [(im.id, im.to_dict()) for im in doc.images], key=lambda t: t[1]["path"]
+        #     )
+        # )
+        return {
+            doc.uid: {im.id: im.to_dict() for im in doc.images}
+            for doc in self.documents
+        }
 
     def clear_dataset(self) -> Dict:
         """
@@ -540,13 +585,49 @@ class Dataset(AbstractDataset):
 
         return {"success": "Regions processed successfully"}
 
+    def get_tasks_for_prefix(self, prefix) -> List:
+        return (
+            list(getattr(self, f"{prefix}_tasks").all())
+            if hasattr(self, f"{prefix}_tasks")
+            else []
+        )
+
     @property
-    def tasks(self):
+    def tasks(self) -> List:
         t = []
         for task_prefix in settings.DEMO_APPS:
-            if hasattr(self, f"{task_prefix}_tasks"):
-                t += list(getattr(self, f"{task_prefix}_tasks").all())
+            if len(tasks := self.get_tasks_for_prefix(task_prefix)):
+                t += tasks
         return t
+
+    @property
+    def task_prefixes(self) -> List[str]:
+        """
+        a list of all tasks prefixes on which tasks have been run on this dataset
+        """
+        return [
+            prefix
+            for prefix in settings.DEMO_APPS
+            if len(self.get_tasks_for_prefix(prefix))
+        ]
+
+    @property
+    def tasks_by_prefix(self) -> List[Tuple[str, List]]:
+        """
+        same as `self.tasks`, but tasks are grouped by type/prefix.
+        Returns:
+            [
+                [ task_prefix, [List,of,tasks,for,prefix] ]
+            ]
+        """
+        prefixes = settings.DEMO_APPS
+        grouped_tasks = [
+            (task_prefix, tasks)
+            for task_prefix in prefixes
+            if len(tasks := self.get_tasks_for_prefix(task_prefix))
+        ]
+        # order groups by descending number of tasks
+        return sorted(grouped_tasks, key=lambda task_group: -len(task_group[1]))
 
     def get_tasks_by_prop(self, prop: str) -> Dict:
         info = {}

@@ -2,7 +2,7 @@ from django.utils.deconstruct import deconstructible
 import os
 import uuid
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 import requests
 from stream_unzip import stream_unzip
 import re
@@ -94,3 +94,98 @@ def sanitize_str(string: str) -> str:
         .replace("/", "^")
         .replace(" ", "_")
     )
+
+
+class TreeDict:
+    """
+    a dict representation of a directory tree,
+    along with helper functions to convert the tree to HTML
+
+    tree structure:
+        {
+            curdir  : Str,  # name of the current directory
+            files   : List[str],  # list of file names in the current directory
+            subdirs : List[dict],  # a list of subdirectories, each represented by the same structure
+        }
+
+    """
+
+    tree: Dict
+
+    def __init__(self, path: str | os.PathLike) -> Dict:
+        to_abspath = lambda _path, _file: os.path.join(_path, _file)
+        to_basename = lambda _path: Path(_path).name
+
+        self.tree = {"curdir": to_basename(path), "files": [], "subdirs": []}
+
+        for el in sorted(os.listdir(path)):
+            el_abspath = to_abspath(path, el)
+            if os.path.isfile(el_abspath):
+                self.tree["files"].append(to_basename(el_abspath))
+            elif os.path.isdir(el_abspath):
+                self.tree["subdirs"].append(TreeDict(el_abspath))
+
+    def to_html_list(self) -> str:
+        filearray_to_html = (
+            lambda files: f"""
+            <li>Files:
+                <ul>
+                    {"".join(f"<li>{f}</li>" for f in files)}
+                </ul>
+            </li>
+        """
+            if len(files)
+            else ""
+        )
+
+        subdirarray_to_html = (
+            lambda subdirs: f"""
+            <li>Directories:
+                <ul>
+                    {"".join(f"{dir_to_html(d)}" for d in subdirs)}
+                </ul>
+            </li>
+        """
+            if len(subdirs)
+            else ""
+        )
+
+        dir_to_html = (
+            lambda dir: f"""
+            <li>{dir["curdir"]}/
+                <ul>
+                    {filearray_to_html(dir["files"])}
+                    {subdirarray_to_html(dir["subdirs"])}
+                </ul>
+            </li>
+        """
+        )
+        return f"<ul>{dir_to_html(self.tree)}</ul>"
+
+    # as pre
+    def to_html_pre(self) -> str:
+        num_spaces = 4
+        indent = lambda lvl, spaces: " " * (lvl * spaces)
+
+        filearray_to_html = (
+            lambda files, lvl: (
+                "".join(f"{indent(num_spaces, lvl+1)}{f}\n" for f in files)
+            )
+            if len(files)
+            else ""
+        )
+
+        subdirarray_to_html = (
+            lambda subdirs, lvl: (
+                "".join(f"{dir_to_html(d.tree, lvl+1)}\n" for d in subdirs)
+            )
+            if len(subdirs)
+            else ""
+        )
+
+        dir_to_html = lambda dir, lvl: (
+            f"{indent(num_spaces, lvl)}{dir['curdir']}/\n"
+            + filearray_to_html(dir["files"], lvl)
+            + subdirarray_to_html(dir["subdirs"], lvl)
+        )
+        return f"<pre>{dir_to_html(self.tree, 0)}</pre>"

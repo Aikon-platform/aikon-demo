@@ -1,7 +1,7 @@
 import React from "react";
 import { ClusterEditorContext } from "../actions";
 import { ClusterImageInfo } from "../types";
-import { ImageDisplay } from "../../shared/ImageDisplay";
+import { ImageFileDisplay } from "../../shared/ImageFileDisplay";
 
 /*
   This file contains the React components that display the list of images in a cluster.
@@ -52,7 +52,7 @@ export function ClusterImage(props: { image: ClusterImageInfo; transformed: bool
   return (
     <div className={"cl-image card" + (props.selected ? " cl-selected" : "")} onClick={props.onClick}>
       {props.selectable && <a href="javascript:void(0)" className="cl-selecter"></a>}
-      <ImageDisplay image={{
+      <ImageFileDisplay image={{
         ...image,
         id: image.num.toString(),
         url: (editorContext?.state.base_url || "") + ((props.transformed && image.tsf_url) ? image.tsf_url : image.url),

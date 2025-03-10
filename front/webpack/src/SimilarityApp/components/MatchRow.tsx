@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { SimilarityMatches } from "../types";
-import { ImageDisplay } from "../../shared/ImageDisplay";
+import { ImageFileDisplay } from "../../shared/ImageFileDisplay";
 import { MatchGroup } from "./MatchGroup";
 import { MatchCSVExporter } from "./MatchExporter";
 import { getImageName, getSourceName, NameProviderContext } from "../../shared/naming";
@@ -35,7 +35,7 @@ export function MatchRow({matches, group_by_source, highlit, threshold}: MatchRo
             <div className="column match-query">
                 <ImageIdentification image={matches.query}/>
                 <div className="columns is-multiline match-items is-centered">
-                    <ImageDisplay image={matches.query} href={matchesRef(matches.query)}/>
+                    <ImageFileDisplay image={matches.query} href={matchesRef(matches.query)}/>
                 </div>
                 {groups.length > 5 && <p>
                     <a href="javascript:void(0)" onClick={toggleShowAll}>
