@@ -10,10 +10,10 @@ ADMINS = [(ENV("ADMIN_NAME"), ADMIN_EMAIL)]
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": ENV("DB_NAME"),
-        "USER": ENV("DB_USER"),
-        "PASSWORD": ENV("DB_PASSWORD"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": ENV("POSTGRES_DB"),
+        "USER": ENV("POSTGRES_USER"),
+        "PASSWORD": ENV("POSTGRES_PASSWORD"),
         "HOST": ENV("DB_HOST"),
         "PORT": ENV("DB_PORT"),
     }

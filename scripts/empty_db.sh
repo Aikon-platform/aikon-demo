@@ -14,6 +14,6 @@ tables=(
 )
 
 for table in "${tables[@]}"; do
-   psql -d $DB_NAME -c "TRUNCATE TABLE ${table} CASCADE;"
+   psql -d $POSTGRES_DB -c "TRUNCATE TABLE ${table} CASCADE;"
    color_echo "yellow" "Truncated ${table}"
 done
