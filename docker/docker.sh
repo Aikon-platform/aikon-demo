@@ -31,6 +31,12 @@ update_containers() {
     build_containers
 }
 
+delete_data() {
+    # sudo rm -rf "$DATA_FOLDER"
+    $dc rm -f $1
+    docker volume rm aikondemo_pgdata aikondemo_redisdata
+}
+
 case "$1" in
     start)
         start_containers
@@ -50,6 +56,16 @@ case "$1" in
     build)
         stop_containers
         build_containers
+        start_containers
+        ;;
+    destroy)
+        stop_containers
+        delete_data
+        ;;
+    fresh)
+        stop_containers
+        delete_data
+        $dc build --no-cache
         start_containers
         ;;
     *)

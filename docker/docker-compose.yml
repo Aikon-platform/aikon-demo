@@ -6,21 +6,20 @@ x-proxy-settings: &proxy-settings
 services:
   web:
     build:
-      context: ../front
+      context: ..
       dockerfile: docker/Dockerfile
       args:
         USERID: ${USERID}
         PORT: ${DJANGO_PORT}
     volumes:
       - ${DATA_FOLDER}:/data
-      - ../app:/home/aikon/app
     env_file:
       - ../front/.env
       - ./.env
     environment:
       <<: *proxy-settings
     ports:
-      - "${DJANGO_PORT}:8000"
+      - "${DJANGO_PORT:-8000}:${DJANGO_PORT:-8000}"
     depends_on:
       - db
       - redis
@@ -33,8 +32,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     env_file:
-      - ../front/.env
-      - ./.env
+      - ./front/.env
+#    environment:
+#      POSTGRES_USER: ${POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#      POSTGRES_DB: ${POSTGRES_DB}
     networks:
       - demo_network
     restart: unless-stopped
@@ -57,7 +59,7 @@ services:
       NGINX_PORT: ${NGINX_PORT:-8080}
     volumes:
       - ./nginx_conf:/etc/nginx/nginx.conf:ro
-      - ../front/staticfiles:/home/aikon-demo/app/staticfiles:ro
+#      - ../front/staticfiles:/home/aikon-demo/staticfiles:ro
       - ${DATA_FOLDER}:/data:ro
       - /etc/ssl:/etc/ssl:ro
     depends_on:

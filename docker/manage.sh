@@ -2,14 +2,13 @@
 
 set -e
 
-source /home/aikon-demo/front/.env
+source /home/aikon-demo/.env
 
-manage="/home/aikon/venv/bin/python /home/aikon-demo/front/manage.py"
+manage="/home/aikon/venv/bin/python /home/aikon-demo/manage.py"
 
 # wait 2sec for postgres to start
 sleep 2
 
-# TODO somehow not working
 $manage collectstatic --noinput
 
 $manage makemigrations
@@ -21,12 +20,12 @@ from django.contrib.auth import get_user_model;
 User = get_user_model();
 username = '$ADMIN_NAME';
 if not User.objects.filter(username=username).exists():
-    User.objects.create_superuser(username, '$ADMIN_EMAIL', '$DB_PASSWORD');
+    User.objects.create_superuser(username, '$ADMIN_EMAIL', '$POSTGRES_PASSWORD');
     print('Superuser created.');
 else:
     print('Superuser already exists.');
 " | $manage shell
 
-colorEcho blue '\nConnect to app using:'
+echo '\nConnect to app using:'
 echo -e "          👤 $ADMIN_NAME"
-echo -e "          🔑 $DB_PASSWORD"
+echo -e "          🔑 $POSTGRES_PASSWORD"

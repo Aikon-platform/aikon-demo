@@ -59,7 +59,7 @@ http {
 
         location /static/ {
             autoindex off;
-            alias /home/USERNAME/front/staticfiles/;
+            alias /home/USERNAME/staticfiles/;
         }
 
         location /media/ {
@@ -68,7 +68,7 @@ http {
         }
 
         location /favicon.ico {
-            alias /home/USERNAME/front/staticfiles/img/favicon.ico;
+            alias /home/USERNAME/staticfiles/img/favicon.ico;
         }
     }
 }

@@ -38,24 +38,26 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/${USER}
 
-COPY --chown=${USER} ./requirements.txt ./requirements-prod.txt ./
+COPY --chown=${USER} ./front/requirements.txt ./
 
 # Install python dependencies
 RUN python3.10 -m venv venv && \
     /home/${USER}/venv/bin/pip install --upgrade pip && \
-    /home/${USER}/venv/bin/pip install -r requirements-prod.txt
+    /home/${USER}/venv/bin/pip install -r requirements.txt
 
 # Copy app files
-COPY --chown=${USER} front /home/${USER}/front
+COPY --chown=${USER} front /home/${USER}
 COPY --chown=${USER} docker/supervisord.conf /home/${USER}/supervisord.conf
-COPY --chown=${USER} docker/.env /home/${USER}/.env
+# NOTE is it used?
+COPY --chown=${USER} docker/.env /home/${USER}/.env.docker
 
 # Must match the PORT in docker.sh
 EXPOSE ${PORT}
 
-RUN mkdir -p /home/${USER}/front/staticfiles && chown ${USER}:${USER} /home/${USER}/front/staticfiles
+RUN mkdir -p /home/${USER}/staticfiles && chown ${USER}:${USER} /home/${USER}/staticfiles
 
 COPY --chown=${USER} docker/manage.sh /home/aikon/manage.sh
+# TODO script not working
 RUN chmod +x /home/aikon/manage.sh
 
 # Launch app
