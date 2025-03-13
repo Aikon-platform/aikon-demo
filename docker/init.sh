@@ -61,16 +61,12 @@ if [ ! -d "$DATA_FOLDER" ]; then
     sudo chmod -R 775 "$DATA_FOLDER"
 fi
 
-if [ $need_update -eq 0 ]; then
+if [ $need_update -eq 1 ]; then
     color_echo yellow "Change detected in .env files. Updating configuration files..."
-
-#     sed -i -e "s~^POSTGRES_PASSWORD=.*~POSTGRES_PASSWORD=\"$POSTGRES_PASSWORD\"~" $DOCKER_ENV
-#     sed -i -e "s~^POSTGRES_USER=.*~POSTGRES_USER=\"$POSTGRES_USER\"~" $DOCKER_ENV
-#     sed -i -e "s~^POSTGRES_DB=.*~POSTGRES_DB=\"$POSTGRES_DB\"~" $DOCKER_ENV
 fi
 
 # generate nginx config without SSL certificate for nginx image inside Docker
-if [ ! -f "$FRONT_ROOT"/docker/nginx_conf ] || [ $need_update -eq 1 ] ; then
+if [ $need_update -eq 1 ] || [ ! -f "$FRONT_ROOT"/docker/nginx_conf ] ; then
     echo_title "GENERATING INTERNAL DOCKER NGINX CONFIG"
 
     cp "$FRONT_ROOT"/docker/nginx.conf.template "$FRONT_ROOT"/docker/nginx_conf
@@ -78,12 +74,11 @@ if [ ! -f "$FRONT_ROOT"/docker/nginx_conf ] || [ $need_update -eq 1 ] ; then
     sed -i -e "s~DJANGO_PORT~$DJANGO_PORT~" "$FRONT_ROOT"/docker/nginx_conf
     sed -i -e "s~NGINX_PORT~$NGINX_PORT~" "$FRONT_ROOT"/docker/nginx_conf
     sed -i -e "s~PROD_URL~$PROD_URL~" "$FRONT_ROOT"/docker/nginx_conf
-#     sed -i -e "s~USERNAME~$(whoami)~" "$FRONT_ROOT"/docker/nginx_conf
     sed -i -e "s~USERNAME~aikon-demo~" "$FRONT_ROOT"/docker/nginx_conf
 fi
 
 # generate nginx config with SSL certificate for outside Docker
-if [ ! -f "$FRONT_ROOT"/docker/nginx_ssl ] || [ $need_update -eq 1 ] ; then
+if [ $need_update -eq 1 ] || [ ! -f "$FRONT_ROOT"/docker/nginx_ssl ] ; then
     echo_title "GENERATING EXTERNAL NGINX CONFIG"
     cp "$FRONT_ROOT"/docker/nginx.conf.ssl_template "$FRONT_ROOT"/docker/nginx_ssl
 
@@ -93,7 +88,7 @@ if [ ! -f "$FRONT_ROOT"/docker/nginx_ssl ] || [ $need_update -eq 1 ] ; then
     sed -i -e "s~PROD_URL~$PROD_URL~" "$FRONT_ROOT"/docker/nginx_ssl
 fi
 
-if [ ! -f "$FRONT_ROOT"/docker/supervisord.conf ] || [ $need_update -eq 1 ] ; then
+if [ $need_update -eq 1 ] || [ ! -f "$FRONT_ROOT"/docker/supervisord.conf ] ; then
     echo_title "GENERATING SUPERVISORD CONFIG"
     cp "$FRONT_ROOT"/docker/supervisord.conf.template "$FRONT_ROOT"/docker/supervisord.conf
 

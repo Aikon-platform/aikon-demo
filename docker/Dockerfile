@@ -48,8 +48,6 @@ RUN python3.10 -m venv venv && \
 # Copy app files
 COPY --chown=${USER} front /home/${USER}
 COPY --chown=${USER} docker/supervisord.conf /home/${USER}/supervisord.conf
-# NOTE is it used?
-COPY --chown=${USER} docker/.env /home/${USER}/.env.docker
 
 # Must match the PORT in docker.sh
 EXPOSE ${PORT}
