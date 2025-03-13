@@ -38,12 +38,12 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/${USER}
 
-COPY --chown=${USER} ./front/requirements.txt ./
+COPY --chown=${USER} ./front/requirements.txt ./front/requirements-prod.txt ./
 
 # Install python dependencies
 RUN python3.10 -m venv venv && \
     /home/${USER}/venv/bin/pip install --upgrade pip && \
-    /home/${USER}/venv/bin/pip install -r requirements.txt
+    /home/${USER}/venv/bin/pip install -r requirements-prod.txt
 
 # Copy app files
 COPY --chown=${USER} front /home/${USER}

@@ -1,33 +1,8 @@
 DOCKER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 FRONT_ROOT="$(dirname "$DOCKER_DIR")"
 
-FRONT_ENV="$FRONT_ROOT/.env"
+FRONT_ENV="$FRONT_ROOT/front/.env"
 DOCKER_ENV="$FRONT_ROOT/docker/.env"
-
-check_env() {
-    local ENV_FILE=$1
-    local HASH_FILE="${ENV_FILE}_hash"
-
-    if [ ! -f "$ENV_FILE" ]; then
-        color_echo red "Error: Environment file $ENV_FILE does not exist" >&2
-        return 1
-    fi
-
-    local CURRENT_HASH=$(md5sum "$ENV_FILE" | awk '{print $1}')
-    if [ ! -f "$HASH_FILE" ]; then
-        echo "$CURRENT_HASH" > "$HASH_FILE"
-        return 0
-    fi
-
-    local STORED_HASH=$(cat "$HASH_FILE")
-
-    if [ "$STORED_HASH" != "$CURRENT_HASH" ]; then
-        echo "$CURRENT_HASH" > "$HASH_FILE"
-        return 0
-    else
-        return 1
-    fi
-}
 
 source "$FRONT_ROOT"/scripts/utils.sh
 
@@ -45,8 +20,34 @@ if [ ! -f $DOCKER_ENV ]; then
     update_env $DOCKER_ENV
 fi
 
+check_env() {
+    local ENV_FILE=$1
+    local HASH_FILE="${ENV_FILE}_hash"
+
+    if [ ! -f "$ENV_FILE" ]; then
+        color_echo red "Error: Environment file $ENV_FILE does not exist" >&2
+        return 1
+    fi
+
+    local CURRENT_HASH=$(md5sum "$ENV_FILE" | awk '{print $1}')
+    if [ ! -f "$HASH_FILE" ]; then
+        echo "$CURRENT_HASH" > "$HASH_FILE"
+        return 1
+    fi
+
+    local STORED_HASH=$(cat "$HASH_FILE")
+
+    if [ "$STORED_HASH" != "$CURRENT_HASH" ]; then
+        echo "$CURRENT_HASH" > "$HASH_FILE"
+        return 1
+    else
+        return 0 # unchanged
+    fi
+}
+
 check_env "$FRONT_ENV" || check_env "$DOCKER_ENV"
-need_update=$?   # 0 means changed, non-zero means unchanged
+need_update=$?   # 1 means changed, 0 means unchanged
+# TODO add check env for env template then update only changed variables
 
 source $FRONT_ENV
 source $DOCKER_ENV
@@ -69,7 +70,7 @@ if [ $need_update -eq 0 ]; then
 fi
 
 # generate nginx config without SSL certificate for nginx image inside Docker
-if [ ! -f "$FRONT_ROOT"/docker/nginx_conf ] || [ $need_update -eq 0 ] ; then
+if [ ! -f "$FRONT_ROOT"/docker/nginx_conf ] || [ $need_update -eq 1 ] ; then
     echo_title "GENERATING INTERNAL DOCKER NGINX CONFIG"
 
     cp "$FRONT_ROOT"/docker/nginx.conf.template "$FRONT_ROOT"/docker/nginx_conf
@@ -82,7 +83,7 @@ if [ ! -f "$FRONT_ROOT"/docker/nginx_conf ] || [ $need_update -eq 0 ] ; then
 fi
 
 # generate nginx config with SSL certificate for outside Docker
-if [ ! -f "$FRONT_ROOT"/docker/nginx_ssl ] || [ $need_update -eq 0 ] ; then
+if [ ! -f "$FRONT_ROOT"/docker/nginx_ssl ] || [ $need_update -eq 1 ] ; then
     echo_title "GENERATING EXTERNAL NGINX CONFIG"
     cp "$FRONT_ROOT"/docker/nginx.conf.ssl_template "$FRONT_ROOT"/docker/nginx_ssl
 
@@ -92,7 +93,7 @@ if [ ! -f "$FRONT_ROOT"/docker/nginx_ssl ] || [ $need_update -eq 0 ] ; then
     sed -i -e "s~PROD_URL~$PROD_URL~" "$FRONT_ROOT"/docker/nginx_ssl
 fi
 
-if [ ! -f "$FRONT_ROOT"/docker/supervisord.conf ] || [ $need_update -eq 0 ] ; then
+if [ ! -f "$FRONT_ROOT"/docker/supervisord.conf ] || [ $need_update -eq 1 ] ; then
     echo_title "GENERATING SUPERVISORD CONFIG"
     cp "$FRONT_ROOT"/docker/supervisord.conf.template "$FRONT_ROOT"/docker/supervisord.conf
 

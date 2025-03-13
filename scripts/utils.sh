@@ -81,6 +81,7 @@ prompt_user() {
         default_val=$current_val
     fi
 
+    # TODO allow empty value
     read -p "$env_var $desc"$'\n'"$default: " value
     echo "${value:-$default_val}"
 }

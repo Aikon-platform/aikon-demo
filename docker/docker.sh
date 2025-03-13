@@ -2,18 +2,17 @@
 
 # HOW TO USE
 # Inside the docker/ directory, run:
-# sudo bash docker.sh <start|stop|restart|update|build>
+# sudo bash docker.sh <start|stop|restart|update|build|destroy|fresh>
 
 set -e
 
 DOCKER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-# initialize the .env files and data folder permissions on first initialization
-bash "$DOCKER_DIR"/init.sh
-
 dc="docker-compose -p aikondemo"
 
 build_containers() {
+    # initialize the .env and config files as well as data folder permissions on first initialization
+    bash "$DOCKER_DIR"/init.sh
     $dc build
     # TODO collectstatic
 }
@@ -33,7 +32,7 @@ update_containers() {
 
 delete_data() {
     # sudo rm -rf "$DATA_FOLDER"
-    $dc rm -f $1
+    # $dc rm -f
     docker volume rm aikondemo_pgdata aikondemo_redisdata
 }
 
@@ -69,7 +68,7 @@ case "$1" in
         start_containers
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|update|build}"
+        echo "Usage: $0 {start|stop|restart|update|build|destroy|fresh}"
         exit 1
 esac
 
