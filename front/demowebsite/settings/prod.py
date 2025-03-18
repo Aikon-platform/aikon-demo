@@ -22,11 +22,14 @@ DATABASES = {
 API_URL = ENV("PROD_API_URL")
 BASE_URL = ENV("BASE_URL", default="https://aikon-demo.enpc.fr/")
 DOMAIN_NAME = urlparse(BASE_URL).netloc
-ALLOWED_HOSTS = [
-    *ENV.list("ALLOWED_HOSTS", default=[]),
-    DOMAIN_NAME,
-    "localhost",
-]
+
+hosts = ENV.list("ALLOWED_HOSTS", default=[]) + [DOMAIN_NAME, "localhost"]
+hosts += ["web"]  # for docker nginx service
+https_hosts = [f"https://{host}" for host in hosts]
+wildcard_hosts = [f"https://*.{host}" for host in hosts if "." in host]
+
+ALLOWED_HOSTS = hosts + https_hosts + wildcard_hosts
+CSRF_TRUSTED_ORIGINS = https_hosts + wildcard_hosts
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 

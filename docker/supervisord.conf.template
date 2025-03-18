@@ -7,7 +7,7 @@ pidfile=/tmp/supervisord.pid
 
 [program:dramatiq]
 command=/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py rundramatiq -p 1 -t 1
-directory=/home/aikondemo
+directory=/home/aikondemo/app
 user=aikondemo
 autostart=true
 autorestart=true
@@ -20,7 +20,7 @@ environment=PYTHONPATH="/home/aikondemo"
 
 [program:django]
 command=/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py runserver 0.0.0.0:DJANGO_PORT
-directory=/home/aikondemo
+directory=/home/aikondemo/app
 user=aikondemo
 autostart=true
 autorestart=true
