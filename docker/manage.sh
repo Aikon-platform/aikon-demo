@@ -2,9 +2,9 @@
 
 set -e
 
-source /home/aikon-demo/.env
+source /home/aikondemo/.env
 
-manage="/home/aikon/venv/bin/python /home/aikon-demo/manage.py"
+manage="/home/aikondemo/venv/bin/python /home/aikondemo/manage.py"
 
 # wait 2sec for postgres to start
 sleep 2

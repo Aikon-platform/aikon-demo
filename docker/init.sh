@@ -47,7 +47,6 @@ check_env() {
 
 check_env "$FRONT_ENV" || check_env "$DOCKER_ENV"
 need_update=$?   # 1 means changed, 0 means unchanged
-# TODO add check env for env template then update only changed variables
 
 source $FRONT_ENV
 source $DOCKER_ENV
@@ -74,7 +73,7 @@ if [ $need_update -eq 1 ] || [ ! -f "$FRONT_ROOT"/docker/nginx_conf ] ; then
     sed -i -e "s~DJANGO_PORT~$DJANGO_PORT~" "$FRONT_ROOT"/docker/nginx_conf
     sed -i -e "s~NGINX_PORT~$NGINX_PORT~" "$FRONT_ROOT"/docker/nginx_conf
     sed -i -e "s~PROD_URL~$PROD_URL~" "$FRONT_ROOT"/docker/nginx_conf
-    sed -i -e "s~USERNAME~aikon-demo~" "$FRONT_ROOT"/docker/nginx_conf
+    sed -i -e "s~USERNAME~aikondemo~" "$FRONT_ROOT"/docker/nginx_conf
 fi
 
 # generate nginx config with SSL certificate for outside Docker

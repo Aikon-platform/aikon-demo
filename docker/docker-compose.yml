@@ -59,7 +59,7 @@ services:
       NGINX_PORT: ${NGINX_PORT:-8080}
     volumes:
       - ./nginx_conf:/etc/nginx/nginx.conf:ro
-#      - ../front/staticfiles:/home/aikon-demo/staticfiles:ro
+#      - ../front/staticfiles:/home/aikondemo/static:ro
       - ${DATA_FOLDER}:/data:ro
       - /etc/ssl:/etc/ssl:ro
     depends_on:
