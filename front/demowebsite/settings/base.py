@@ -91,7 +91,6 @@ MEDIA_ROOT = Path(ENV("MEDIA_ROOT", default=BASE_DIR / "media"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# TODO change to use redis for docker
 REDIS_HOST = ENV.str("REDIS_HOST", "localhost")
 REDIS_PORT = ENV.str("REDIS_PORT", "6379")
 REDIS_PASSWORD = ENV.str("REDIS_PASSWORD", default="")
