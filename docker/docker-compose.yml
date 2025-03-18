@@ -30,13 +30,10 @@ services:
   db:
     image: postgres:13
     volumes:
+      - staticfiles:/home/aikondemo/app/staticfiles
       - pgdata:/var/lib/postgresql/data
     env_file:
       - ../front/.env
-#    environment:
-#      POSTGRES_DB: ${POSTGRES_DB:-demowebsite}
-#      POSTGRES_USER: ${POSTGRES_USER:-demowebsite}
-#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
       - demo_network
     restart: unless-stopped
@@ -58,8 +55,8 @@ services:
       PROD_URL: ${PROD_URL:-localhost}
       NGINX_PORT: ${NGINX_PORT:-8080}
     volumes:
+      - staticfiles:/usr/share/nginx/html/static:ro
       - ./nginx_conf:/etc/nginx/nginx.conf:ro
-#      - ../front/staticfiles:/home/aikondemo/app/staticfiles:ro
       - ${DATA_FOLDER}:/data:ro
       - /etc/ssl:/etc/ssl:ro
     depends_on:

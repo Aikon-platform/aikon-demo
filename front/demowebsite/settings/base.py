@@ -84,13 +84,14 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = Path(ENV("MEDIA_ROOT", default=BASE_DIR / "media"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# TODO change to use redis for docker
 REDIS_HOST = ENV.str("REDIS_HOST", "localhost")
 REDIS_PORT = ENV.str("REDIS_PORT", "6379")
 REDIS_PASSWORD = ENV.str("REDIS_PASSWORD", default="")
