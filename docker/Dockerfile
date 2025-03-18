@@ -46,17 +46,17 @@ RUN python3.10 -m venv venv && \
     /home/${USER}/venv/bin/pip install -r requirements-prod.txt
 
 # Copy app files
-COPY --chown=${USER} front /home/${USER}
+COPY --chown=${USER} front /home/${USER}/app
 COPY --chown=${USER} docker/supervisord.conf /home/${USER}/supervisord.conf
 
 # Must match the PORT in docker.sh
 EXPOSE ${PORT}
 
-RUN mkdir -p /home/${USER}/staticfiles && chown ${USER}:${USER} /home/${USER}/staticfiles
+RUN mkdir -p /home/${USER}/app/staticfiles && chown ${USER}:${USER} /home/${USER}/app/staticfiles
 
-COPY --chown=${USER} docker/manage.sh /home/aikon/manage.sh
-# TODO script not working
-RUN chmod +x /home/aikon/manage.sh
+COPY --chown=${USER} docker/manage.sh /home/${USER}/manage.sh
+RUN chmod +x /home/${USER}/manage.sh
+RUN /home/${USER}/manage.sh
 
 # Launch app
 CMD export LC_ALL=C.UTF-8 && export LANG=C.UTF-8 && \

@@ -6,7 +6,7 @@ logfile_maxbytes=0
 pidfile=/tmp/supervisord.pid
 
 [program:dramatiq]
-command=/home/aikondemo/venv/bin/python /home/aikondemo/manage.py rundramatiq -p 1 -t 1
+command=/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py rundramatiq -p 1 -t 1
 directory=/home/aikondemo
 user=aikondemo
 autostart=true
@@ -19,7 +19,7 @@ stopsignal=QUIT
 environment=PYTHONPATH="/home/aikondemo"
 
 [program:django]
-command=/home/aikondemo/venv/bin/python /home/aikondemo/manage.py runserver 0.0.0.0:DJANGO_PORT
+command=/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py runserver 0.0.0.0:DJANGO_PORT
 directory=/home/aikondemo
 user=aikondemo
 autostart=true
