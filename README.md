@@ -1,7 +1,7 @@
 # Discover-demo
 A web interface to showcase demos of the Discover project.
 
-Please refer to [api/README](https://github.com/Aikon-platform/discover-api/blob/main/README.md) and [front/README](front/README.md) for installing and running each individual part.
+Please refer to [api/README](https://github.com/Aikon-platform/aikon-api/blob/main/README.md) and [front/README](front/README.md) for installing and running each individual part.
 
 ## General requirements
 
@@ -13,7 +13,7 @@ Please refer to [api/README](https://github.com/Aikon-platform/discover-api/blob
 
 ## Development
 
-1. To install the API and Front application following the instructions in [api/README](https://github.com/Aikon-platform/discover-api/blob/main/README.md) and [front/README](front/README.md)
+1. To install the API and Front application following the instructions in [api/README](https://github.com/Aikon-platform/aikon-api/blob/main/README.md) and [front/README](front/README.md)
     ```bash
     bash setup.sh
     ```

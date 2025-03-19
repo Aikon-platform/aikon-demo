@@ -1,0 +1,32 @@
+[supervisord]
+nodaemon=true
+user=root
+logfile=/dev/stdout
+logfile_maxbytes=0
+pidfile=/tmp/supervisord.pid
+
+[program:dramatiq]
+command=/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py rundramatiq -p 1 -t 1
+directory=/home/aikondemo/app
+user=aikondemo
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+stopsignal=QUIT
+environment=PYTHONPATH="/home/aikondemo"
+
+[program:django]
+command=/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py runserver 0.0.0.0:DJANGO_PORT
+directory=/home/aikondemo/app
+user=aikondemo
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+stopsignal=QUIT
+environment=PYTHONPATH="/home/aikondemo"

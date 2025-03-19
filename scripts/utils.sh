@@ -65,7 +65,7 @@ echo_title(){
 }
 
 generate_random_string() {
-    echo "$(openssl rand -base64 32 | tr -d '/\n')"
+    echo "$(openssl rand -base64 32 | tr -d '/\n' | sed -r -e "s/[^a-zA-Z0-9]+$//")"
 }
 
 prompt_user() {
@@ -81,6 +81,49 @@ prompt_user() {
         default_val=$current_val
     fi
 
+    # TODO allow empty value
     read -p "$env_var $desc"$'\n'"$default: " value
     echo "${value:-$default_val}"
+}
+
+get_env_value() {
+    param=$1
+    env_file=$2
+    value=$(awk -F= -v param="$param" '/^[^#]/ && $1 == param {gsub(/"/, "", $2); print $2}' "$env_file")
+    echo "$value"
+}
+
+SED_CMD="sed -i -e"
+
+update_env() {
+    env_file=$1
+    IFS=$'\n' read -d '' -r -a lines < "$env_file"  # Read file into array
+    for line in "${lines[@]}"; do
+        if [[ $line =~ ^[^#]*= ]]; then
+            param=$(echo "$line" | cut -d'=' -f1)
+            current_val=$(get_env_value "$param" "$env_file")
+
+            # Extract description from previous line if it exists
+            desc=""
+            if [[ $prev_line =~ ^# ]]; then
+                desc=$(echo "$prev_line" | sed 's/^#\s*//')
+            fi
+
+            case $param in
+                *PASSWORD*)
+                    default_val="$(generate_random_string)"
+                    ;;
+                *SECRET*)
+                    default_val="$(generate_random_string)"
+                    ;;
+                *)
+                    default_val="$current_val"
+                    ;;
+            esac
+
+            new_value=$(prompt_user "$param" "$default_val" "$current_val" "$desc")
+            $SED_CMD "s~^$param=.*~$param=\"$new_value\"~" "$env_file"
+        fi
+        prev_line="$line"
+    done
 }

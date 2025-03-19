@@ -69,6 +69,8 @@ Thumbs.db
 .env.prod
 .env.dev
 .venv
+supervisord.conf
+.*hash
 env/
 venv/
 ENV/
@@ -92,3 +94,6 @@ node_modules/
 .vscode/
 
 front/shared/static/css/style.css.map
+
+nginx_conf
+nginx_ssl

@@ -43,15 +43,11 @@ def send_newaccount_notification(user):
         send_mail(
             "[Discover Demo] User Account requested",
             (
-                "Dear {nom},\n\n"
-                "A new account request was submitted by {username}.\n"
-                "Please review it on the admin page at {url}.\n\n"
+                f"Dear {admin_user.first_name},\n\n"
+                f"A new account request was submitted by {user.username}.\n"
+                f"Please review it on the admin page at {settings.BASE_URL + reverse('accounts_admin')}.\n\n"
                 "Best regards,\n"
                 "The Discover team"
-            ).format(
-                nom=admin_user.first_name,
-                username=user.username,
-                url=settings.BASE_URL + reverse("accounts_admin"),
             ),
             settings.DEFAULT_FROM_EMAIL,
             [admin_user.email],
