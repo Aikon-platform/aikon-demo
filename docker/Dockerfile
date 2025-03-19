@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     redis-server \
     supervisor \
+    tzdata \
     ffmpeg \
     libsm6 \
     libxext6 \

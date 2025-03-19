@@ -15,8 +15,8 @@ services:
       - staticfiles:/home/aikondemo/app/staticfiles
       - ${DATA_FOLDER}:/data
     env_file:
-      - ../front/.env
       - ./.env
+      - ../front/.env
     environment:
       <<: *proxy-settings
     ports:
@@ -46,8 +46,8 @@ services:
   nginx:
     image: nginx:latest
     env_file:
-      - ../front/.env
       - ./.env
+      - ../front/.env
     ports:
       - "${NGINX_PORT:-8080}:${NGINX_PORT:-8080}"
     environment:

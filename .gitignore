@@ -69,6 +69,8 @@ Thumbs.db
 .env.prod
 .env.dev
 .venv
+supervisord.conf
+.*hash
 env/
 venv/
 ENV/

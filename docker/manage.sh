@@ -2,8 +2,6 @@
 
 set -e
 
-source /home/aikondemo/app/.env
-
 manage="/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py"
 
 # wait 2sec for postgres to start
@@ -14,6 +12,7 @@ $manage collectstatic --noinput
 $manage makemigrations
 $manage migrate
 
+# source /home/aikondemo/app/.env
 # # Create superuser if it doesn't exist
 # echo "
 # from django.contrib.auth import get_user_model;
