@@ -27,6 +27,6 @@ if not User.objects.filter(username=username).exists():
 create_superuser
 # echo "from django.contrib.auth.models import User; User.objects.create_superuser('$ADMIN_NAME', '$ADMIN_EMAIL', '$POSTGRES_PASSWORD')" | $manage shell
 
-colorEcho blue '\nConnect to app using:'
+color_echo blue '\nConnect to app using:'
 echo -e "          👤 $ADMIN_NAME"
 echo -e "          🔑 $POSTGRES_PASSWORD"

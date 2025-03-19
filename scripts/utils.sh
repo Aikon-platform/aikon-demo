@@ -65,7 +65,7 @@ echo_title(){
 }
 
 generate_random_string() {
-    echo "$(openssl rand -base64 32 | tr -d '/\n')"
+    echo "$(openssl rand -base64 32 | tr -d '/\n' | sed -r -e "s/[^a-zA-Z0-9]+$//")"
 }
 
 prompt_user() {
