@@ -6,7 +6,6 @@ import traceback
 from typing import Dict, Any, Literal, TypedDict
 from pathlib import Path
 from datetime import datetime, timedelta
-from time import strftime
 
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -216,7 +215,7 @@ def AbstractTask(task_prefix: str):
             to have all db updates in one place
             """
             self.is_finished = True
-            self.finished_on = datetime.now()
+            self.finished_on = timezone.now()
 
         def start_task(self, endpoint: str = "start"):
             """
