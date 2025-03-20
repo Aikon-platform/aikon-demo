@@ -13,7 +13,9 @@ dc="docker-compose -p aikondemo"
 build_containers() {
     # initialize the .env and config files as well as data folder permissions on first initialization
     bash "$DOCKER_DIR"/init.sh
+    docker network disconnect -f aikondemo_demo_network aikonapi
     $dc build
+    docker network connect aikondemo_demo_network aikonapi
     # TODO collectstatic
 }
 
