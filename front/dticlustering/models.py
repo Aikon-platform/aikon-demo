@@ -21,7 +21,7 @@ from tasking.models import AbstractAPITaskOnDataset
 User = get_user_model()
 
 API_URL = getattr(settings, "API_URL", "http://localhost:5000")
-BASE_URL = getattr(settings, "BASE_URL", "http://localhost:8000")
+BASE_URL = "http://web:8002"  # getattr(settings, "BASE_URL", "http://localhost:8000")
 
 
 class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
@@ -58,7 +58,7 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
 
     def get_task_kwargs(self):
         return {
-            "dataset_url": f"{settings.BASE_URL}{self.dataset.zip_file.url}",  # TODO not only zip_file
+            "dataset_url": f"{BASE_URL}{self.dataset.zip_file.url}",  # TODO not only zip_file
             "dataset_id": str(self.dataset.id),
             "parameters": json.dumps(self.parameters),
         }

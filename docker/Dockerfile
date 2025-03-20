@@ -9,6 +9,11 @@ ENV USER=aikondemo
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/home/${USER}
 
+ENV http_proxy=http://proxy.enpc.fr:3128
+ENV https_proxy=http://proxy.enpc.fr:3128
+ENV HTTP_PROXY=http://proxy.enpc.fr:3128
+ENV HTTPS_PROXY=http://proxy.enpc.fr:3128
+
 RUN useradd -u ${USERID} -m -d /home/${USER} ${USER}
 
 # Set up environment

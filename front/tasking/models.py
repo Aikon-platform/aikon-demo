@@ -198,7 +198,8 @@ def AbstractTask(task_prefix: str):
             """
             Returns the URL to notify the front-end
             """
-            return f"{BASE_URL}{reverse(f'{self.django_app_name}:notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
+            base_url = "http://web:8002"
+            return f"{base_url}{reverse(f'{self.django_app_name}:notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
 
         def get_task_kwargs(self):
             return {"parameters": self.parameters}
@@ -211,7 +212,7 @@ def AbstractTask(task_prefix: str):
             When a task finishes (no matter the reason: success/error/cancel),
             update fields `is_finished` and `finished_on`
 
-            TOOD:move setting of `self.status` field  and `self.save()`
+            TODO: move setting of `self.status` field  and `self.save()`
             to have all db updates in one place
             """
             self.is_finished = True

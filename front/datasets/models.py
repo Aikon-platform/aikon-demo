@@ -24,6 +24,8 @@ from .fields import URLListModelField
 User = get_user_model()
 path_datasets = PathAndRename("datasets/")
 
+BASE_URL = "http://web:8002"
+
 
 class AbstractDataset(models.Model):
     """
@@ -283,7 +285,7 @@ class Dataset(AbstractDataset):
         if not hasattr(self, "_zip_document"):
             self._zip_document = Document(
                 dtype="zip",
-                src=f"{settings.BASE_URL}{self.zip_file.url}",
+                src=f"{BASE_URL}{self.zip_file.url}",
                 # path=self.full_path / "unzipped",
             )
         return self._zip_document
@@ -293,7 +295,7 @@ class Dataset(AbstractDataset):
         if not hasattr(self, "_pdf_document"):
             self._pdf_document = Document(
                 dtype="pdf",
-                src=f"{settings.BASE_URL}{self.pdf_file.url}",
+                src=f"{BASE_URL}{self.pdf_file.url}",
                 # path=self.full_path / "pdf",
             )
         return self._pdf_document
