@@ -64,7 +64,7 @@ http {
 
         location /media/ {
             autoindex off;
-            alias /data/;
+            alias /data/mediafiles/;
         }
 
         location /favicon.ico {
