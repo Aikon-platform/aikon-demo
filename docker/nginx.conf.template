@@ -36,6 +36,7 @@ http {
 
         location / {
             proxy_pass              http://django;
+            client_max_body_size    5000M;
             proxy_pass_header       Set-Cookie;
 
             proxy_set_header        Host                 $http_host;
