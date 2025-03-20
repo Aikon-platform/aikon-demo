@@ -14,12 +14,12 @@ build_containers() {
     # initialize the .env and config files as well as data folder permissions on first initialization
     bash "$DOCKER_DIR"/init.sh
     $dc build
-    docker network connect aikondemo_demo_network aikonapi
+    docker network connect aikondemo_demo_network aikonapi || true
     # TODO collectstatic
 }
 
 stop_containers() {
-    docker network disconnect -f aikondemo_demo_network aikonapi
+    docker network disconnect -f aikondemo_demo_network aikonapi || true
     $dc down
 }
 
