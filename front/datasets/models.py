@@ -24,7 +24,7 @@ from .fields import URLListModelField
 User = get_user_model()
 path_datasets = PathAndRename("datasets/")
 
-BASE_URL = "http://web:8002"
+BASE_URL = "http://nginx:8081"
 
 
 class AbstractDataset(models.Model):
@@ -317,7 +317,7 @@ class Dataset(AbstractDataset):
     def img_documents(self) -> List[Document]:
         if not hasattr(self, "_img_documents"):
             self._img_documents = [
-                # Document(dtype="img", src=f"{settings.BASE_URL}{img.url}")
+                # Document(dtype="img", src=f"{BASE_URL}{img.url}")
                 # for img in self.img_files
             ]
         return self._img_documents
