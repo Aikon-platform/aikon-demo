@@ -57,9 +57,11 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
         return f"{self.result_media_url}/results.zip"
 
     def get_task_kwargs(self):
+        kwargs = super().get_task_kwargs()
         return {
-            "dataset_url": f"{settings.BASE_URL}{self.dataset.zip_file.url}",  # TODO not only zip_file
-            "dataset_id": str(self.dataset.id),
+            **kwargs,
+            # "dataset_url": f"{settings.BASE_URL}{self.dataset.zip_file.url}",  # TODO not only zip_file
+            # "dataset_id": str(self.dataset.id),
             "parameters": json.dumps(self.parameters),
         }
 

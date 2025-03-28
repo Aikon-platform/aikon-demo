@@ -210,7 +210,7 @@ def AbstractTask(task_prefix: str):
             When a task finishes (no matter the reason: success/error/cancel),
             update fields `is_finished` and `finished_on`
 
-            TOOD:move setting of `self.status` field  and `self.save()`
+            TODO: move setting of `self.status` field  and `self.save()`
             to have all db updates in one place
             """
             self.is_finished = True
