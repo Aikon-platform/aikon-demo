@@ -1,3 +1,4 @@
+@use "sass:color";
 @import "_variables";
 
 .matches-viewer {
@@ -16,7 +17,7 @@
         }
 
         .match-group, .match-query, .match-expanded {
-            border: 8px solid lighten($faded-color, 5%);
+            border: 8px solid color.adjust($faded-color, $lightness: 5%);
             padding: 0.5em;
             border-radius: 4*$border-radius;
 

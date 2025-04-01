@@ -1,7 +1,8 @@
+@use "sass:color";
 @use "bulma/sass" with (
     $scheme-main: hsl(233, 100%, 63%),
+    $success: hsl(84, 74%, 43%),
 );
-
 @import "_variables";
 
 *, *::before, *::after {
@@ -108,7 +109,7 @@ input[type="submit"], input[type="file"], button, .btn {
     text-decoration: none;
 
     .iconify {
-        margin: 0em;
+        margin: 0;
         width: 1.3em;
         height: 1.3em;
         & + span {
@@ -130,11 +131,11 @@ input[type="submit"], input[type="file"], button, .btn {
     }
     &.cancel {
         background: $red;
-        border-color: darken($red, 20%);
+        border-color: color.adjust($red, $lightness: -20%);
     }
     &.validate {
         background: $green;
-        border-color: darken($green, 20%);
+        border-color: color.adjust($green, $lightness: -20%);
     }
     &:disabled, &.disabled {
         background-color: #ccc;
@@ -147,7 +148,7 @@ input[type="submit"], input[type="file"], button, .btn {
     }
 
     &.is-outline {
-        background-color: lighten($bg-color, 5%);
+        background-color: color.adjust($bg-color, $lightness: 5%);
         border: 2px solid $main-color;
         color: $main-color;
     }
@@ -176,11 +177,11 @@ ul.messages {
         border-radius: $border-radius;
 
         &.success {
-            background-color: darken($green, 50%);
+            background-color: color.adjust($green, $lightness: -50%);
             color: #fff;
         }
         &.warning, &.error {
-            background-color: darken($red, 50%);
+            background-color: color.adjust($red, $lightness: -50%);
             color: #fff;
         }
     }
@@ -193,7 +194,7 @@ ul.messages {
     max-width: 700px;
     margin: 0 auto;
     .row {
-        background-color: lighten($bg-color, 5%);
+        background-color: color.adjust($bg-color, $lightness: 5%);
         border-radius: $border-radius;
         border: 2px solid $grey;
         margin: 0.5em 0;
@@ -373,6 +374,31 @@ ul.messages {
     display: flex;
     justify-content: center; /* Horizontal centering */
     align-items: center; /* Vertical centering */
+}
+
+.duration-tag {
+    display: inline-block;
+    padding: 0.25rem 0.5rem 0.2rem;
+    margin: 0.25rem;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+
+    &.short {
+        background-color: color.adjust($green, $lightness: 50%);
+        color: $green;
+    }
+
+    &.mid {
+        background-color: color.adjust($yellow, $lightness: 50%);
+        color: $yellow;
+    }
+
+    &.long {
+        background-color: color.adjust($red, $lightness: 50%);
+        color: $red;
+    }
 }
 
 @import "_progresstracking";

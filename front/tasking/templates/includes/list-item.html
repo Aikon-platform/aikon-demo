@@ -29,17 +29,16 @@
         <span class="tag status status-{{ task.status }}">{{ task.status }}</span>
     </div>
     <p class="user"><span class="iconify" data-icon="mdi:account"></span> {{ task.requested_by.username }}</p>
-    <div class="">
+    <div>
         <p class="date">{{ task.requested_on|date:"Y-m-d H:i" }}
             {% if task.task_duration %}
-                <span class="
-                    tag is-white is-normal
+                <span class="duration-tag
                     {% if task.task_duration.eval == 'short' %}
-                         has-text-success
+                        short
                     {% elif task.task_duration.eval == 'mid' %}
-                        has-text-warning
+                        mid
                     {% else %}
-                        has-text-danger
+                        long
                     {% endif %}"
                 >{{ task.task_duration.delta|fmt_duration }}</span>
             {% endif %}
