@@ -20,9 +20,13 @@ class RegionsForm(AbstractTaskOnDatasetForm):
         required=True,
     )
 
-    postprocess_watermarks = forms.BooleanField(
-        label="Squarify and add 5% margin to crops",
-        required=False,
+    postprocess = forms.ChoiceField(
+        choices=[
+            ("", "No postprocessing"),
+            ("watermarks", "Squarify and add 5% margin to crops"),
+            ("character_line_extraction", r"Add 10% horizontal margin and 30% vertical margin")
+        ],
+        required=False
     )
 
     def __init__(self, *args, **kwargs):
@@ -30,32 +34,12 @@ class RegionsForm(AbstractTaskOnDatasetForm):
         self.fields["model"].choices = Regions.get_available_models()
 
 
-    # def clean(self):
-    #     """when attempting to run a character extraction, assert that a successful line extraction has previously been run"""
-    #     cleaned_data = super().clean()
-    #     model = cleaned_data.get("model", None)
-    #     dataset = cleaned_data.get("dataset", None)
-    #     id_dataset = dataset.id if dataset is not None else None
-    #     if model == "character_line_extraction":
-    #         #NOTE about the `parameters__icontains`: in Django SQLite, JSON filtering operations
-    #         # are not supported, so the JSON filtering `jsonfield__contains=<dict>` does not work. so,
-    #         # we use string filtering: `__icontains` to ensure that we have a successful line_extraction.
-    #         q = Regions.objects.filter(
-    #             Q(dataset=id_dataset)
-    #             & Q(parameters__icontains='"line_extraction"')  # double quotes to ensure we filter by the entire model name
-    #             & Q(status="SUCCESS")
-    #         )
-    #         if not q.exists():
-    #             raise ValidationError("A successful line extraction needs to be run before performing a character extraction.")
-    #     return
-
-
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.parameters = {"model": self.cleaned_data["model"]}
-        if self.cleaned_data.get("postprocess_watermarks"):
-            instance.parameters["postprocess"] = "watermarks"
-
+        instance.parameters = {
+            "model": self.cleaned_data["model"],
+            "postprocess": self.cleaned_data.get("postprocess", "")
+        }
         if commit:
             instance.save()
         return instance

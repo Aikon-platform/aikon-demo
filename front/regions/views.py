@@ -12,7 +12,6 @@ class RegionsMixin:
     """
     Mixin for Regions extractions views
     """
-
     model = Regions
     form_class = RegionsForm
     task_name = "Regions Extraction"
