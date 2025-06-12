@@ -112,4 +112,35 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = ENV(
     "DATA_UPLOAD_MAX_MEMORY_SIZE", default=25 * 1024 * 1024
 )
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "WARNING",
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "django.core.mail": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+    "formatters": {
+        "verbose": {
+            "format": "[%(asctime)s - %(levelname)s] %(funcName)s \n%(message)s \n"
+        },
+    },
+}
+
 LOGOUT_REDIRECT_URL = reverse_lazy("home")
