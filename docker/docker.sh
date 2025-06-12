@@ -9,17 +9,38 @@ set -e
 DOCKER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 dc="docker-compose -p aikondemo"
+NETWORK_NAME="aikondemo_demo_network"
+API_CONTAINER="aikonapi"
+
+create_network() {
+    if ! network_exists; then
+        color_echo blue "\nCreating Docker network $NETWORK_NAME"
+        docker network create "$NETWORK_NAME" --driver bridge
+    else
+        color_echo blue "\nNetwork $NETWORK_NAME already exists"
+    fi
+}
+
+connect_api() {
+    if ! docker network inspect "$NETWORK_NAME" | grep -q "$API_CONTAINER"; then
+        color_echo blue "\nConnecting $API_CONTAINER to $NETWORK_NAME"
+        docker network connect "$NETWORK_NAME" "$API_CONTAINER" || true
+    else
+        color_echo blue "\n$API_CONTAINER is already connected to $NETWORK_NAME"
+    fi
+}
 
 build_containers() {
     # initialize the .env and config files as well as data folder permissions on first initialization
     bash "$DOCKER_DIR"/init.sh
+    create_network
     $dc build
-    docker network connect aikondemo_demo_network aikonapi || true
+    connect_api
     # TODO collectstatic
 }
 
 stop_containers() {
-    docker network disconnect -f aikondemo_demo_network aikonapi || true
+    docker network disconnect -f "$NETWORK_NAME" "$API_CONTAINER" || true
     $dc down
 }
 
