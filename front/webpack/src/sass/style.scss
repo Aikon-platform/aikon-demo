@@ -3,7 +3,12 @@
     $scheme-main: hsl(233, 100%, 63%),
     $success: hsl(84, 74%, 43%),
 );
-@import "_variables";
+@use "_variables" as *;
+@use "_progresstracking" as *;
+@use "_clusterviewer" as *;
+@use "_similarity" as *;
+@use "_dataset" as *;
+@use "_shared" as *;
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -400,9 +405,3 @@ ul.messages {
         color: $red;
     }
 }
-
-@import "_progresstracking";
-@import "_clusterviewer";
-@import "_similarity";
-@import "_dataset";
-@import "_shared";

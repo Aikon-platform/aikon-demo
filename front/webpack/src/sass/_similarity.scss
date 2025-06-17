@@ -1,5 +1,5 @@
 @use "sass:color";
-@import "_variables";
+@use "_variables" as *;
 
 .matches-viewer {
     .match-row {
