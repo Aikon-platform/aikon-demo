@@ -84,6 +84,9 @@ api/media/
 api/data/
 api/runs/
 
+# mediafiles
+front/mediafiles/
+
 */tmp/
 
 

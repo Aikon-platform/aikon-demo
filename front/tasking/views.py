@@ -142,7 +142,6 @@ class TaskStatusView(LoginRequiredIfConfProtectedMixin, TaskMixin, DetailView):
     """
     Clustering status and results
     """
-
     template_name = "tasking/status.html"
 
 
