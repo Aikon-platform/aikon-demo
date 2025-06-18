@@ -77,6 +77,8 @@ export function ImageMagnifier({ image, transpositions, comparison }: MagnifyPro
         setTransf(transpositions || []);
     }, [transpositions]);
 
+    console.log("ImageMagnifier", comparison)
+
     return image && (
         <div className="magnifier" onClick={() => setMagnifying({ image: undefined })}>
             <IconBtn icon="mdi:close" className="magnifier-close"/>

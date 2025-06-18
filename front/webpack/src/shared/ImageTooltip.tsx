@@ -40,6 +40,8 @@ export function ImageTooltip({ image, transpositions }: TooltipProps) {
         return () => document.removeEventListener("mousemove", followMouse);
     }, []);
 
+    console.log("ImageTooltip", image)
+
     return image && (
         <div className="tooltip" ref={refTooltip}>
             <div className="display-image">

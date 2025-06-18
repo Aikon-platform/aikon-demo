@@ -33,6 +33,8 @@ export function ImageFileDisplay({image, similarity, transpositions, comparison,
     const tooltip = React.useContext(TooltipContext);
     const [pinned, setPinned] = React.useState(false);
 
+    console.log("ImageFileDisplay", image)
+
     return (
         <div className="display-item"
             onMouseEnter={() => tooltip.setTooltip && tooltip.setTooltip({image: image, transpositions})}
