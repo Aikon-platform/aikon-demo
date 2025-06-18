@@ -210,7 +210,7 @@ def AbstractTask(task_prefix: str):
             When a task finishes (no matter the reason: success/error/cancel),
             update fields `is_finished` and `finished_on`
 
-            TOOD:move setting of `self.status` field  and `self.save()`
+            TODO: move setting of `self.status` field  and `self.save()`
             to have all db updates in one place
             """
             self.is_finished = True
@@ -253,8 +253,8 @@ def AbstractTask(task_prefix: str):
             if notify and self.notify_email:
                 try:
                     send_mail(
-                        f"[discover-demo] Task {self.status}",
-                        f"Your task {self} on discover-demo has finished with status {self.status}.\n\nYou can access the results at: {BASE_URL}{self.get_absolute_url()}",
+                        f"[AIKON-demo] Task {self.status}",
+                        f"Your task {self} on AIKON-demo has finished with status {self.status}.\n\nYou can access the results at: {BASE_URL}{self.get_absolute_url()}",
                         settings.DEFAULT_FROM_EMAIL,
                         [self.requested_by.email],
                         fail_silently=False,

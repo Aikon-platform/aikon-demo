@@ -1,4 +1,5 @@
-@import "_variables";
+@use "sass:color";
+@use "_variables" as *;
 
 // IMAGE DISPLAY BOX
 
@@ -221,7 +222,7 @@
 
         .toolbar-item {
             padding: 0.7em;
-            background: lighten($faded-color, 10%);
+            background: color.adjust($faded-color, $lightness: 10%);
             border-radius: 2*$border-radius;
             &.toolbar-btn {
                 background: none;

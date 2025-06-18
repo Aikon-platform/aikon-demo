@@ -1,3 +1,5 @@
+import re
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -54,12 +56,15 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
         """
         URL to the full result in a zip file
         """
+        # TODO check because contains prototypes for sprites where summary is empty
         return f"{self.result_media_url}/results.zip"
 
     def get_task_kwargs(self):
+        kwargs = super().get_task_kwargs()
         return {
-            "dataset_url": f"{settings.BASE_URL}{self.dataset.zip_file.url}",  # TODO not only zip_file
-            "dataset_id": str(self.dataset.id),
+            **kwargs,
+            # "dataset_url": f"{settings.BASE_URL}{self.dataset.zip_file.url}",  # TODO not only zip_file
+            # "dataset_id": str(self.dataset.id),
             "parameters": json.dumps(self.parameters),
         }
 
@@ -157,49 +162,6 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
         Returns a dict with all the result data
         """
 
-        path = self.result_full_path
-        if not path.exists():
-            return {}
-
-        result_dict = {}
-
-        clusters_path = path / "clusters"
-        prototypes_path = path / "prototypes"
-        backgrounds_path = path / "backgrounds"
-
-        # Cluster_by_path csv
-        cluster_by_path_file = path / "cluster_by_path.csv"
-        if cluster_by_path_file.exists():
-            result_dict["csv_export_file"] = "cluster_by_path.csv"
-
-        # Image data json
-        image_data_file = path / "cluster_by_path.json"
-        image_data = {}
-        if image_data_file.exists():
-            with open(image_data_file, "r") as f:
-                image_data = json.load(f)
-
-        # no proto
-        if not prototypes_path.exists():
-            result_dict["clusters"] = []
-            return result_dict
-
-        # List prototypes
-        prototypes = {
-            int(c.name[len("prototype") : -4])
-            for c in prototypes_path.glob("prototype*")
-            if c.suffix in [".jpg", ".png"]
-        }
-
-        result_dict["clusters"] = {}
-
-        # List backgrounds
-        result_dict["background_urls"] = [
-            "backgrounds/{b.name}"
-            for b in backgrounds_path.glob("background*")
-            if b.suffix in [".jpg", ".png"]
-        ]
-
         def try_and_get_url(*try_names):
             """
             For each name in try_names, returns (as a URL) the first one
@@ -209,8 +171,44 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
                 if (path / try_name).exists():
                     return f"{try_name}"
 
-        # Iter clusters
+        path = self.result_full_path
+        if not path.exists():
+            return {}
+
+        # Cluster_by_path csv
+        csv_cluster = "cluster_by_path.csv"
+        csv_export = csv_cluster if (path / csv_cluster).exists() else None
+
+        # Image data json
+        image_data_file = path / "cluster_by_path.json"
+        image_data = {}
+        if image_data_file.exists():
+            with open(image_data_file, "r") as f:
+                image_data = json.load(f)
+
+        # List backgrounds
+        bkg_urls = [
+            "backgrounds/{b.name}"
+            for b in (path / "backgrounds").glob("background*")
+            if b.suffix in [".jpg", ".png"]
+        ]
+
+        prototypes_path = path / "prototypes"
+        if not prototypes_path.exists():
+            # no proto
+            return {
+                "csv_export_file": csv_export,
+                "clusters": {},
+            }
+
+        prototypes = {
+            int(re.findall(r"\d+", c.name)[-1]) for c in prototypes_path.glob("proto*")
+        }
+
+        clusters = {}
         for p in sorted(prototypes):
+            # TODO here path are not correct for sprites results because in subdirs
+
             # Display the masked prototype if it exists, otherwise the original
             proto_url = try_and_get_url(
                 f"masked_prototypes/prototype{p}.png",
@@ -219,21 +217,17 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
                 f"prototypes/prototype{p}.jpg",
             )
 
-            cluster = {
+            mask_url = try_and_get_url(f"masks/mask{p}.png", f"masks/mask{p}.jpg")
+
+            clusters[p] = {
                 "proto_url": proto_url,
                 "id": p,
                 "name": f"Cluster {p}",
+                "mask_url": mask_url,
                 "images": [],
             }
-            result_dict["clusters"][p] = cluster
 
-            # add mask
-            cluster["mask_url"] = try_and_get_url(
-                f"masks/mask{p}.png",
-                f"masks/mask{p}.jpg",
-            )
-
-            cluster_dir = clusters_path / f"cluster{p}"
+            cluster_dir = path / "clusters" / f"cluster{p}"
             if not cluster_dir.exists():
                 continue
 
@@ -254,9 +248,13 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
                     img_data["path"] = img_ext_data["path"]
                     img_data["distance"] = img_ext_data["distance"]
 
-                cluster["images"].append(img_data)
+                clusters[p]["images"].append(img_data)
 
-        return result_dict
+        return {
+            "csv_export_file": csv_export,
+            "clusters": clusters,
+            "background_urls": bkg_urls,
+        }
 
 
 class SavedClustering(models.Model):

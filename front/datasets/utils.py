@@ -118,12 +118,13 @@ class TreeDict:
 
         self.tree = {"curdir": to_basename(path), "files": [], "subdirs": []}
 
-        for el in sorted(os.listdir(path)):
-            el_abspath = to_abspath(path, el)
-            if os.path.isfile(el_abspath):
-                self.tree["files"].append(to_basename(el_abspath))
-            elif os.path.isdir(el_abspath):
-                self.tree["subdirs"].append(TreeDict(el_abspath))
+        if os.path.exists(path):
+            for el in sorted(os.listdir(path)):
+                el_abspath = to_abspath(path, el)
+                if os.path.isfile(el_abspath):
+                    self.tree["files"].append(to_basename(el_abspath))
+                elif os.path.isdir(el_abspath):
+                    self.tree["subdirs"].append(TreeDict(el_abspath))
 
     def to_html_list(self) -> str:
         filearray_to_html = (
