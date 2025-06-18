@@ -14,19 +14,19 @@ API_CONTAINER="aikonapi"
 
 create_network() {
     if ! network_exists; then
-        color_echo blue "\nCreating Docker network $NETWORK_NAME"
+        echo "Creating Docker network $NETWORK_NAME"
         docker network create "$NETWORK_NAME" --driver bridge
     else
-        color_echo blue "\nNetwork $NETWORK_NAME already exists"
+        echo "Network $NETWORK_NAME already exists"
     fi
 }
 
 connect_api() {
     if ! docker network inspect "$NETWORK_NAME" | grep -q "$API_CONTAINER"; then
-        color_echo blue "\nConnecting $API_CONTAINER to $NETWORK_NAME"
+        echo "\nConnecting $API_CONTAINER to $NETWORK_NAME"
         docker network connect "$NETWORK_NAME" "$API_CONTAINER" || true
     else
-        color_echo blue "\n$API_CONTAINER is already connected to $NETWORK_NAME"
+        echo "\n$API_CONTAINER is already connected to $NETWORK_NAME"
     fi
 }
 
