@@ -2,6 +2,7 @@ x-proxy-settings: &proxy-settings
   HTTP_PROXY: ${HTTP_PROXY}
   HTTPS_PROXY: ${HTTPS_PROXY}
   NO_PROXY: "localhost,127.0.0.1,web,nginx,redis,db,.demo_network"
+#  NO_PROXY: "localhost,127.0.0.1,web,nginx,redis,db,.demo_network,::1,8.8.8.8,8.8.4.4,1.1.1.1,smtp.gmail.com"
 
 services:
   web:
@@ -11,6 +12,10 @@ services:
       args:
         USERID: ${USERID}
         PORT: ${DJANGO_PORT}
+#    dns:
+#      - 8.8.8.8
+#      - 8.8.4.4
+#      - 1.1.1.1
     volumes:
       - staticfiles:/home/aikondemo/app/staticfiles
       - ${DATA_FOLDER}:/data
