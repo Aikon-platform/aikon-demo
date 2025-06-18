@@ -149,7 +149,7 @@ If you're using nginx as a webserver, the best option is to use gunicorn, and st
 
 If you prefer apache2, you can also use gunicorn this way (and configure a proxy pass in apache), or directly use apache's mod_wsgi.
 
-The discover-demo runs this way. To install it, follow the [official documentation](https://modwsgi.readthedocs.io/en/develop/user-guides/quick-installation-guide.html). A few tips:
+The AIKON-demo runs this way. To install it, follow the [official documentation](https://modwsgi.readthedocs.io/en/develop/user-guides/quick-installation-guide.html). A few tips:
 
   - when running `configure`, do `./configure --with-python=/usr/bin/python3`
   - at the step "Loading Module Into Apache", the conf file should be `/etc/apache2/apache2.conf`
