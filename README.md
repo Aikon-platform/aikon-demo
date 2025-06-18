@@ -1,5 +1,5 @@
-# Discover-demo
-A web interface to showcase demos of the Discover project.
+# AIKON-demo
+A web interface to showcase demos of the AIKON project.
 
 Please refer to [api/README](https://github.com/Aikon-platform/aikon-api/blob/main/README.md) and [front/README](front/README.md) for installing and running each individual part.
 

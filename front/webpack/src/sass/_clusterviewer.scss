@@ -1,4 +1,5 @@
-@import "_variables.scss";
+@use "sass:color";
+@use "_variables.scss" as *;
 
 $toolbar-height: 60px;
 
@@ -6,7 +7,7 @@ $toolbar-height: 60px;
     width: 100%;
     max-width: 100%;
     padding: 0;
-    background-color: darken($bg-color, 10%);
+    background-color: color.adjust($bg-color, $lightness: -10%);
     align-self: stretch;
 
     .cl-anchor {
@@ -403,7 +404,7 @@ $toolbar-height: 60px;
             border: 2px solid $head-color;
 
             &:hover {
-                background-color: lighten($bg-color, 5%);
+                background-color: color.adjust($bg-color, $lightness: 5%);
             }
 
             span {

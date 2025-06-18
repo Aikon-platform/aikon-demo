@@ -1,4 +1,5 @@
-@import "_variables";
+@use "sass:color";
+@use "_variables" as *;
 
 .dataset-view-structure {
     max-height: 40vh;
@@ -6,7 +7,7 @@
 }
 
 .image-generic-outer-wrapper {
-    outline: 1px solid lighten($faded-color, 5%);
+    outline: 1px solid color.adjust($faded-color, $lightness: 5%);
     border-radius: 2*$border-radius;
     min-width: 150px;
     min-height: 220px;
