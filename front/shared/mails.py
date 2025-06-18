@@ -41,13 +41,13 @@ def send_newaccount_notification(user):
         | Q(user_permissions__codename="add_user")
     ).distinct():
         send_mail(
-            "[Discover Demo] User Account requested",
+            "[AIKON Demo] User Account requested",
             (
                 f"Dear {admin_user.first_name},\n\n"
                 f"A new account request was submitted by {user.username}.\n"
                 f"Please review it on the admin page at {settings.BASE_URL + reverse('accounts_admin')}.\n\n"
                 "Best regards,\n"
-                "The Discover team"
+                "The AIKON team"
             ),
             settings.DEFAULT_FROM_EMAIL,
             [admin_user.email],
