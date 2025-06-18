@@ -32,15 +32,9 @@
     <div>
         <p class="date">{{ task.requested_on|date:"Y-m-d H:i" }}
             {% if task.task_duration %}
-                <span class="duration-tag
-                    {% if task.task_duration.eval == 'short' %}
-                        short
-                    {% elif task.task_duration.eval == 'mid' %}
-                        mid
-                    {% else %}
-                        long
-                    {% endif %}"
-                >{{ task.task_duration.delta|fmt_duration }}</span>
+                <span class="duration-tag {{ task.task_duration.eval }}">
+                    {{ task.task_duration.delta|fmt_duration }}
+                </span>
             {% endif %}
         </p>
 
