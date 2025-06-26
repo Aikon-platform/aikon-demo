@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 
 from .models import DTIClustering, SavedClustering
@@ -38,10 +40,41 @@ DTI_BACKGROUND_OPTIONS = [
 ]
 
 
+class TransformsField(forms.CharField):
+    """
+    Custom hidden form field for transform configuration that handles JSON data
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs["widget"] = forms.HiddenInput()
+        kwargs["required"] = False
+        super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def to_python(value):
+        """Convert JSON string to Python dict"""
+        if not value:
+            return {"transforms": "identity", "iterations": 1, "milestones": [1]}
+
+        try:
+            return json.loads(value)
+        except (json.JSONDecodeError, TypeError):
+            raise forms.ValidationError("Invalid transform configuration")
+
+    @staticmethod
+    def prepare_value(value):
+        """Convert Python dict to JSON string for display"""
+        if isinstance(value, dict):
+            return json.dumps(value)
+        return value or json.dumps(
+            {"transforms": "identity", "iterations": 1, "milestones": [1]}
+        )
+
+
 class DTIClusteringForm(AbstractTaskOnDatasetForm):
     p_n_clusters = forms.IntegerField(
         label="Number of clusters",
-        help_text="The number of clusters to be generated",
+        help_text="The number of groups to find in the dataset",
         min_value=1,
         max_value=50,
         initial=10,
@@ -54,42 +87,18 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
         required=True,
         initial="0_dti",
     )
-    p_transforms = forms.MultipleChoiceField(
-        label="Transforms",
-        help_text="The transforms to be used for clustering",
-        choices=DTI_TRANSFORM_OPTIONS,
-        widget=forms.CheckboxSelectMultiple,
-        required=True,
-        initial=["0_identity", "1_color"],
+    p_transforms = TransformsField(
+        label="Transform Configuration",
+        help_text="Image transformations to fit prototype",
     )
-    # p_n_epochs = forms.IntegerField(
-    #     label="Number of epochs",
-    #     help_text="Number of times the whole dataset is passed through the network",
-    #     min_value=10,
-    #     max_value=1000,
-    #     initial=400,
-    #     required=True,
-    # )
-    # p_batch_size = forms.IntegerField(
-    #     label="Batch size",
-    #     help_text="Number of samples used per iteration",
-    #     min_value=10,
-    #     max_value=40,
-    #     initial=16,
-    #     required=True,
-    # )
-    # p_milestones = IntegerListField(
-    #     label="Milestones",
-    #     help_text="List of epoch indices (integers separated by a comma) where learning rate is reduced",
-    #     initial=350,
-    #     required=True,
-    # )
-    # p_curriculum = IntegerListField(
-    #     label="Learning curriculum",
-    #     help_text="List of epoch indices (integers separated by a comma) to unlock/unfreeze/learn transformations",
-    #     initial=0,
-    #     required=True,
-    # )
+    p_batch_size = forms.IntegerField(
+        label="Batch size",
+        help_text="Number of samples used per iteration",
+        min_value=16,
+        max_value=64,
+        initial=32,
+        required=True,
+    )
 
     class Meta(AbstractTaskOnDatasetForm.Meta):
         model = DTIClustering
@@ -114,6 +123,8 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
         )
 
     def _populate_instance(self, instance):
+
+        # TODO modify here to get transforms infos
         p_transforms = "_".join(
             [t.split("_")[1] for t in sorted(self.cleaned_data["p_transforms"])]
         )

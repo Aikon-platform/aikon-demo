@@ -22597,6 +22597,10 @@ ul.messages li.warning, ul.messages li.error {
   font-style: italic;
 }
 
+.full-width {
+  width: 100%;
+}
+
 .widen {
   width: calc(100vw - 2em);
   margin-left: calc(-50vw + 50% + 1em);

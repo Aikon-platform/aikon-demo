@@ -1,0 +1,26 @@
+{% extends "demowebsite/base.html" %}
+
+{% block title %}Start a new {{ task_name }} task{% endblock %}
+
+{% block content %}
+<div class="centerwrap">
+
+    {% include "includes/breadcrumbs.html" %}
+
+    <h1 class="is-title is-size-2 py-3">Start a new {{ task_name }}</h1>
+    {% if from_task %}
+        <p>Using same dataset as {{ task_name }} <a href="{{ from_task.get_absolute_url }}">#{{ from_task.id }}</a></p>
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">
+
+        {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_transforms" %}
+
+        {% include "dticlustering/transforms.html" with field=form.p_transforms %}
+
+        <p class="has-text-centered pt-3">
+            <input class="button is-link" type="submit" value="Start processing">
+        </p>
+
+    </form>
+</div>
+{% endblock %}
