@@ -1,7 +1,22 @@
-<div class="field transform-field" data-field-name="{{ field.name }}">
-    <label class="label">{{ field.label }}</label>
+{% if field.errors %}
+    <div class="notification is-danger is-light py-3 px-4 mt-5 mb-2">
+        {{ field.errors }}
+    </div>
+{% endif %}
 
+<div class="field transform-field" data-field-name="{{ field.name }}">
     {{ field }}
+
+    <div class="py-1">
+        {# LABEL #}
+        <label for="{{ field.id_for_label }}" class="label {% if field.field.required %}required{% endif %}">
+            {{ field.label }}
+        </label>
+    </div>
+
+    {% if field.help_text %}
+        <p class="help">{{ field.help_text }}</p>
+    {% endif %}
 
     <div class="transform-table">
         <table class="table is-fullwidth is-striped">
@@ -34,15 +49,7 @@
                     </td>
                     <td></td>
                     <td>
-                        <div class="field">
-                            <div class="control">
-                                <label>
-                                    <input type="number" class="input is-small iteration-input"
-                                           data-transform="identity"
-                                           value="1" min="1" max="100">
-                                </label>
-                            </div>
-                        </div>
+                        {% include "dticlustering/iteration.html" with transform="identity" %}
                     </td>
                 </tr>
 
@@ -80,16 +87,7 @@
                         </div>
                     </td>
                     <td>
-                        <div class="field">
-                            <div class="control">
-                                <label>
-                                    <input type="number"
-                                           class="input is-small iteration-input"
-                                           data-transform="color"
-                                           value="1" min="1" max="100" disabled>
-                                </label>
-                            </div>
-                        </div>
+                        {% include "dticlustering/iteration.html" with transform="color" %}
                     </td>
                 </tr>
 
@@ -126,17 +124,7 @@
                         </div>
                     </td>
                     <td>
-                        <div class="field">
-                            <div class="control">
-                                <label>
-                                    <input type="number"
-                                           class="input is-small iteration-input"
-                                           data-transform="spatial"
-                                           value="1" min="1" max="100"
-                                           disabled>
-                                </label>
-                            </div>
-                        </div>
+                        {% include "dticlustering/iteration.html" with transform="spatial" %}
                     </td>
                 </tr>
 
@@ -160,16 +148,7 @@
                     </td>
                     <td></td>
                     <td>
-                        <div class="field">
-                            <div class="control">
-                                <label>
-                                    <input type="number"
-                                           class="input is-small iteration-input"
-                                           data-transform="morpho"
-                                           value="1" min="1" max="100" disabled>
-                                </label>
-                            </div>
-                        </div>
+                        {% include "dticlustering/iteration.html" with transform="morpho" %}
                     </td>
                 </tr>
 
@@ -205,33 +184,12 @@
                         </div>
                     </td>
                     <td>
-                        <div class="field">
-                            <div class="control">
-                                <label>
-                                    <input type="number"
-                                           class="input is-small iteration-input"
-                                           data-transform="tps"
-                                           value="1" min="1" max="100" disabled>
-                                </label>
-                            </div>
-                        </div>
+                        {% include "dticlustering/iteration.html" with transform="tps" %}
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-
-    {% if field.help_text %}
-        <p class="help">{{ field.help_text }}</p>
-    {% endif %}
-
-    {% if field.errors %}
-        <div class="help is-danger">
-            {% for error in field.errors %}
-                <p>{{ error }}</p>
-            {% endfor %}
-        </div>
-    {% endif %}
 </div>
 
 <script>
@@ -276,7 +234,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
-            // Parameter changes
             this.container.querySelectorAll('.parameter-select, .parameter-input').forEach(input => {
                 input.addEventListener('change', () => {
                     this.updateTransformMap();
@@ -284,7 +241,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
-            // Iteration changes
             this.container.querySelectorAll('.iteration-input').forEach(input => {
                 input.addEventListener('input', () => {
                     this.updateHiddenInput();
@@ -293,13 +249,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         updateTransformMap() {
-            // Update color transform based on selection
             const colorSelect = this.container.querySelector('.parameter-select[data-transform="color"]');
             if (colorSelect) {
                 this.transformMap.color = colorSelect.value;
             }
 
-            // Update spatial transform based on selection
             const spatialSelect = this.container.querySelector('.parameter-select[data-transform="spatial"]');
             if (spatialSelect) {
                 this.transformMap.spatial = spatialSelect.value;
@@ -320,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const milestones = [];
 
             this.container.querySelectorAll('.transform-checkbox:checked').forEach(checkbox => {
-                const transform = checkbox.dataset.transform;
                 const row = checkbox.closest('tr');
                 const iterationInput = row.querySelector('.iteration-input');
                 const iterations = parseInt(iterationInput.value) || 1;
@@ -343,8 +296,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 iterations: iterations.total,
                 milestones: iterations.milestones
             };
-
-            console.log(config)
 
             this.hiddenInput.value = JSON.stringify(config);
         }

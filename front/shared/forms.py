@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from typing import Type
 
@@ -19,6 +20,39 @@ class FormConfig:
     display_name: str
     description: str
     form_class: Type[forms.Form]
+
+
+class HiddenJsonField(forms.CharField):
+    """
+    Custom hidden form field that handles JSON data.
+    Stores a Python dict as a JSON string in a hidden input.
+    """
+
+    def __init__(self, *args, json_structure=None, **kwargs):
+        self.json_structure = json_structure or {}
+        kwargs.setdefault("widget", forms.HiddenInput())
+        kwargs.setdefault("required", False)
+        # Use json_structure as default initial if no initial given
+        if "initial" not in kwargs:
+            kwargs["initial"] = self.json_structure
+        super().__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if not value:
+            return self.json_structure
+
+        if isinstance(value, dict):
+            return value
+
+        try:
+            return json.loads(value)
+        except (json.JSONDecodeError, TypeError):
+            raise forms.ValidationError("Invalid JSON data.")
+
+    def prepare_value(self, value):
+        if isinstance(value, dict):
+            return json.dumps(value)
+        return value or json.dumps(self.json_structure)
 
 
 class AccountRequestForm(forms.ModelForm):

@@ -1,0 +1,210 @@
+{% if field.errors %}
+    <div class="notification is-danger is-light py-3 px-4 mt-5 mb-2">
+        {{ field.errors }}
+    </div>
+{% endif %}
+
+<div class="field background-field" data-field-name="{{ field.name }}">
+    {{ field }}
+
+    <div class="py-1">
+        <label for="{{ field.id_for_label }}" class="label {% if field.field.required %}required{% endif %}">
+            {{ field.label }}
+        </label>
+    </div>
+
+    {% if field.help_text %}
+        <p class="help">{{ field.help_text }}</p>
+    {% endif %}
+
+    <div class="field has-addons is-fullwidth">
+        <div class="control">
+            <button type="button" class="button prototype-button is-active has-background-link-light has-text-link mx-0" data-value="kmeans">
+                <span class="icon is-small">
+                    <span class="iconify" data-icon="mdi:checkbox-blank"></span>
+                </span>
+                <span>Full Image</span>
+            </button>
+            <label>
+                <input type="radio" name="prototype_method_{{ field.name }}" value="kmeans" class="prototype-method is-hidden" checked>
+            </label>
+        </div>
+        <div class="control">
+            <button type="button" class="button prototype-button has-text-link mx-0" data-value="sprites">
+                <span class="icon is-small">
+                    <span class="iconify" data-icon="mdi:checkbox-multiple-blank"></span>
+                </span>
+                <span>Use sprites</span>
+            </button>
+            <label>
+                <input type="radio" name="prototype_method_{{ field.name }}" value="sprites" class="prototype-method is-hidden">
+            </label>
+        </div>
+    </div>
+
+    <div class="sprites-table" style="display: none;">
+        <table class="table is-fullwidth is-striped">
+            <thead>
+                <tr>
+                    <th style="width: 30%"></th>
+                    <th style="width: 20%">Freeze</th>
+                    <th style="width: 50%">Initialize</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% include "dticlustering/component-row.html" with component="foreground" %}
+                {% include "dticlustering/component-row.html" with component="background" %}
+                {% include "dticlustering/component-row.html" with component="mask" %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    class Prototypes {
+        constructor(fieldName) {
+            this.fieldName = fieldName;
+            this.container = document.querySelector(`[data-field-name="${fieldName}"]`);
+            this.hiddenInput = this.container.querySelector(`input[name="${fieldName}"]`);
+            this.spritesTable = this.container.querySelector('.sprites-table');
+
+            this.init();
+        }
+
+        init() {
+            this.loadFromHiddenInput();
+            this.bindEvents();
+            this.updateHiddenInput();
+        }
+
+        bindEvents() {
+            this.container.querySelectorAll('.prototype-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    this.container.querySelectorAll('.prototype-button').forEach(btn => {
+                        btn.classList.remove('is-active', 'has-background-link-light');
+                    });
+
+                    button.classList.add('is-active', 'has-background-link-light');
+
+                    const value = button.dataset.value;
+                    const radio = this.container.querySelector(`.prototype-method[value="${value}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                    }
+
+                    const useSprites = value === 'sprites';
+                    this.spritesTable.style.display = useSprites ? 'block' : 'none';
+                    this.updateHiddenInput();
+                });
+            });
+
+            this.container.querySelectorAll('.freeze-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    this.updateHiddenInput();
+                });
+            });
+
+            this.container.querySelectorAll('.init-select').forEach(select => {
+                select.addEventListener('change', () => {
+                    this.updateHiddenInput();
+                });
+            });
+        }
+
+        getPrototypeMethod() {
+            const checkedRadio = this.container.querySelector('.prototype-method:checked');
+            return checkedRadio ? checkedRadio.value : 'kmeans';
+        }
+
+        getFreezeValues() {
+            const components = ['foreground', 'background', 'mask'];
+            return components.map(component => {
+                const checkbox = this.container.querySelector(`.freeze-checkbox[data-component="${component}"]`);
+                return checkbox ? checkbox.checked : false;
+            });
+        }
+
+        getInitValues() {
+            const components = ['foreground', 'background', 'mask'];
+            return components.map(component => {
+                const select = this.container.querySelector(`.init-select[data-component="${component}"]`);
+                return select ? select.value : 'mean';
+            });
+        }
+
+        updateHiddenInput() {
+            const useSprites = this.getPrototypeMethod() === 'sprites';
+
+            const config = {
+                use_sprites: useSprites,
+                freeze: this.getFreezeValues(),
+                init: this.getInitValues()
+            };
+
+            this.hiddenInput.value = JSON.stringify(config);
+        }
+
+        loadFromHiddenInput() {
+            try {
+                const config = JSON.parse(this.hiddenInput.value || '{}');
+                const methodValue = config.use_sprites ? 'sprites' : 'kmeans';
+
+                this.container.querySelectorAll('.prototype-button').forEach(btn => {
+                    btn.classList.remove('is-active', 'has-background-link-light');
+                });
+
+                const activeButton = this.container.querySelector(`.prototype-button[data-value="${methodValue}"]`);
+                if (activeButton) {
+                    activeButton.classList.add('is-active', 'has-background-link-light');
+                }
+
+                const radio = this.container.querySelector(`.prototype-method[value="${methodValue}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    this.spritesTable.style.display = config.use_sprites ? 'block' : 'none';
+                }
+
+                if (config.freeze && Array.isArray(config.freeze)) {
+                    const components = ['foreground', 'background', 'mask'];
+                    components.forEach((component, index) => {
+                        const checkbox = this.container.querySelector(`.freeze-checkbox[data-component="${component}"]`);
+                        if (checkbox && config.freeze[index] !== undefined) {
+                            checkbox.checked = config.freeze[index];
+                        }
+                    });
+                }
+
+                if (config.init && Array.isArray(config.init)) {
+                    const components = ['foreground', 'background', 'mask'];
+                    components.forEach((component, index) => {
+                        const select = this.container.querySelector(`.init-select[data-component="${component}"]`);
+                        if (select && config.init[index]) {
+                            select.value = config.init[index];
+                        }
+                    });
+                }
+
+            } catch (e) {
+                console.warn('Failed to load background config:', e);
+            }
+        }
+    }
+
+    document.querySelectorAll('.background-field').forEach(field => {
+        const fieldName = field.dataset.fieldName;
+        new Prototypes(fieldName);
+    });
+});
+</script>
+
+<style>
+.background-field .checkbox {
+    margin: 0;
+}
+.prototype-button {
+    border-color: var(--bulma-link);
+}
+</style>

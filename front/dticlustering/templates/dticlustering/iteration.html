@@ -1,0 +1,11 @@
+<div class="field">
+    <div class="control">
+        <label>
+            <input type="number"
+                   class="input is-small iteration-input"
+                   data-transform="{{ transform }}"
+                   step="1000"
+                   value="1000" min="1000" max="10000" {% if transform != "identity" %}disabled{% endif %}>
+        </label>
+    </div>
+</div>
