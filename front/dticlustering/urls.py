@@ -4,14 +4,14 @@ from .views import *
 app_name = "dticlustering"
 
 urlpatterns = [
-    path("", DTIClusteringList.as_view(), name="list"),
+    path("", DTIClusteringMixin.List.as_view(), name="list"),
     path("start", DTIClusteringStart.as_view(), name="start"),
-    path("<uuid:pk>", DTIClusteringStatus.as_view(), name="status"),
-    path("<uuid:pk>/progress", DTIClusteringProgress.as_view(), name="progress"),
-    path("<uuid:pk>/cancel", DTIClusteringCancel.as_view(), name="cancel"),
-    path("<uuid:pk>/watch", DTIClusteringWatcher.as_view(), name="notify"),
+    path("<uuid:pk>", DTIClusteringMixin.Status.as_view(), name="status"),
+    path("<uuid:pk>/progress", DTIClusteringMixin.Progress.as_view(), name="progress"),
+    path("<uuid:pk>/cancel", DTIClusteringMixin.Cancel.as_view(), name="cancel"),
+    path("<uuid:pk>/watch", DTIClusteringMixin.Watcher.as_view(), name="notify"),
     path("<uuid:pk>/restart", DTIClusteringStartFrom.as_view(), name="restart"),
-    path("<uuid:pk>/delete", DTIClusteringDelete.as_view(), name="delete"),
+    path("<uuid:pk>/delete", DTIClusteringMixin.Delete.as_view(), name="delete"),
     path(
         "<uuid:from_pk>/saved/create",
         SavedClusteringFromDTI.as_view(),
@@ -31,7 +31,7 @@ urlpatterns = [
     # Admin views
     path(
         "list/perdataset/<uuid:dataset_pk>",
-        DTIClusteringByDatasetList.as_view(),
+        DTIClusteringMixin.ByDatasetList.as_view(),
         name="list_perdataset",
     ),
     path("monitor", DTIClusteringMonitoring.as_view(), name="monitor"),

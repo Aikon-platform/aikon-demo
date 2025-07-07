@@ -1,0 +1,56 @@
+{% extends "tasking/start.html" %}
+
+{% block form_content %}
+    {% include "demowebsite/dataset_baseform.html" with excluded_fields="squarify,h_margin,v_margin" %}
+
+    <h4 class="mt-4 mb-2">Post-processing</h4>
+    <hr class="mt-0 mb-1">
+
+    <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
+        <div class="column pl-0 pt-0 is-one-fifth">
+            <div class="field ">
+                <div class="pb-1">
+                    <label for="id_squarify" class="label">
+                        Resize
+                    </label>
+                </div>
+                {% include "includes/form/form_field.html" with field=form.squarify %}
+            </div>
+        </div>
+        <div class="column">
+            {% include "includes/form/form_field.html" with field=form.h_margin %}
+        </div>
+        <div class="column pr-0">
+            {% include "includes/form/form_field.html" with field=form.v_margin %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modelChoices = document.querySelectorAll('input[type="radio"][name="model"]');
+        const squarifyField = document.getElementById("id_squarify");
+        const hMargin = document.getElementById("id_h_margin");
+        const vMargin = document.getElementById("id_v_margin");
+
+        modelChoices.forEach(choice => {
+            choice.addEventListener("change", function() {
+                if (this.value.includes("watermark")) {
+                    squarifyField.checked = true;
+                    hMargin.value = 5;
+                    vMargin.value = 5;
+                } else if (this.value.includes("char")) {
+                    squarifyField.checked = false;
+                    hMargin.value = 10;
+                    vMargin.value = 30;
+                } else {
+                    squarifyField.checked = false;
+                    hMargin.value = 0;
+                    vMargin.value = 0;
+                }
+            });
+        });
+    });
+    </script>
+{% endblock %}
