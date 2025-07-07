@@ -276,12 +276,13 @@ document.addEventListener('DOMContentLoaded', function() {
             this.container.querySelectorAll('.transform-checkbox:checked').forEach(checkbox => {
                 const row = checkbox.closest('tr');
                 const iterationInput = row.querySelector('.iteration-input');
-                const iterations = parseInt(iterationInput.value) || 1;
+                const iterations = parseInt(iterationInput.value) || 1000;
 
                 total += iterations;
                 milestones.push(total);
             });
 
+            milestones.pop();
             return { total, milestones };
         }
 
