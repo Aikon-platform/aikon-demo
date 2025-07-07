@@ -20,7 +20,8 @@ from .models import DTIClustering, SavedClustering
 from .forms import DTIClusteringForm, SavedClusteringForm
 
 
-# @task_view_set
+# NOTE all view are instanciated with decoration, override them to add custom behavior
+@task_view_set
 class DTIClusteringMixin:
     """
     Mixin for DTI clustering views
@@ -34,43 +35,48 @@ class DTIClusteringMixin:
     task_data = "dataset"
 
 
-class DTIClusteringStart(DTIClusteringMixin, TaskStartView):
+class DTIClusteringStart(DTIClusteringMixin.Start):
+    template_name = "dticlustering/start.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["transforms"] = "truc"
+        return context
+
+
+class DTIClusteringStartFrom(DTIClusteringMixin.StartFrom, DTIClusteringStart):
     pass
 
 
-class DTIClusteringStartFrom(DTIClusteringMixin, TaskStartFromView):
-    pass
-
-
-class DTIClusteringStatus(DTIClusteringMixin, TaskStatusView):
-    pass
-
-
-class DTIClusteringProgress(DTIClusteringMixin, TaskProgressView):
-    pass
-
-
-class DTIClusteringCancel(DTIClusteringMixin, TaskCancelView):
-    pass
-
-
-class DTIClusteringWatcher(DTIClusteringMixin, TaskWatcherView):
-    pass
-
-
-class DTIClusteringDelete(DTIClusteringMixin, TaskDeleteView):
-    pass
-
-
-class DTIClusteringList(DTIClusteringMixin, TaskListView):
-    permission_see_all = "dticlustering.monitor_dticlustering"
-
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related("dataset")
-
-
-class DTIClusteringByDatasetList(DTIClusteringMixin, TaskByDatasetList):
-    permission_see_all = "dticlustering.monitor_dticlustering"
+# class DTIClusteringStatus(DTIClusteringMixin, TaskStatusView):
+#     pass
+#
+#
+# class DTIClusteringProgress(DTIClusteringMixin, TaskProgressView):
+#     pass
+#
+#
+# class DTIClusteringCancel(DTIClusteringMixin, TaskCancelView):
+#     pass
+#
+#
+# class DTIClusteringWatcher(DTIClusteringMixin, TaskWatcherView):
+#     pass
+#
+#
+# class DTIClusteringDelete(DTIClusteringMixin, TaskDeleteView):
+#     pass
+#
+#
+# class DTIClusteringList(DTIClusteringMixin, TaskListView):
+#     permission_see_all = "dticlustering.monitor_dticlustering"
+#
+#     def get_queryset(self):
+#         return super().get_queryset().prefetch_related("dataset")
+#
+#
+# class DTIClusteringByDatasetList(DTIClusteringMixin, TaskByDatasetList):
+#     permission_see_all = "dticlustering.monitor_dticlustering"
 
 
 # TODO add DTIClusteringMixin

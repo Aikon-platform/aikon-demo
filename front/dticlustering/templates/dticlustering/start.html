@@ -1,0 +1,21 @@
+{% extends "tasking/base_start.html" %}
+
+{% block form_content %}
+    {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,p_transforms,p_background" %}
+
+    <h4 class="mb-2">Prototype configuration</h4>
+    <hr class="mt-0 mb-1">
+
+    <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
+        <div class="column pl-0">
+            {% include "includes/form/form_field.html" with field=form.p_n_clusters %}
+        </div>
+        <div class="column pr-0">
+            {# {% include "includes/form/form_field.html" with field=form.p_batch_size %}#}
+        </div>
+    </div>
+
+    {% include "dticlustering/transforms.html" with field=form.p_transforms %}
+
+    {% include "dticlustering/background.html" with field=form.p_background %}
+{% endblock %}

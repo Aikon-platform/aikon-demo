@@ -22597,6 +22597,10 @@ ul.messages li.warning, ul.messages li.error {
   font-style: italic;
 }
 
+.full-width {
+  width: 100%;
+}
+
 .widen {
   width: calc(100vw - 2em);
   margin-left: calc(-50vw + 50% + 1em);
@@ -22627,5 +22631,3 @@ ul.messages li.warning, ul.messages li.error {
   background-color: rgb(253.3768115942, 211.4057971014, 208.6231884058);
   color: #c81307;
 }
-
-/*# sourceMappingURL=style.css.map */

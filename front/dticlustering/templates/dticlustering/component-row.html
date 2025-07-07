@@ -1,0 +1,24 @@
+<tr data-component="{{ component }}">
+    <td><strong>{{ component|capfirst }}</strong></td>
+    <td>
+        <label class="checkbox">
+            <input type="checkbox" class="freeze-checkbox" data-component="{{ component }}">
+            <span class="checkmark"></span>
+        </label>
+    </td>
+    <td>
+        <div class="field">
+            <div class="control">
+                <div class="select is-small full-width">
+                    <label>
+                        <select class="init-select full-width" data-component="{{ component }}">
+                            <option value="constant">Constant</option>
+                            <option value="mean" selected>Mean</option>
+                            <option value="gaussian">Gaussian</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </td>
+</tr>

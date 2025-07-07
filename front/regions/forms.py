@@ -11,7 +11,7 @@ class RegionsForm(AbstractTaskOnDatasetForm):
         model = Regions
         fields = AbstractTaskOnDatasetForm.Meta.fields + ("model",)
 
-    #TODO implement `clean` to check if dataset field (inherited from `AbstractTaskOnDatasetForm` aldready has a line extraction, if we're doing char extraction)
+    # TODO implement `clean` to check if dataset field (inherited from `AbstractTaskOnDatasetForm` aldready has a line extraction, if we're doing char extraction)
     model = forms.ChoiceField(
         label="Model",
         help_text="Model used to extract image regions in the dataset",
@@ -20,25 +20,51 @@ class RegionsForm(AbstractTaskOnDatasetForm):
         required=True,
     )
 
-    postprocess = forms.ChoiceField(
-        choices=[
-            ("", "No postprocessing"),
-            ("watermarks", "Squarify and add 5% margin to crops"),
-            ("character_line_extraction", r"Add 10% horizontal margin and 30% vertical margin")
-        ],
-        required=False
+    # postprocess = forms.ChoiceField(
+    #     choices=[
+    #         ("", "No postprocessing"),
+    #         ("watermarks", "Squarify and add 5% margin to crops"),
+    #         ("character_line_extraction", r"Add 10% horizontal margin and 30% vertical margin")
+    #     ],
+    #     required=False
+    # )
+
+    squarify = forms.BooleanField(
+        label="Squarify",
+        help_text="Squarify extracted regions",
+        required=False,
+        initial=False,
+    )
+    h_margin = forms.IntegerField(
+        label="Horizontal Margin (%)",
+        help_text="Percentage of horizontal margin to add to the regions.",
+        min_value=0,
+        max_value=100,
+        required=False,
+        initial=0,
+    )
+    v_margin = forms.IntegerField(
+        label="Vertical Margin (%)",
+        help_text="Percentage of vertical margin to add to the regions.",
+        min_value=0,
+        max_value=100,
+        required=False,
+        initial=0,
     )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["model"].choices = Regions.get_available_models()
 
-
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.parameters = {
             "model": self.cleaned_data["model"],
-            "postprocess": self.cleaned_data.get("postprocess", "")
+            "postprocess": {
+                "squarify": self.cleaned_data.get("squarify", False),
+                "h_margin": self.cleaned_data.get("h_margin", 0) / 100.0,
+                "v_margin": self.cleaned_data.get("v_margin", 0) / 100.0,
+            },
         }
         if commit:
             instance.save()
