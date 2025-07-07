@@ -1,43 +1,21 @@
-{% extends "demowebsite/base.html" %}
+{% extends "tasking/base_start.html" %}
 
-{% block title %}Start a new {{ task_name }} task{% endblock %}
+{% block form_content %}
+    {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,p_transforms,p_background" %}
 
-{% block content %}
+    <h4 class="mb-2">Prototype configuration</h4>
+    <hr class="mt-0 mb-1">
 
-<div class="centerwrap">
-
-    {% include "includes/breadcrumbs.html" %}
-
-    <h1 class="is-title is-size-2 py-3">Start a new {{ task_name }}</h1>
-    {% if from_task %}
-        <p>Using same dataset as {{ task_name }} <a href="{{ from_task.get_absolute_url }}">#{{ from_task.id }}</a>
-        </p>
-    {% endif %}
-
-    <form action="" method="post" enctype="multipart/form-data">
-        {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,p_transforms,p_background" %}
-
-        <h4 class="mb-2">Prototype configuration</h4>
-        <hr class="mt-0 mb-1">
-
-        <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
-            <div class="column pl-0">
-                {% include "includes/form/form_field.html" with field=form.p_n_clusters %}
-            </div>
-            <div class="column pr-0">
-                {# {% include "includes/form/form_field.html" with field=form.p_batch_size %}#}
-            </div>
+    <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
+        <div class="column pl-0">
+            {% include "includes/form/form_field.html" with field=form.p_n_clusters %}
         </div>
+        <div class="column pr-0">
+            {# {% include "includes/form/form_field.html" with field=form.p_batch_size %}#}
+        </div>
+    </div>
 
-        {% include "dticlustering/transforms.html" with field=form.p_transforms %}
+    {% include "dticlustering/transforms.html" with field=form.p_transforms %}
 
-        {% include "dticlustering/background.html" with field=form.p_background %}
-
-        <p class="has-text-centered pt-3">
-            <input class="button is-link" type="submit" value="Start processing">
-        </p>
-
-    </form>
-</div>
-
+    {% include "dticlustering/background.html" with field=form.p_background %}
 {% endblock %}

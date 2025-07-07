@@ -24,7 +24,7 @@
     "bulma": "^1.0.4",
     "css-loader": "^6.8.1",
     "sass": "^1.72.0",
-    "sass-loader": "^13.3.2",
+    "sass-loader": "^16.0.5",
     "style-loader": "^3.3.3",
     "ts-loader": "^9.5.0",
     "ts-node": "^10.9.1",

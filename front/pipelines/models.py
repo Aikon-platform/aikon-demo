@@ -104,7 +104,7 @@ class Pipeline(AbstractTaskOnDataset("pipelines")):
             pipeline=self,
             parameters={
                 "model": "fasterrcnn_watermarks.pth",
-                "postprocess": "watermarks",
+                "postprocess": {"squarify": True, "h_margin": 0.05, "v_margin": 0.05},
             },
         )
         self.regions_task.save()

@@ -1,0 +1,5 @@
+{% if task_data == "dataset" %}
+    {% include "demowebsite/dataset_baseform.html" with excluded_fields="excluded_field" %}
+{% else %}
+    {% include "demowebsite/baseform.html" %}
+{% endif %}

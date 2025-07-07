@@ -89,7 +89,7 @@ class LoginRequiredIfConfProtectedMixin(AccessMixin):
 
 
 class TaskStartView(LoginRequiredIfConfProtectedMixin, TaskMixin, CreateView):
-    template_name = "tasking/start.html"
+    template_name = "regions/start.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -142,6 +142,7 @@ class TaskStatusView(LoginRequiredIfConfProtectedMixin, TaskMixin, DetailView):
     """
     Clustering status and results
     """
+
     template_name = "tasking/status.html"
 
 
