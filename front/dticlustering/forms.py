@@ -30,7 +30,7 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
 
     p_background = HiddenJsonField(
         label="Learned Prototypes",
-        help_text="What part of the images should be taken into account for prototype learning",
+        help_text="How parts of the images should be taken into account for prototype learning",
         json_structure={
             "use_sprites": False,  # Default to DTI (no sprites)
             "freeze": [False, False, False],  # foreground, background, masks

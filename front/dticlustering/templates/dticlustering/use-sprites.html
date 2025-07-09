@@ -23,7 +23,7 @@
                 <span class="icon is-small">
                     <span class="iconify" data-icon="mdi:checkbox-blank"></span>
                 </span>
-                <span>Full Image</span>
+                <span>1 Layer (full image)</span>
             </button>
             <label>
                 <input type="radio" name="prototype_method_{{ field.name }}" value="kmeans" class="prototype-method is-hidden" checked>
@@ -34,11 +34,22 @@
                 <span class="icon is-small">
                     <span class="iconify" data-icon="mdi:checkbox-multiple-blank"></span>
                 </span>
-                <span>Use sprites</span>
+                <span>2 layers (back/foreground separation)</span>
             </button>
             <label>
                 <input type="radio" name="prototype_method_{{ field.name }}" value="sprites" class="prototype-method is-hidden">
             </label>
+        </div>
+    </div>
+
+    <div class="kmeans-init">
+        <div class="py-1">
+            <label class="label">
+                Initialization
+            </label>
+        </div>
+        <div class="select is-small">
+            {% include "dticlustering/init-dropdown.html" with component="kmeans" %}
         </div>
     </div>
 
@@ -47,13 +58,13 @@
             <thead>
                 <tr>
                     <th style="width: 30%"></th>
-                    <th style="width: 20%">Freeze</th>
-                    <th style="width: 50%">Initialize</th>
+                    <th style="width: 20%">Uniform</th>
+                    <th style="width: 50%">Initialization</th>
                 </tr>
             </thead>
             <tbody>
-                {% include "dticlustering/component-row.html" with component="foreground" %}
                 {% include "dticlustering/component-row.html" with component="background" %}
+                {% include "dticlustering/component-row.html" with component="foreground" %}
                 {% include "dticlustering/component-row.html" with component="mask" %}
             </tbody>
         </table>
@@ -68,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.container = document.querySelector(`[data-field-name="${fieldName}"]`);
             this.hiddenInput = this.container.querySelector(`input[name="${fieldName}"]`);
             this.spritesTable = this.container.querySelector('.sprites-table');
+            this.kmeansInit = this.container.querySelector('.kmeans-init');
 
             this.init();
         }
@@ -97,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const useSprites = value === 'sprites';
                     this.spritesTable.style.display = useSprites ? 'block' : 'none';
+                    this.kmeansInit.style.display = useSprites ? 'none' : 'block';
                     this.updateHiddenInput();
                 });
             });
@@ -104,6 +117,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.container.querySelectorAll('.freeze-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', () => {
                     this.updateHiddenInput();
+
+                    // make init dropdown disabled if checkbox is checked
+                    const component = checkbox.id.replace('freeze-', '');
+                    const initDropdown = document.getElementById(`init-${component}`);
+                    if (initDropdown) {
+                        initDropdown.disabled = checkbox.checked;
+                    }
+
                 });
             });
 
@@ -127,11 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        getInitValues() {
-            const components = ['foreground', 'background', 'mask'];
+        getInitValues(useSprites) {
+            const components = useSprites ? ['foreground', 'background', 'mask'] : ['kmeans'];
             return components.map(component => {
-                const select = this.container.querySelector(`.init-select[data-component="${component}"]`);
-                return select ? select.value : 'mean';
+                const select = document.getElementById(`init-${component}`);
+                return select ? select.value : 'gaussian';
             });
         }
 
@@ -141,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const config = {
                 use_sprites: useSprites,
                 freeze: this.getFreezeValues(),
-                init: this.getInitValues()
+                init: this.getInitValues(useSprites)
             };
 
             this.hiddenInput.value = JSON.stringify(config);
@@ -151,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const config = JSON.parse(this.hiddenInput.value || '{}');
                 const methodValue = config.use_sprites ? 'sprites' : 'kmeans';
+                const useSprites = config.use_sprites || false;
 
                 this.container.querySelectorAll('.prototype-button').forEach(btn => {
                     btn.classList.remove('is-active', 'has-background-link-light');
@@ -165,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (radio) {
                     radio.checked = true;
                     this.spritesTable.style.display = config.use_sprites ? 'block' : 'none';
+                    this.kmeansInit.style.display = config.use_sprites ? 'none' : 'block';
                 }
 
                 if (config.freeze && Array.isArray(config.freeze)) {
@@ -178,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 if (config.init && Array.isArray(config.init)) {
-                    const components = ['foreground', 'background', 'mask'];
+                    const components = useSprites ? ['foreground', 'background', 'mask'] : ['kmeans'];
                     components.forEach((component, index) => {
                         const select = this.container.querySelector(`.init-select[data-component="${component}"]`);
                         if (select && config.init[index]) {
