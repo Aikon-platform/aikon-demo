@@ -44,7 +44,7 @@
                 {% if object.dataset %}
                     <a href="{% url app_name|add:':restart' object.id %}" class="button is-link is-light ml-2">
                         <span class="iconify" data-icon="mdi:clock-start"></span>
-                        <span>Start new {{ task_name }} with same dataset</span>
+                        <span>Start new {{ task_name }} with same configuration</span>
                     </a>
                 {% endif %}
                 <a href="{% url app_name|add:':delete' object.pk %}" class="button is-light">

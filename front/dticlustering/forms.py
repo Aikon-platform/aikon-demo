@@ -25,7 +25,12 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
     p_transforms = HiddenJsonField(
         label="Transform Configuration",
         help_text="Image transformations to fit prototype",
-        json_structure={"transforms": "identity", "iterations": 1, "milestones": [1]},
+        json_structure={
+            "transforms": "identity",
+            "iterations": 1,
+            "milestones": [1],
+            "grid_size": 0,  # thin plate spline grid size
+        },
     )
 
     p_background = HiddenJsonField(
@@ -34,7 +39,7 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
         json_structure={
             "use_sprites": False,  # Default to DTI (no sprites)
             "freeze": [False, False, False],  # foreground, background, masks
-            "init": ["mean", "mean", "mean"],  # foreground, background, masks
+            "init": ["gaussian"],  # only one init for DTI
         },
     )
 
