@@ -11,18 +11,24 @@ from tasking.models import AbstractAPITaskOnDataset
 
 
 class Regions(AbstractAPITaskOnDataset("regions")):
-    # Results
     regions = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Regions Extraction"
 
     def __str__(self):
+        name = self.name or "Crops"
         return (
-            f"Crops from {self.dataset.name}"
-            if self.dataset
-            else f"Regions Extraction #{self.pk}"
+            f"{name} on {self.dataset.name}" if self.dataset else f"{name} #{self.pk}"
         )
+
+    def save(self, *args, **kwargs):
+        if not self.name:
+            model = getattr(self, "parameters", {}).get("model", None)
+            # ext = str(model).replace('_', ' ').capitalize()
+            self.name = f"Crops with {model.replace('_', ' ')}" if model else "Crops"
+
+        super().save()
 
     def on_task_success(self, data):
         self.status = "PROCESSING RESULTS"

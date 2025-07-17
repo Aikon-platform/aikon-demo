@@ -270,7 +270,13 @@ class Dataset(AbstractDataset):
 
     def save(self, *args, **kwargs):
         if not self.name:
-            self.name = f"Dataset #{self.id}"
+            file_field = self.zip_file or self.pdf_file or self.img_files
+            if file_field:
+                self.name = Path(file_field.name).name
+            elif self.iiif_manifests:
+                self.name = f"Manifests {Path(self.iiif_manifests[0]).name} ({len(self.iiif_manifests)})"
+            else:
+                self.name = "Dataset"
 
         super().save()
 

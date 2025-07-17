@@ -27,9 +27,9 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
         help_text="Image transformations to fit prototype",
         json_structure={
             "transforms": "identity",
-            "iterations": 1,
-            "milestones": [1],
-            "grid_size": 0,  # thin plate spline grid size
+            "iterations": 1000,
+            "milestones": [1000],
+            "grid_size": 4,  # thin plate spline grid size
         },
     )
 

@@ -70,7 +70,7 @@ class AbstractTaskOnDatasetForm(AbstractTaskForm, AbstractDatasetForm):
         if not self._user.is_superuser:
             dataset_queryset = dataset_queryset.filter(created_by=self._user)
 
-        self.fields["dataset"].queryset = dataset_queryset
+        self.fields["dataset"].queryset = dataset_queryset.order_by("name")
 
     def check_dataset(self):
         """

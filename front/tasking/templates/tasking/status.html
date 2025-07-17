@@ -12,9 +12,8 @@
 
         <h1>
             {# TODO allow task name modification #}
-            {{ task_name }}
-            <span class="id-main">{{ object.name }}</span>
-            <span class="id-suffix">{{ object.id }}</span>
+            <span class="id-main">{{ object.name|default:task_name }}</span>
+            <span class="id-suffix">#{{ object.id }}</span>
         </h1>
         <p>
             Requested by {{ object.requested_by }}

@@ -90,6 +90,7 @@ def AbstractTask(task_prefix: str):
         def __str__(self):
             if self.name:
                 return f"{self.name}"
+
             return f"{self.__class__.__name__} task"
 
         # Util URLs and Paths
