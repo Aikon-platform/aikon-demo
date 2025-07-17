@@ -104,9 +104,10 @@ class AbstractTaskOnDatasetForm(AbstractTaskForm, AbstractDatasetForm):
         return super().is_valid() and self.check_dataset()
 
     def _populate_dataset(self):
-        if dataset := self.cleaned_data["dataset"]:
-            self._dataset = dataset
-            return
+        if self.cleaned_data.get("reuse_dataset", False):
+            if dataset := self.cleaned_data["dataset"]:
+                self._dataset = dataset
+                return
 
         dataset_fields = {
             "name": self.cleaned_data.get("dataset_name", None),
