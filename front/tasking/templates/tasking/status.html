@@ -12,9 +12,8 @@
 
         <h1>
             {# TODO allow task name modification #}
-            {{ task_name }}
-            <span class="id-main">{{ object.name }}</span>
-            <span class="id-suffix">{{ object.id }}</span>
+            <span class="id-main">{{ object.name|default:task_name }}</span>
+            <span class="id-suffix">#{{ object.id }}</span>
         </h1>
         <p>
             Requested by {{ object.requested_by }}
@@ -44,7 +43,7 @@
                 {% if object.dataset %}
                     <a href="{% url app_name|add:':restart' object.id %}" class="button is-link is-light ml-2">
                         <span class="iconify" data-icon="mdi:clock-start"></span>
-                        <span>Start new {{ task_name }} with same dataset</span>
+                        <span>Start new {{ task_name }} with same configuration</span>
                     </a>
                 {% endif %}
                 <a href="{% url app_name|add:':delete' object.pk %}" class="button is-light">

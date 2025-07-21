@@ -21,179 +21,179 @@
     <div class="transform-table">
         <table class="table is-fullwidth is-striped">
             <thead>
-                <tr>
-                    <th style="width: 5%">#</th>
-                    <th style="width: 10%">Apply</th>
-                    <th style="width: 30%">Type</th>
-                    <th style="width: 35%">Parameters</th>
-                    <th style="width: 20%">Iterations</th>
-                </tr>
+            <tr>
+                <th style="width: 5%">#</th>
+                <th style="width: 10%">Apply</th>
+                <th style="width: 30%">Type</th>
+                <th style="width: 35%">Parameters</th>
+                <th style="width: 20%">Iterations</th>
+            </tr>
             </thead>
             <!-- Identity -->
             <tbody>
-                <tr data-transform="identity">
-                    <td>1</td>
-                    <td>
-                        <label class="checkbox">
-                            <input type="checkbox" class="transform-checkbox"
-                                   data-transform="identity" checked disabled>
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                    <td>
-                        <span>Identity</span>
-                        <span class="icon is-small has-text-link has-tooltip">
+            <tr data-transform="identity">
+                <td>1</td>
+                <td>
+                    <label class="checkbox">
+                        <input type="checkbox" class="transform-checkbox"
+                               data-transform="identity" checked disabled>
+                        <span class="checkmark"></span>
+                    </label>
+                </td>
+                <td>
+                    <span>Identity</span>
+                    <span class="icon is-small has-text-link has-tooltip">
                             <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
                             <span class="tooltip">No transformation applied, preserves original image</span>
                         </span>
-                    </td>
-                    <td></td>
-                    <td>
-                        {% include "dticlustering/iteration.html" with transform="identity" %}
-                    </td>
-                </tr>
+                </td>
+                <td></td>
+                <td>
+                    {% include "dticlustering/iteration.html" with transform="identity" %}
+                </td>
+            </tr>
 
-                <!-- Color -->
-                <tr data-transform="color">
-                    <td>2</td>
-                    <td>
-                        <label class="checkbox">
-                            <input type="checkbox"
-                                   class="transform-checkbox"
-                                   data-transform="color">
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                    <td>
-                        <span>Color</span>
+            <!-- Color -->
+            <tr data-transform="color">
+                <td>2</td>
+                <td>
+                    <label class="checkbox">
+                        <input type="checkbox"
+                               class="transform-checkbox"
+                               data-transform="color">
+                        <span class="checkmark"></span>
+                    </label>
+                </td>
+                <td>
+                    <span>Color</span>
 
-                        <span class="icon is-small has-text-link has-tooltip">
+                    <span class="icon is-small has-text-link has-tooltip">
                             <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
                             <span class="tooltip">Applies color transformations to the image</span>
                         </span>
-                    </td>
-                    <td>
-                        <div class="field">
-                            <div class="control">
-                                <div class="select is-small full-width">
-                                    <label>
-                                        <select class="parameter-select full-width" data-transform="color" disabled>
-                                            <option value="color">Affine</option>
-                                            <option value="linearcolor">Linear</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        {% include "dticlustering/iteration.html" with transform="color" %}
-                    </td>
-                </tr>
-
-                <!-- Spatial -->
-                <tr data-transform="spatial">
-                    <td>3</td>
-                    <td>
-                        <label class="checkbox">
-                            <input type="checkbox"
-                                   class="transform-checkbox"
-                                   data-transform="spatial">
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                    <td>
-                        <span>Spatial</span>
-                        <span class="icon is-small has-text-link has-tooltip">
-                            <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
-                            <span class="tooltip">Applies geometric transformations to the image</span>
-                        </span>
-                    </td>
-                    <td>
-                        <div class="field">
-                            <div class="control">
-                                <div class="select is-small full-width">
-                                    <label>
-                                        <select class="parameter-select full-width" data-transform="spatial" disabled>
-                                            <option value="affine">Affine</option>
-                                            <option value="projective">Projective</option>
-                                        </select>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        {% include "dticlustering/iteration.html" with transform="spatial" %}
-                    </td>
-                </tr>
-
-                <!-- Morphological -->
-                <tr data-transform="morpho">
-                    <td>4</td>
-                    <td>
-                        <label class="checkbox">
-                            <input type="checkbox"
-                                   class="transform-checkbox"
-                                   data-transform="morpho">
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                    <td>
-                        <span>Morphological</span>
-                        <span class="icon is-small has-text-link has-tooltip">
-                            <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
-                            <span class="tooltip">Applies morphological operations like dilation or erosion</span>
-                        </span>
-                    </td>
-                    <td></td>
-                    <td>
-                        {% include "dticlustering/iteration.html" with transform="morpho" %}
-                    </td>
-                </tr>
-
-                <!-- Thin Plate Spline -->
-                <tr data-transform="tps">
-                    <td>5</td>
-                    <td>
-                        <label class="checkbox">
-                            <input type="checkbox"
-                                   class="transform-checkbox"
-                                   data-transform="tps">
-                            <span class="checkmark"></span>
-                        </label>
-                    </td>
-                    <td>
-                        <span>Thin Plate Spline</span>
-                        <span class="icon is-small has-text-link has-tooltip">
-                            <span class="tooltip">Applies deformation using a grid of control points</span>
-                            <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
-                        </span>
-                    </td>
-                    <td>
-                        <div class="field">
-                            <div class="control">
+                </td>
+                <td>
+                    <div class="field">
+                        <div class="control">
+                            <div class="select is-small full-width">
                                 <label>
-                                    <input type="number"
-                                           class="input is-small parameter-input"
-                                           data-transform="tps"
-                                           placeholder="Grid size" value="4"
-                                           min="1" max="10" disabled>
+                                    <select class="parameter-select full-width" data-transform="color" disabled>
+                                        <option value="color">Affine</option>
+                                        <option value="linearcolor">Linear</option>
+                                    </select>
                                 </label>
                             </div>
                         </div>
-                    </td>
-                    <td>
-                        {% include "dticlustering/iteration.html" with transform="tps" %}
-                    </td>
-                </tr>
+                    </div>
+                </td>
+                <td>
+                    {% include "dticlustering/iteration.html" with transform="color" %}
+                </td>
+            </tr>
+
+            <!-- Spatial -->
+            <tr data-transform="spatial">
+                <td>3</td>
+                <td>
+                    <label class="checkbox">
+                        <input type="checkbox"
+                               class="transform-checkbox"
+                               data-transform="spatial">
+                        <span class="checkmark"></span>
+                    </label>
+                </td>
+                <td>
+                    <span>Spatial</span>
+                    <span class="icon is-small has-text-link has-tooltip">
+                            <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
+                            <span class="tooltip">Applies geometric transformations to the image</span>
+                        </span>
+                </td>
+                <td>
+                    <div class="field">
+                        <div class="control">
+                            <div class="select is-small full-width">
+                                <label>
+                                    <select class="parameter-select full-width" data-transform="spatial" disabled>
+                                        <option value="affine">Affine</option>
+                                        <option value="projective">Projective</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% include "dticlustering/iteration.html" with transform="spatial" %}
+                </td>
+            </tr>
+
+            <!-- Morphological -->
+            <tr data-transform="morpho">
+                <td>4</td>
+                <td>
+                    <label class="checkbox">
+                        <input type="checkbox"
+                               class="transform-checkbox"
+                               data-transform="morpho">
+                        <span class="checkmark"></span>
+                    </label>
+                </td>
+                <td>
+                    <span>Morphological</span>
+                    <span class="icon is-small has-text-link has-tooltip">
+                            <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
+                            <span class="tooltip">Applies morphological operations like dilation or erosion</span>
+                        </span>
+                </td>
+                <td></td>
+                <td>
+                    {% include "dticlustering/iteration.html" with transform="morpho" %}
+                </td>
+            </tr>
+
+            <!-- Thin Plate Spline -->
+            <tr data-transform="tps">
+                <td>5</td>
+                <td>
+                    <label class="checkbox">
+                        <input type="checkbox"
+                               class="transform-checkbox"
+                               data-transform="tps">
+                        <span class="checkmark"></span>
+                    </label>
+                </td>
+                <td>
+                    <span>Thin Plate Spline</span>
+                    <span class="icon is-small has-text-link has-tooltip">
+                            <span class="tooltip">Applies deformation using a grid of control points</span>
+                            <span class="iconify mr-1" data-icon="mdi:alpha-i-circle-outline"></span>
+                        </span>
+                </td>
+                <td>
+                    <div class="field">
+                        <div class="control">
+                            <label>
+                                <input id="grid-size" type="number"
+                                       class="input is-small parameter-input"
+                                       data-transform="tps"
+                                       placeholder="Grid size" value="4"
+                                       min="1" max="10" disabled>
+                            </label>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% include "dticlustering/iteration.html" with transform="tps" %}
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     class Transforms {
         constructor(fieldName) {
             this.fieldName = fieldName;
@@ -204,6 +204,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 'identity': 'identity',
                 'color': 'linearcolor', // Default to linear
                 'spatial': 'affine',    // Default to affine
+                'morpho': 'morpho',
+                'tps': 'tps'
+            };
+
+            this.transformType = {
+                'identity': 'identity',
+                'color': 'color',
+                'linearcolor': 'color',
+                'affine': 'spatial',
+                'projective': 'spatial',
                 'morpho': 'morpho',
                 'tps': 'tps'
             };
@@ -246,6 +256,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.updateHiddenInput();
                 });
             });
+
+            document.getElementById("grid-size")?.addEventListener('input', () => {
+                this.updateHiddenInput();
+            });
         }
 
         updateTransformMap() {
@@ -283,7 +297,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             milestones.pop();
-            return { total, milestones };
+            return {total, milestones};
         }
 
         updateHiddenInput() {
@@ -291,11 +305,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const transforms = this.getSelectedTransforms();
             const iterations = this.getIterations();
+            const gridSize = parseInt(this.container.querySelector('#grid-size')?.value) || 4;
 
             const config = {
                 transforms: transforms.join('_'),
                 iterations: iterations.total,
-                milestones: iterations.milestones
+                milestones: iterations.milestones,
+                grid_size: gridSize
             };
 
             this.hiddenInput.value = JSON.stringify(config);
@@ -304,7 +320,41 @@ document.addEventListener('DOMContentLoaded', function() {
         loadFromHiddenInput() {
             try {
                 const config = JSON.parse(this.hiddenInput.value || '{}');
-                // TODO: Implement loading from existing form values and setting checkboxes/values accordingly
+                if (!config.transforms) return;
+
+                const transformsList = config.transforms.split('_');
+                const milestones = (config.milestones || []).concat([config.iterations || 1000]);
+
+                transformsList.forEach((transform, index) => {
+                    const uiTransform = this.transformType[transform];
+                    if (!uiTransform) return;
+
+                    const checkbox = this.container.querySelector(`.transform-checkbox[data-transform="${uiTransform}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+
+                        const row = checkbox.closest('tr');
+                        const iterationInput = row.querySelector('.iteration-input');
+                        const parameterSelect = row.querySelector('.parameter-select');
+                        const parameterInput = row.querySelector('.parameter-input');
+
+                        if (!iterationInput) return;
+                        iterationInput.disabled = false;
+                        iterationInput.value = index === 0 ? milestones[index] : milestones[index] - milestones[index - 1];
+
+                        if (parameterSelect){
+                            parameterSelect.disabled = false;
+                            parameterSelect.value = transform;
+                            this.transformMap[uiTransform] = transform;
+                        }
+
+                        if (parameterInput) {
+                            // Grid size for TPS
+                            parameterInput.disabled = false;
+                            parameterInput.value = config.grid_size || 4;
+                        }
+                    }
+                });
 
             } catch (e) {
                 console.warn('Failed to load transform config:', e);
@@ -320,26 +370,25 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-
 .has-tooltip {
-  position: relative;
-  display: inline-block;
+    position: relative;
+    display: inline-block;
 }
 
 .has-tooltip .tooltip {
-  visibility: hidden;
-  width: 30em;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 0.5em;
-  position: absolute;
-  z-index: 99;
+    visibility: hidden;
+    width: 30em;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.5em;
+    position: absolute;
+    z-index: 99;
 }
 
 .has-tooltip:hover .tooltip {
-  visibility: visible;
+    visibility: visible;
 }
 
 .transform-table .checkbox {

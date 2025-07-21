@@ -121,13 +121,33 @@ class TaskStartFromView(TaskStartView):
         if previous_task := self.model.objects.get(id=self.kwargs["pk"]):
             self.from_task = previous_task
 
-            # TODO when dataset is not yours, should work anyway
+            if self.request.method == "GET":
+                generated_fields = [
+                    "id",
+                    "requested_on",
+                    "requested_by_id",
+                    "status",
+                    "is_finished",
+                    "finished_on",
+                    "api_tracking_id",
+                ]
 
-            kwargs["initial"] = {"name": previous_task.name}
-            if hasattr(previous_task, "crops"):
-                kwargs["crops"] = previous_task.crops
-            elif hasattr(previous_task, "dataset"):
-                kwargs["dataset"] = previous_task.dataset
+                kwargs["initial"] = {}
+
+                for field in previous_task._meta.fields:
+                    field_name = field.name
+                    if field_name in generated_fields or field_name.startswith("_"):
+                        continue
+
+                    value = getattr(previous_task, field_name)
+                    if value is None:
+                        continue
+
+                    if field_name in ("dataset", "crops"):
+                        # TODO when dataset is not yours, should work anyway
+                        kwargs["initial"]["reuse_dataset"] = True
+
+                    kwargs["initial"][field_name] = value
 
         return kwargs
 
