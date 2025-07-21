@@ -8,14 +8,19 @@ from regions.models import AbstractAPITaskOnCrops
 
 
 class Similarity(AbstractAPITaskOnCrops("similarity")):
-    def save(self, *args, **kwargs):
+    def __str__(self):
         if not self.name:
             param = getattr(self, "parameters", {})
             algo = param.get("algorithm", "cosine")
             feat_net = param.get("feat_net", None)
-            self.name = (
+            return (
                 f"{algo.capitalize()} similarity{f' ({feat_net})' if feat_net else ''}"
             )
+        return self.name
+
+    def save(self, *args, **kwargs):
+        # if not self.name:
+        #     self.name = self.__str__()
 
         super().save()
 

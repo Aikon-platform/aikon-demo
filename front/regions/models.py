@@ -17,16 +17,19 @@ class Regions(AbstractAPITaskOnDataset("regions")):
         verbose_name = "Regions Extraction"
 
     def __str__(self):
-        name = self.name or "Crops"
+        gen_name = self.name
+        if not gen_name:
+            model = getattr(self, "parameters", {}).get("model", None)
+            gen_name = str(model).replace("_", " ").capitalize() if model else "Crops"
         return (
-            f"{name} on {self.dataset.name}" if self.dataset else f"{name} #{self.pk}"
+            f"{gen_name} on {self.dataset.name}"
+            if self.dataset
+            else f"{gen_name} #{self.pk}"
         )
 
     def save(self, *args, **kwargs):
-        if not self.name:
-            model = getattr(self, "parameters", {}).get("model", None)
-            # ext = str(model).replace('_', ' ').capitalize()
-            self.name = f"Crops with {model.replace('_', ' ')}" if model else "Crops"
+        # if not self.name:
+        #     self.name = self.__str__()
 
         super().save()
 

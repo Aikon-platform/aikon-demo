@@ -37,19 +37,29 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
     class Meta:
         verbose_name = "DTI Clustering"
 
-    def save(self, *args, **kwargs):
+    def __str__(self):
         if not self.name:
             params = getattr(self, "parameters", {})
-            use_sprites = params.get("background_option", {}).get("use_sprites", False)
+            if isinstance(params, str):
+                params = json.loads(params)
+
+            bkg = params.get("background_option", {})
+            use_sprites = False
+            if isinstance(bkg, dict):
+                use_sprites = bkg.get("use_sprites", False)
             exp_type = "DTI sprites" if use_sprites else "DTI K-means"
-            transforms = params.get("transformation_sequence", {}).get(
-                "transforms", "identity"
-            )
+
+            tsf = params.get("transformation_sequence", {})
+            if isinstance(tsf, dict):
+                tsf = tsf.get("transforms", "identity")
             n_proto = params.get("n_prototypes", 10)
 
-            self.name = (
-                f"{exp_type} w/ {n_proto} clusters ({transforms.replace('_', ' + ')})"
-            )
+            return f"{exp_type} w/ {n_proto} clusters ({tsf.replace('_', ' + ')})"
+        return self.name
+
+    def save(self, *args, **kwargs):
+        # if not self.name:
+        #     self.name = self.__str__()
 
         super().save()
 
