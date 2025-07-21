@@ -45,38 +45,18 @@ class DTIClusteringStart(DTIClusteringMixin.Start):
 
 
 class DTIClusteringStartFrom(DTIClusteringMixin.StartFrom, DTIClusteringStart):
-    pass
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        if parameters := kwargs.get("initial", {}).get("parameters"):
+            kwargs["initial"].update(
+                {
+                    "p_n_clusters": parameters.get("n_prototypes", 10),
+                    "p_background": parameters.get("background_option", {}),
+                    "p_transforms": parameters.get("transformation_sequence", {}),
+                }
+            )
 
-
-# class DTIClusteringStatus(DTIClusteringMixin, TaskStatusView):
-#     pass
-#
-#
-# class DTIClusteringProgress(DTIClusteringMixin, TaskProgressView):
-#     pass
-#
-#
-# class DTIClusteringCancel(DTIClusteringMixin, TaskCancelView):
-#     pass
-#
-#
-# class DTIClusteringWatcher(DTIClusteringMixin, TaskWatcherView):
-#     pass
-#
-#
-# class DTIClusteringDelete(DTIClusteringMixin, TaskDeleteView):
-#     pass
-#
-#
-# class DTIClusteringList(DTIClusteringMixin, TaskListView):
-#     permission_see_all = "dticlustering.monitor_dticlustering"
-#
-#     def get_queryset(self):
-#         return super().get_queryset().prefetch_related("dataset")
-#
-#
-# class DTIClusteringByDatasetList(DTIClusteringMixin, TaskByDatasetList):
-#     permission_see_all = "dticlustering.monitor_dticlustering"
+        return kwargs
 
 
 # TODO add DTIClusteringMixin
@@ -96,6 +76,10 @@ class SavedClusteringFromDTI(LoginRequiredMixin, CreateView):
             self.from_task = DTIClustering.objects.get(id=self.kwargs["from_pk"])
         except DTIClustering.DoesNotExist:
             raise Http404()
+
+        initial = kwargs.get("initial", {})
+        initial["clustering_data"] = self.from_task.expanded_results
+        kwargs["from_task"] = self.from_task
 
         initial = kwargs.get("initial", {})
         initial["clustering_data"] = self.from_task.expanded_results
