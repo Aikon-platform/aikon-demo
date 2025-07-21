@@ -25,7 +25,7 @@ User = get_user_model()
 path_datasets = PathAndRename("datasets/")
 
 BASE_URL = "http://nginx:8081"
-
+#BASE_URL = "http://195.221.193.74:8081"
 
 class AbstractDataset(models.Model):
     """
