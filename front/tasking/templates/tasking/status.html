@@ -73,11 +73,15 @@
     {% if object.is_finished %}
         <div class="centerwrap">
             <p>Status: <span class="status status-{{ object.status }}">{{ object.status }}</span></p>
-
             {% if object.full_log %}
-                {% if object.status != "SUCCESS" %}
-                    <pre class="full-log">{{ object.full_log }}</pre>
-                {% endif %}
+                <div class="centerwrap">
+                    <details>
+                        <summary>
+                            <h4 style="display: inline">View Execution Logs</h4>
+                        </summary>
+                        <pre class="full-log">{{ object.full_log }}</pre>
+                    </details>
+                </div>
             {% endif %}
         </div>
 
