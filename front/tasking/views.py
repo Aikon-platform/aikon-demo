@@ -177,12 +177,34 @@ class TaskProgressView(
         if not hasattr(self, "object"):
             self.object = self.get_object()
 
+        progress_data = self.object.get_progress()
+
+        if "log" in progress_data and not self.object.is_finished:
+            self.write_new_logs(progress_data["log"])
+
         return JsonResponse(
             {
                 "is_finished": self.object.is_finished,
-                **self.object.get_progress(),
+                **progress_data,
             }
         )
+
+    def write_new_logs(self, log_info):
+        current_log = self.object.full_log or ""
+
+        if "progress" in log_info:
+            for prog in log_info["progress"]:
+                log_line = (
+                    f"PROGRESS: {prog['context']} {prog['current']}/{prog['total']}"
+                )
+                if log_line not in current_log:
+                    self.object.write_log(f"{log_line}\n")
+
+        if "infos" in log_info and log_info["infos"]:
+            for info in log_info["infos"]:
+                log_line = f"INFO: {info}"
+                if log_line not in current_log:
+                    self.object.write_log(f"{log_line}\n")
 
 
 class TaskCancelView(LoginRequiredIfConfProtectedMixin, TaskMixin, DetailView):
