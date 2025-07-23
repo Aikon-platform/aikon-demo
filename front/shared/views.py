@@ -27,6 +27,10 @@ class HomeView(TemplateView):
     template_name = "demowebsite/home.html"
 
 
+class GDPRView(TemplateView):
+    template_name = "demowebsite/gdpr.html"
+
+
 class AccountsAdminMixin(PermissionRequiredMixin, LoginRequiredMixin):
     """
     Mixin for views that required the user special permission to access
