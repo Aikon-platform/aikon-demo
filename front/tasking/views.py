@@ -192,19 +192,15 @@ class TaskProgressView(
     def write_new_logs(self, log_info):
         current_log = self.object.full_log or ""
 
-        if "progress" in log_info:
-            for prog in log_info["progress"]:
-                log_line = (
-                    f"PROGRESS: {prog['context']} {prog['current']}/{prog['total']}"
-                )
-                if log_line not in current_log:
-                    self.object.write_log(f"{log_line}\n")
+        for prog in log_info.get("progress", []):
+            log_line = f"PROGRESS: {prog['context']} {prog['current']}/{prog['total']}"
+            if log_line not in current_log:
+                self.object.write_log(f"{log_line}\n")
 
-        if "infos" in log_info and log_info["infos"]:
-            for info in log_info["infos"]:
-                log_line = f"INFO: {info}"
-                if log_line not in current_log:
-                    self.object.write_log(f"{log_line}\n")
+        for info in log_info.get("infos", []):
+            log_line = f"INFO: {info}"
+            if log_line not in current_log:
+                self.object.write_log(f"{log_line}\n")
 
 
 class TaskCancelView(LoginRequiredIfConfProtectedMixin, TaskMixin, DetailView):
