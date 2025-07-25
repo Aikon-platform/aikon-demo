@@ -241,6 +241,10 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
                 f"masked_prototypes/prototype{p}.jpg",
                 f"prototypes/prototype{p}.png",
                 f"prototypes/prototype{p}.jpg",
+                f"masked_prototypes/proto{p}.png",
+                f"masked_prototypes/proto{p}.jpg",
+                f"prototypes/proto{p}.png",
+                f"prototypes/proto{p}.jpg",
             )
 
             mask_url = try_and_get_url(f"masks/mask{p}.png", f"masks/mask{p}.jpg")
