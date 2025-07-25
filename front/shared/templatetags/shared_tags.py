@@ -14,6 +14,8 @@ def field_type(obj):
 
 @register.filter
 def field_classes(obj):
+    if not hasattr(obj, "field") or not hasattr(obj.field, "widget"):
+        return ""
     classes = obj.field.widget.attrs.get("extra-class", "")
     if type(classes) is list:
         return " ".join(classes)
@@ -22,6 +24,8 @@ def field_classes(obj):
 
 @register.filter
 def add_class(field, class_name):
+    if not hasattr(field, "field") or not hasattr(field.field, "widget"):
+        return field
     attrs = field.field.widget.attrs
     attrs["class"] = attrs.get("class", "") + " " + class_name
     return field.as_widget(attrs=attrs)

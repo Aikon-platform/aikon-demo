@@ -178,9 +178,11 @@ class TaskProgressView(
             self.object = self.get_object()
 
         progress_data = self.object.get_progress()
-
-        if "log" in progress_data and not self.object.is_finished:
-            self.write_new_logs(progress_data["log"])
+        if progress_info := progress_data.get("log", {}).get("infos", []):
+            logs = self.object.full_log() or ""
+            for info in progress_info:
+                if info not in logs:
+                    self.object.write_log(f"{info}\n")
 
         return JsonResponse(
             {
@@ -188,19 +190,6 @@ class TaskProgressView(
                 **progress_data,
             }
         )
-
-    def write_new_logs(self, log_info):
-        current_log = self.object.full_log or ""
-
-        for prog in log_info.get("progress", []):
-            log_line = f"PROGRESS: {prog['context']} {prog['current']}/{prog['total']}"
-            if log_line not in current_log:
-                self.object.write_log(f"{log_line}\n")
-
-        for info in log_info.get("infos", []):
-            log_line = f"INFO: {info}"
-            if log_line not in current_log:
-                self.object.write_log(f"{log_line}\n")
 
 
 class TaskCancelView(LoginRequiredIfConfProtectedMixin, TaskMixin, DetailView):

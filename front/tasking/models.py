@@ -167,23 +167,22 @@ def AbstractTask(task_prefix: str):
             )
             return {"delta": delta, "eval": eval}
 
-        @cached_property
+        # @cached_property
         def full_log(self):
             """
             Returns the full log file content
-            TODO keep log content before final error
             """
             if not self.log_file_path.exists():
                 return None
             with open(self.log_file_path, "r") as f:
                 return f.read()
 
-        def write_log(self, text: str):
+        def write_log(self, text: str, mode="a"):
             """
             Writes text to the log file
             """
             self.log_file_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.log_file_path, "a") as f:
+            with open(self.log_file_path, mode) as f:
                 f.write(text)
 
         def get_token(self):
