@@ -177,11 +177,6 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
 
         return cleared_data
 
-    @classmethod
-    def get_frontend_monitoring(cls):
-        # TODO delete
-        return cls.get_frontend_monitoring()
-
     @cached_property
     def expanded_results(self):
         """
