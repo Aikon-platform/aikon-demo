@@ -116,15 +116,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
             this.container.querySelectorAll('.freeze-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', () => {
-                    this.updateHiddenInput();
-
                     // make init dropdown disabled if checkbox is checked
                     const component = checkbox.id.replace('freeze-', '');
                     const initDropdown = document.getElementById(`init-${component}`);
                     if (initDropdown) {
+                        initDropdown.value = checkbox.checked ? 'constant' : initDropdown.value;
                         initDropdown.disabled = checkbox.checked;
                     }
-
+                    this.updateHiddenInput();
                 });
             });
 
@@ -164,6 +163,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 freeze: this.getFreezeValues(),
                 init: this.getInitValues(useSprites)
             };
+
+            console.log(config)
 
             this.hiddenInput.value = JSON.stringify(config);
         }
