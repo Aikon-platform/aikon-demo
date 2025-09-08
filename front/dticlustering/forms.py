@@ -15,6 +15,12 @@ LEARNING_RATE_CHOICES = [
     (1e-2, "0.01 (Very Fast)"),
 ]
 
+LEARNING_SOURCE_CHOICES = [
+    ("data", "Direct Pixel Learning"),
+    ("generator_mlp", "MLP Generator (Latent Space)"),
+    ("generator_unet", "UNet Generator (Latent Space)"),
+]
+
 
 class DTIClusteringForm(AbstractTaskOnDatasetForm):
     p_n_clusters = forms.IntegerField(
@@ -46,6 +52,13 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
         help_text="How fast the prototypes adapt: higher values learn faster but may be unstable.",
         choices=LEARNING_RATE_CHOICES,
         initial=5e-4,
+        widget=forms.Select(),
+    )
+    source = forms.ChoiceField(
+        label="Sprite Generation Method",
+        help_text="How sprites are learned: direct pixel optimization or neural network generation from latent vectors.",
+        choices=LEARNING_SOURCE_CHOICES,
+        initial="data",
         widget=forms.Select(),
     )
     p_transforms = HiddenJsonField(
@@ -81,6 +94,7 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
             # "batch_size": self.cleaned_data["p_batch_size"],
             "empty_cluster_threshold": self.cleaned_data["empty_cluster_thres"],
             "lr": self.cleaned_data["lr"],
+            "source": self.cleaned_data["source"],
             "background_option": self.cleaned_data["p_background"],
             "transformation_sequence": self.cleaned_data["p_transforms"],
         }
