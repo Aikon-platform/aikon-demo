@@ -17,8 +17,8 @@ LEARNING_RATE_CHOICES = [
 
 LEARNING_SOURCE_CHOICES = [
     ("data", "Direct Pixel Learning"),
-    ("generator_mlp", "MLP Generator (Latent Space)"),
-    ("generator_unet", "UNet Generator (Latent Space)"),
+    ("mlp", "MLP Generator (Latent Space)"),
+    ("unet", "UNet Generator (Latent Space)"),
 ]
 
 
