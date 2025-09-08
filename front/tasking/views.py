@@ -178,11 +178,13 @@ class TaskProgressView(
             self.object = self.get_object()
 
         progress_data = self.object.get_progress()
-        if progress_info := progress_data.get("log", {}).get("infos", []):
-            logs = self.object.full_log() or ""
-            for info in progress_info:
-                if info not in logs:
-                    self.object.write_log(f"{info}\n")
+        progress_logs = progress_data.get("log", {})
+        if progress_logs:
+            if progress_info := progress_logs.get("infos", []):
+                logs = self.object.full_log() or ""
+                for info in progress_info:
+                    if info not in logs:
+                        self.object.write_log(f"{info}\n")
 
         return JsonResponse(
             {

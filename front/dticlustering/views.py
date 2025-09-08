@@ -57,6 +57,7 @@ class DTIClusteringStartFrom(DTIClusteringMixin.StartFrom, DTIClusteringStart):
                         "empty_cluster_threshold", 0.025
                     ),
                     "lr": parameters.get("lr", 5e-4),
+                    "source": parameters.get("source", "data"),
                 }
             )
 

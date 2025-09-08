@@ -1,12 +1,12 @@
 {% extends "tasking/start.html" %}
 
 {% block form_content %}
-    {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,p_transforms,p_background,empty_cluster_thres,lr" %}
+    {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,p_transforms,p_background,empty_cluster_thres,lr,source" %}
 
     <h4 class="mb-2">Prototype configuration</h4>
     <hr class="mt-0 mb-1">
 
-    <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
+    <div class="columns is-flex is-align-items-center is-justify-content-space-between m-0">
         <div class="column pl-0">
             {% include "includes/form/form_field.html" with field=form.p_n_clusters %}
         </div>
@@ -15,7 +15,7 @@
         </div>
     </div>
     <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
-        <div class="column pr-0">
+        <div class="column pl-0">
              {% include "includes/form/form_field.html" with field=form.source %}
         </div>
         <div class="column">
