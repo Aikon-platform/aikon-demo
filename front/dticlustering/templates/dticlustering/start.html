@@ -13,7 +13,12 @@
         <div class="column">
              {% include "includes/form/form_field.html" with field=form.empty_cluster_thres %}
         </div>
+    </div>
+    <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
         <div class="column pr-0">
+             {% include "includes/form/form_field.html" with field=form.source %}
+        </div>
+        <div class="column">
              {% include "includes/form/form_field.html" with field=form.lr %}
         </div>
     </div>
