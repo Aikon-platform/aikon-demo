@@ -86,9 +86,9 @@ class SavedClusteringFromDTI(LoginRequiredMixin, CreateView):
         initial["clustering_data"] = self.from_task.expanded_results
         kwargs["from_task"] = self.from_task
 
-        initial = kwargs.get("initial", {})
-        initial["clustering_data"] = self.from_task.expanded_results
-        kwargs["from_task"] = self.from_task
+        # initial = kwargs.get("initial", {})
+        # initial["clustering_data"] = self.from_task.expanded_results
+        # kwargs["from_task"] = self.from_task
 
         return kwargs
 
