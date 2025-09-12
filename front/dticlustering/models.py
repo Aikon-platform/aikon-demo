@@ -257,16 +257,29 @@ class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
                 continue
 
             raw_dir = cluster_dir / "raw"
+            old_format = False
             if not raw_dir.exists():
-                continue
+                raw_dir = cluster_dir
+                old_format = True
 
             for img in raw_dir.glob("*_raw.*"):
                 if img.suffix not in [".jpg", ".png"]:
                     continue
                 img_id = int(img.stem[: -len("_raw")])
+
+                raw_path = (
+                    f"clusters/cluster{p}/{img.name}"
+                    if old_format
+                    else f"clusters/cluster{p}/raw/{img.name}"
+                )
+                tsf_path = (
+                    f"clusters/cluster{p}/{img_id}_tsf{img.suffix}"
+                    if old_format
+                    else f"clusters/cluster{p}/tsf/{img_id}_tsf{img.suffix}"
+                )
                 img_data = {
-                    "raw_url": f"clusters/cluster{p}/raw/{img.name}",
-                    "tsf_url": f"clusters/cluster{p}/tsf/{img_id}_tsf{img.suffix}",
+                    "raw_url": raw_path,
+                    "tsf_url": tsf_path,
                     "path": None,
                     "distance": 100.0,
                     "id": img_id,
