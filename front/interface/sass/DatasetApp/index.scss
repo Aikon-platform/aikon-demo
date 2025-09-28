@@ -1,0 +1,64 @@
+@use "sass:color";
+@use "../variables" as *;
+
+.dataset-view-structure {
+    max-height: 40vh;
+    overflow: scroll;
+}
+
+.image-generic-outer-wrapper {
+    outline: 1px solid color.adjust($faded-color, $lightness: 5%);
+    border-radius: 2*$border-radius;
+    min-width: 150px;
+    min-height: 220px;
+    // background-color: lightgreen;
+
+    &:hover {
+        outline: 2px solid $faded-color;
+    }
+
+    .image-generic-inner-wrapper {
+        height: 100%;
+        display: grid;
+        grid-template-rows: 10% 90%;
+        grid-template-columns: 100%;
+        // background-color: plum;
+
+        &>* {
+            height: 100%;
+            width: 100%;
+        }
+        .image-generic-title {
+            margin: 10px 0 0 10%;
+        }
+        .image-generic-content {
+            margin: 0;
+            // background-color: powderblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .display-item {
+                width: 100%;
+                height: 100%;
+                // background-color: palevioletred;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                .display-image{
+                    height: 90%;
+                    width: 90%;
+                    // display: flex;
+                    // justify-content: center;
+                    // align-items: center;
+
+                    img.display-img {
+                        max-height: 100%;
+                        // transform: translateY(-5%);
+                    }
+                }
+            }
+        }
+    }
+}

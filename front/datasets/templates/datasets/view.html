@@ -119,15 +119,16 @@
 </div>
 
 {{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}
-<script type="text/javascript" src="{% static "js/build.js" %}"></script>
 <script type="text/javascript"
         id="generic-image-array-script"
 >
-    const docToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent),
-          datasetFormat = "{{ dataset.format }}",
-          htmlId = "document-image-browser";
+    document.addEventListener("DOMContentLoaded", () => {
+        const docToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent),
+              datasetFormat = "{{ dataset.format }}",
+              htmlId = "document-image-browser";
 
-    DemoTools.initDatasetImageBrowser(document.getElementById(htmlId), docToImageArray, datasetFormat);
+        DemoTools.initDatasetImageBrowser(document.getElementById(htmlId), docToImageArray, datasetFormat);
+    });
 </script>
 
 

@@ -5,8 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{% static "css/style.css" %}?v1.1">
     <link rel="icon" type="image/png" href="{% static "img/favicon.png" %}"/>
+    {% if debug and False %}{# Enable to develop locally using pnpm run dev #}
+    <script type="module" src="http://localhost:5173/src/main.ts"></script>
+    {% else %}
+    <script type="module" src="{% static "dist/main.js" %}"></script>
+    <link rel="stylesheet" href="{% static "dist/main.css" %}?v1.1">
+    {% endif %}
     {% block extra_head %}{% endblock %}
 </head>
 <body>

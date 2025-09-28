@@ -50,45 +50,43 @@ You can now connect to [localhost:8000](http://localhost:8000/) and see the webs
 
 ### Webpack setup
 
-This project uses webpack to bundle the javascript and sass components (committed in `shared/static/`).
+This project uses vite to bundle the javascript and sass components (committed in `shared/static/`).
 
-If you want to develop those components, you need first to [install npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), for example by installing nvm, and then initializing npm:
-
-```bash
-# Install nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-# Install node
-nvm install node
-# Install webpack
-npm install -g webpack
-```
-
-You then need to initialize npm in the webpack folder, and install all required packages:
+If you want to develop those components, you need first to [install pnpm](https://pnpm.io/installation) or [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), for example by installing nvm, and then initializing npm:
 
 ```bash
-cd webpack
-npm install
+# Install pnpm
+curl -fsSL https://get.pnpm.io/install.sh | sh -
 ```
 
-You can then start webpack compiler from the webpack folder:
+You then need to initialize (p)npm in the interface folder, and install all required packages:
 
 ```bash
-npm run start
+cd interface
+pnpm install
 ```
+
+You can then start vite compiler from the interface folder:
+
+```bash
+pnpm run dev
+```
+
+This will start a vite server that will provide the js and css files. To test them directly in the templates, modify the `{% if debug and False %}` to `{% if debug %}` in `shared/templates/demowebsite/base.html` (TODO: find a better way to do this). The first compilation takes a while (bulma is a bit heavy...).
 
 It's better to commit production static files. To generate them (js & css), run:
 
 ```bash
-# in front/webpack
-npm run production
+# in front/interface
+pnpm run build
 ```
 
-**Note:** If you only need to update css:
+<!-- **Note:** If you only need to update css:
 
 ```bash
 # in front/webpack
 npm run scss
-```
+``` -->
 
 ## Production
 
