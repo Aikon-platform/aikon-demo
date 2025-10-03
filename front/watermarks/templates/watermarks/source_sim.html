@@ -6,14 +6,15 @@
 {% endblock %}
 
 {% block content %}
-<script type="text/javascript" src="{% static "js/build.js" %}"></script>
 <h3>Watermark similarity browser</h3>
 <div id="matches" class="watermark-matches"></div>
 
 <script type="text/javascript">
-    const data_folder = "{{ object.data_folder_url|escapejs }}/";
-    DemoTools.initWatermarkSimBrowser(
-        document.getElementById("matches"),
-        data_folder);
+    document.addEventListener("DOMContentLoaded", () => {
+        const data_folder = "{{ object.data_folder_url|escapejs }}/";
+        DemoTools.initWatermarkSimBrowser(
+            document.getElementById("matches"),
+            data_folder);
+    });
 </script>
 {% endblock %}

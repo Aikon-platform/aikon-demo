@@ -16,9 +16,11 @@
         </div>
 
         <script type="text/javascript">
-            DemoTools.initSimilaritySimBrowser(
-                document.getElementById("matches"), "{{ object.similarity_task.index_url|escapejs }}",
-                "{{ object.similarity_task.similarity_matrix_url|escapejs }}", "cluster");
+            document.addEventListener("DOMContentLoaded", () => {
+                DemoTools.initSimilarityApp(
+                    document.getElementById("matches"), "{{ object.similarity_task.index_url|escapejs }}",
+                    "{{ object.similarity_task.similarity_matrix_url|escapejs }}", "cluster");
+            });
         </script>
     </div>
 {% endif %}

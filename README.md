@@ -22,3 +22,4 @@ Please refer to [api/README](https://github.com/Aikon-platform/aikon-api/blob/ma
     ```bash
     bash run.sh
     ```
+4. Specific optional steps are needed for the front-end development, see [front/interface/README.md](front/interface/README.md).

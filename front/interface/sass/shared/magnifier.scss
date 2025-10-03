@@ -1,0 +1,71 @@
+@use "../variables" as *;
+
+.magnifier {
+    border-radius: 2*$border-radius;
+    width: fit-content;
+    height: fit-content;
+
+    .magnifying-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+        gap: 2em;
+    }
+
+    .magnifying-item {
+        background-color: white;
+        border-radius: 2*$border-radius;
+        text-align: center;
+        padding: 1em;
+        // setting only max-height without height breaks the sizing of child elements......................
+        // max-height: 90%;
+        // max-width: 40%;
+        min-height: 650px;
+        min-width: 400px;
+        overflow: scroll;
+        height: 90%;
+        max-width: 40vw;
+        display: grid;
+        grid-template-rows: 75% 25%;
+        grid-template-columns: 100%;
+        gap: .5em;
+
+        &:only-child {
+            max-width: 80vw;
+        }
+
+        &:has(.rot90, .rot270) {
+            // kind of hacky: when the image is in horizontal display, widen its .magnifying-item container
+            min-width: 500px;
+        }
+
+        .display-image {
+            max-height: 80vh;
+            .display-img {
+                object-fit: contain;
+            }
+        }
+    }
+
+    .magnifying-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        &>* {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .title-identification {
+            word-break: break-all;
+            margin: 0;
+
+            .tag {
+                margin-bottom: 0px !important;
+            }
+        }
+    }
+}
+

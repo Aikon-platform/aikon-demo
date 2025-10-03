@@ -42,10 +42,12 @@
 
     {{ object.annotations|json_script:"annotations"}}
     <script type="text/javascript">
-        const annotations = JSON.parse(document.getElementById("annotations").textContent);
-        DemoTools.initWatermarkMatches(
-            document.getElementById("matches"), "{{ object.image.url|escapejs }}",
-            annotations, "{{ object.compare_to.data_folder_url|escapejs}}/");
+        document.addEventListener("DOMContentLoaded", () => {
+            const annotations = JSON.parse(document.getElementById("annotations").textContent);
+            DemoTools.initWatermarkMatches(
+                document.getElementById("matches"), "{{ object.image.url|escapejs }}",
+                annotations, "{{ object.compare_to.data_folder_url|escapejs}}/");
+        });
     </script>
 {% endif %}
 
