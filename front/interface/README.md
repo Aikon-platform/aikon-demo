@@ -40,7 +40,7 @@ From the interface folder, instead of running `pnpm run build --watch`, run:
 pnpm run dev
 ```
 
-This will start a vite server that will provide the js and css files. Now, to have them fetched in the django templates, you need to modify the file [shared/templates/demowebsite/base.html](../../shared/templates/demowebsite/base.html#L9), and modify:
+This will start a vite server that will provide the js and css files. Now, to have them fetched in the django templates, you need to modify the file [shared/templates/demowebsite/base.html](../shared/templates/demowebsite/base.html#L9), and modify:
 
 ```html
 {% if debug and False %}{# Set true to enable to develop locally using pnpm run dev #}
