@@ -82,7 +82,6 @@ export function graphFromSimilarityMatches(
     for (const [i, image] of index.images.entries()) {
         map_index.set(image.id, i);
     }
-    console.log(map_index);
 
     for (const match of matches) {
         const query_index = map_index.get(match.query.id)!;

@@ -52,7 +52,6 @@ export default class NameProvider implements TNameProvider {
      */
     getSourceName(source?: TDocument): string {
         if (source === undefined) return "";
-        console.log(source, this.sources[source?.uid]);
         return this.sources[source.uid]?.name || source.name || source.uid || "";
     }
 

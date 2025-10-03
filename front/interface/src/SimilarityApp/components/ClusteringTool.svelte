@@ -101,9 +101,3 @@
     {/if}
 </div>
 <div class="mt-4"></div>
-
-<style lang="scss">
-    .hidden {
-        display: none;
-    }
-</style>

@@ -48,45 +48,9 @@ And the server:
 
 You can now connect to [localhost:8000](http://localhost:8000/) and see the website.
 
-### Webpack setup
+### Vite setup
 
-This project uses vite to bundle the javascript and sass components (committed in `shared/static/`).
-
-If you want to develop those components, you need first to [install pnpm](https://pnpm.io/installation) or [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), for example by installing nvm, and then initializing npm:
-
-```bash
-# Install pnpm
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-```
-
-You then need to initialize (p)npm in the interface folder, and install all required packages:
-
-```bash
-cd interface
-pnpm install
-```
-
-You can then start vite compiler from the interface folder:
-
-```bash
-pnpm run dev
-```
-
-This will start a vite server that will provide the js and css files. To test them directly in the templates, modify the `{% if debug and False %}` to `{% if debug %}` in `shared/templates/demowebsite/base.html` (TODO: find a better way to do this). The first compilation takes a while (bulma is a bit heavy...).
-
-It's better to commit production static files. To generate them (js & css), run:
-
-```bash
-# in front/interface
-pnpm run build
-```
-
-<!-- **Note:** If you only need to update css:
-
-```bash
-# in front/webpack
-npm run scss
-``` -->
+This project uses vite to bundle the javascript and sass components (committed into `shared/static/`). If you want to modify those parts, please refer to the detailed documentation in [interface/README.md](interface/README.md).
 
 ## Production
 

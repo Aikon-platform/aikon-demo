@@ -61,7 +61,6 @@
         }
     });
     $effect(() => {
-        console.log("Updating cluster", cluster.name);
         cluster.images.length;
         images = name_provider.sortImages(cluster.images);
     });

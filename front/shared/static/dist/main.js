@@ -8956,7 +8956,7 @@ function ImageFileDisplay(e, b) {
 	}), append(e, T), pop();
 }
 delegate(["click"]);
-var on_click$3 = (e, b, x) => b(get$2(x)), root_2$6 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"cl-selecter svelte-wblulv\" aria-label=\"Select image\"></a>"), root_1$9 = /* @__PURE__ */ from_html("<div><!> <!></div>"), root_3$6 = /* @__PURE__ */ from_html("<p>∅</p>"), on_click_1$1 = (e, b, x) => {
+var on_click$3 = (e, b, x) => b(get$2(x)), root_2$6 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"cl-selecter\" aria-label=\"Select image\"></a>"), root_1$9 = /* @__PURE__ */ from_html("<div><!> <!></div>"), root_3$6 = /* @__PURE__ */ from_html("<p>∅</p>"), on_click_1$1 = (e, b, x) => {
 	b(!b()), b() && x.onexpand?.();
 }, root_4$2 = /* @__PURE__ */ from_html("<a class=\"cl-more card cl-placeholder\" href=\"javascript:void(0)\"> </a>"), root$12 = /* @__PURE__ */ from_html("<div><!> <!></div>");
 function ImageList(e, b) {
@@ -9822,7 +9822,7 @@ function ClusteringTool(e, b) {
 	};
 	if_block(M, (e) => {
 		get$2(x) ? e(N) : e(P, !1);
-	}), reset(A), next(2), template_effect((e) => j = set_class(A, 1, "cluster-viewer svelte-z8nipj", null, j, e), [() => ({
+	}), reset(A), next(2), template_effect((e) => j = set_class(A, 1, "cluster-viewer", null, j, e), [() => ({
 		"viewer-table": !get$2(x),
 		hidden: !b.visible
 	})]), append(e, D), pop();

@@ -40,7 +40,6 @@
             const match_id = loc.slice(7);
             highlit = match_id;
             const itemIndex = matches.findIndex(match => match.query.id === match_id);
-            console.log(itemIndex);
             if (itemIndex !== -1) {
                 actual_page = Math.floor(itemIndex / PAGINATE_BY) + 1;
             }
