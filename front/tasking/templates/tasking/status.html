@@ -17,7 +17,7 @@
             Requested by {{ object.requested_by }}
             {% if object.dataset %}
                 on dataset
-                <a class="is-hoverable" href="{% url app_name|add:':list_perdataset' object.dataset.pk %}">
+                <a class="is-hoverable" href="{% url url_prefix|add:'list_perdataset' object.dataset.pk %}">
                     <span class="id-main">{{ object.dataset.name }}</span>
                     <span class="id-suffix">{{ object.dataset.id }}</span>
                 </a>
@@ -25,7 +25,7 @@
         </p>
         <p>
             {% if not object.is_finished %}
-                <a href="{% url app_name|add:':cancel' object.id %}" class="button is-ghost">
+                <a href="{% url url_prefix|add:'cancel' object.id %}" class="button is-ghost">
                     <span class="iconify" data-icon="mdi:close-circle"></span>
                     <span>Cancel</span>
                 </a>
@@ -39,12 +39,12 @@
             {% endif %}
             {% if object.is_finished %}
                 {% if object.dataset %}
-                    <a href="{% url app_name|add:':restart' object.id %}" class="button is-link is-light ml-2">
+                    <a href="{% url url_prefix|add:'restart' object.id %}" class="button is-link is-light ml-2">
                         <span class="iconify" data-icon="mdi:clock-start"></span>
                         <span>Start new {{ task_name }} with same configuration</span>
                     </a>
                 {% endif %}
-                <a href="{% url app_name|add:':delete' object.pk %}" class="button is-light">
+                <a href="{% url url_prefix|add:'delete' object.pk %}" class="button is-light">
                     <span class="iconify" data-icon="mdi:delete"></span>
                     <span>Delete this experiment</span>
                 </a>
@@ -95,7 +95,7 @@
 
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", () => {
-                    DemoTools.initProgressTracker(document.getElementById("tracking"), "{% url app_name|add:':progress' object.id %}");
+                    DemoTools.initProgressTracker(document.getElementById("tracking"), "{% url url_prefix|add:'progress' object.id %}");
                 });
             </script>
         </div>

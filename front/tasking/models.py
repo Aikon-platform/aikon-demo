@@ -529,7 +529,27 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                 return {
                     "status": "UNKNOWN",
                 }
+        
+        def prepare_dataset_from_api(self, output: dict) -> bool:
+            """
+            Handle the connection between the dataset served by the API and the front-end dataset
 
+            Returns:
+                bool: True if the dataset was prepared successfully, False otherwise
+            """
+            try:
+                dataset_url = output.get("dataset_url")
+
+                if dataset_url:
+                    self.dataset.api_url = dataset_url
+                    self.dataset.save()
+            except Exception as e:
+                self.on_task_error(
+                    {"error": f"Could not save dataset from {dataset_url}:\n{e}"}
+                )
+                return False
+            return True
+    
         @classmethod
         def get_api_monitoring(cls):
             """

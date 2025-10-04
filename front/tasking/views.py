@@ -20,6 +20,7 @@ LOGIN_REQUIRED = getattr(settings, "LOGIN_REQUIRED", True)
 class TaskMixin:
     app_name = None
     task_name = None
+    task_url_prefix = None
     model: AbstractTask = None
     form_class = None
     task_data = None
@@ -29,6 +30,7 @@ class TaskMixin:
         context["task_name"] = getattr(self, "task_name", self.model._meta.verbose_name)
         context["app_name"] = self.model.django_app_name
         context["task_data"] = self.task_data
+        context["url_prefix"] = f"{self.model.django_app_name}:{self.task_url_prefix or ''}"
         return context
 
 
