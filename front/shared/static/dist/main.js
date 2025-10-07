@@ -3451,7 +3451,7 @@ var NameProvider = class {
 		return b && (x = x.split(".").slice(0, -1).join("."), x.length >= 16 && (x = x.slice(0, 5) + "..." + x.slice(-10))), x;
 	}
 	getSourceName(e) {
-		return e === void 0 ? "" : (console.log(e, this.sources[e?.uid]), this.sources[e.uid]?.name || e.name || e.uid || "");
+		return e === void 0 ? "" : this.sources[e.uid]?.name || e.name || e.uid || "";
 	}
 	fetchIIIFNames(e) {
 		return new Promise(async (b, x) => {
@@ -9022,7 +9022,7 @@ function ImageList(e, b) {
 delegate(["click"]);
 var root_1$8 = /* @__PURE__ */ from_html("<h3> </h3> <p><!></p>", 1), root_4$1 = /* @__PURE__ */ from_html("<form><input type=\"text\"/> <a href=\"javascript:void(0)\" class=\"btn\"><!></a></form>"), on_click$2 = (e, b) => {
 	set(b, !0);
-}, root_6$1 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"btn is-edit\" title=\"Rename\"><!></a>"), root_5$3 = /* @__PURE__ */ from_html("<span> </span> <!>", 1), root_8$1 = /* @__PURE__ */ from_html("<!> <!>", 1), root_7$3 = /* @__PURE__ */ from_html("<p><!></p>"), root_10 = /* @__PURE__ */ from_html("<p><!></p>"), root_3$5 = /* @__PURE__ */ from_html("<div class=\"cl-propinfo\"><div class=\"cl-cluster-title\"><!></div> <p> </p> <!></div>"), root_14 = /* @__PURE__ */ from_html("<img alt=\"mask\" class=\"mask\"/>"), root_11 = /* @__PURE__ */ from_html("<div class=\"cl-protoinfo\"><p><!></p> <div class=\"cl-proto\"><img alt=\"cl-proto\" class=\"prototype\"/> <!></div></div>"), on_click_1 = (e, b) => b(!0), root_15 = /* @__PURE__ */ from_html("<a class=\"cl-overlay cl-hoveroptions\" href=\"javascript:void(0)\"><!> <!></a>"), root$11 = /* @__PURE__ */ from_html("<div><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><!> <!></div> <!></div> <div class=\"cl-samples\"><!></div></div>");
+}, root_6$1 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"btn is-edit\" title=\"Rename\"><!></a>"), root_5$3 = /* @__PURE__ */ from_html("<span> </span> <!>", 1), root_8$1 = /* @__PURE__ */ from_html("<!> <!>", 1), root_7$3 = /* @__PURE__ */ from_html("<p><!></p>"), root_10 = /* @__PURE__ */ from_html("<p><!></p>"), root_3$5 = /* @__PURE__ */ from_html("<div class=\"cl-propinfo\"><div class=\"cl-cluster-title\"><!></div> <p> </p> <!></div>"), root_11 = /* @__PURE__ */ from_html("<div class=\"cl-protoinfo\"><p><!></p> <div class=\"cl-proto\"><img alt=\"cl-proto\" class=\"prototype\"/></div></div>"), on_click_1 = (e, b) => b(!0), root_14 = /* @__PURE__ */ from_html("<a class=\"cl-overlay cl-hoveroptions\" href=\"javascript:void(0)\"><!> <!></a>"), root$11 = /* @__PURE__ */ from_html("<div><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><!> <!></div> <!></div> <div class=\"cl-samples\"><!></div></div>");
 function ClusterElement(e, b) {
 	push(b, !0);
 	let x = prop(b, "cluster", 7), S = prop(b, "expanded", 7, !1), C = prop(b, "editing", 15, !1), w = prop(b, "editable", 3, !1), T = prop(b, "dti_transformed", 15, !1), E = prop(b, "thumbnail", 3, !1), D = prop(b, "selected", 3, !1), O = /* @__PURE__ */ state(!1), k = /* @__PURE__ */ state(void 0), A = /* @__PURE__ */ state(void 0), j = getEditorState(), M = getNameProvider(), N = {
@@ -9046,7 +9046,7 @@ function ClusterElement(e, b) {
 	user_effect(() => {
 		C() && R();
 	}), user_effect(() => {
-		console.log("Updating cluster", x().name), x().images.length, set(F, M.sortImages(x().images), !0);
+		x().images.length, set(F, M.sortImages(x().images), !0);
 	});
 	var z = root$11();
 	let B;
@@ -9152,19 +9152,14 @@ function ClusterElement(e, b) {
 		if_block(C, (e) => {
 			T() ? e(w) : e(E, !1);
 		}), reset(S);
-		var D = sibling(S, 2), O = child(D), k = sibling(O, 2), A = (e) => {
-			var b = root_14();
-			template_effect(() => set_attribute(b, "src", (j.base_url || "") + x().mask_url)), append(e, b);
-		};
-		if_block(k, (e) => {
-			x().mask_url && e(A);
-		}), reset(D), reset(b), template_effect(() => set_attribute(O, "src", (j.base_url || "") + x().proto_url)), append(e, b);
+		var D = sibling(S, 2), O = child(D);
+		reset(D), reset(b), template_effect(() => set_attribute(O, "src", (j.base_url || "") + x().proto_url)), append(e, b);
 	};
 	if_block(q, (e) => {
 		!E() && x().proto_url && e(J);
 	}), reset(U);
 	var Y = sibling(U, 2), X = (e) => {
-		var b = root_15();
+		var b = root_14();
 		b.__click = [on_click_1, C];
 		var x = child(b);
 		IconBtn(x, {
@@ -9689,7 +9684,6 @@ function connectedComponents(e, b, x) {
 function graphFromSimilarityMatches(e, b) {
 	let x = [], S = /* @__PURE__ */ new Map();
 	for (let [b, x] of e.images.entries()) S.set(x.id, b);
-	console.log(S);
 	for (let e of b) {
 		let b = S.get(e.query.id);
 		for (let C of e.matches) {
@@ -10071,7 +10065,7 @@ function SimBrowser(e, b) {
 			let x = e.slice(7);
 			set(k, x, !0);
 			let S = b.matches.findIndex((e) => e.query.id === x);
-			console.log(S), S !== -1 && set(w, Math.floor(S / 30) + 1);
+			S !== -1 && set(w, Math.floor(S / 30) + 1);
 			return;
 		}
 		set(k, null), e.startsWith("#page-") && set(w, parseInt(e.slice(6)), !0);
