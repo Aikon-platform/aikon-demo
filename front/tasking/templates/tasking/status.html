@@ -4,8 +4,6 @@
 {% block title %}{{ task_name }} experiment #{{ object.name }}-{{ object.id }}{% endblock %}
 
 {% block content %}
-    <script type="text/javascript" src="{% static "js/build.js" %}?v1.1"></script>
-
     <div class="centerwrap">
 
         {% include "includes/breadcrumbs.html" %}
@@ -92,11 +90,13 @@
     {% else %}
         <div class="centerwrap">
             <div id="tracking">
-                {# <p>Status: <span class="status status-{{ object.status }}">{{ object.status }}</span></p> #}
+                {# <p>Status: <span class="status status-{{ object.status }}">{{ object.status }}</span></p>#}
             </div>
 
             <script type="text/javascript">
-                DemoTools.initProgressTracker(document.getElementById("tracking"), "{% url app_name|add:':progress' object.id %}");
+                document.addEventListener("DOMContentLoaded", () => {
+                    DemoTools.initProgressTracker(document.getElementById("tracking"), "{% url app_name|add:':progress' object.id %}");
+                });
             </script>
         </div>
     {% endif %}

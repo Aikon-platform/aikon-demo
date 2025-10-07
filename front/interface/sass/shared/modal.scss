@@ -1,0 +1,13 @@
+.modal {
+    z-index: 1000;
+}
+
+.dialog-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}

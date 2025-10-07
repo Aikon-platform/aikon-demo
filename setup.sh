@@ -27,6 +27,6 @@ run_script "venv.sh" "Virtual environment setup"
 run_script "var_env.sh" "Environment variables configuration"
 # run_script "redis.sh" "Redis installation and setup"
 run_script "database.sh" "Database configuration"
-# run_script "webpack.sh" "Webpack setup"
+# run_script "vite.sh" "Vite setup"
 
 echo_title "🥳 ALL SETUP!"

@@ -24,9 +24,11 @@
         </div>
 
         <script type="text/javascript">
-            DemoTools.initSimilaritySimBrowser(
-                document.getElementById("matches"), "{{ object.index_url|escapejs }}",
-                "{{ object.similarity_matrix_url|escapejs }}", "browse");
+            document.addEventListener("DOMContentLoaded", () => {
+                DemoTools.initSimilarityApp(
+                    document.getElementById("matches"), "{{ object.index_url|escapejs }}",
+                    "{{ object.similarity_matrix_url|escapejs }}", "browse");
+            });
         </script>
     </div>
 {% endif %}

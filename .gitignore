@@ -76,6 +76,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.pgpass
 
 # Specific for this project
 front/media/
@@ -96,7 +97,7 @@ node_modules/
 .idea/
 .vscode/
 
-front/shared/static/css/style.css.map
+front/shared/static/dist/main.css.map
 
 nginx_conf
 nginx_ssl
