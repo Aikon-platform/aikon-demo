@@ -48,47 +48,9 @@ And the server:
 
 You can now connect to [localhost:8000](http://localhost:8000/) and see the website.
 
-### Webpack setup
+### Vite setup
 
-This project uses webpack to bundle the javascript and sass components (committed in `shared/static/`).
-
-If you want to develop those components, you need first to [install npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm), for example by installing nvm, and then initializing npm:
-
-```bash
-# Install nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-# Install node
-nvm install node
-# Install webpack
-npm install -g webpack
-```
-
-You then need to initialize npm in the webpack folder, and install all required packages:
-
-```bash
-cd webpack
-npm install
-```
-
-You can then start webpack compiler from the webpack folder:
-
-```bash
-npm run start
-```
-
-It's better to commit production static files. To generate them (js & css), run:
-
-```bash
-# in front/webpack
-npm run production
-```
-
-**Note:** If you only need to update css:
-
-```bash
-# in front/webpack
-npm run scss
-```
+This project uses vite to bundle the javascript and sass components (committed into `shared/static/`). If you want to modify those parts, please refer to the detailed documentation in [interface/README.md](interface/README.md).
 
 ## Production
 

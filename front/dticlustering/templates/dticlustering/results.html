@@ -44,7 +44,9 @@
 {{ object.expanded_results|json_script:"result_data" }}
 
 <script type="text/javascript">
-    let result_data = JSON.parse(document.getElementById("result_data").textContent);
-    DemoTools.initClusterViewer(document.getElementById("result"), result_data, "{{ object.result_media_url|escapejs }}/");
+    document.addEventListener("DOMContentLoaded", () => {
+        let result_data = JSON.parse(document.getElementById("result_data").textContent);
+        DemoTools.initClusterViewer(document.getElementById("result"), result_data, "{{ object.result_media_url|escapejs }}/");
+    });
 </script>
 {% endif %}

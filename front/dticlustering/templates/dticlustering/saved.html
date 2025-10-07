@@ -32,12 +32,11 @@
 
 <div id="result" class="cluster-viewer"></div>
 
-<script type="text/javascript" src="{% static "js/build.js" %}"></script>
 <script type="text/javascript">
-    console.log(document.getElementById("id_clustering_data"))
-    const FORM_FIELD = document.getElementById("id_clustering_data");
-    let result_data = JSON.parse(FORM_FIELD.value);
-    console.log(result_data);
-    DemoTools.initClusterViewer(document.getElementById("result"), result_data, "{{ from_task.result_media_url|escapejs }}/", true, {{ editing|yesno:"true,false"}}, FORM_FIELD);
+    document.addEventListener("DOMContentLoaded", () => {
+        const FORM_FIELD = document.getElementById("id_clustering_data");
+        let result_data = JSON.parse(FORM_FIELD.value);
+        DemoTools.initClusterViewer(document.getElementById("result"), result_data, "{{ from_task.result_media_url|escapejs }}/", true, {{ editing|yesno:"true,false"}}, FORM_FIELD);
+    });
 </script>
 {% endblock %}

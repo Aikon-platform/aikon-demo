@@ -103,7 +103,7 @@ class Pipeline(AbstractTaskOnDataset("pipelines")):
             notify_email=False,
             pipeline=self,
             parameters={
-                "model": "fasterrcnn_watermarks.pth",
+                "model": "fasterrcnn_watermark_extraction",
                 "postprocess": {"squarify": True, "h_margin": 0.05, "v_margin": 0.05},
             },
         )

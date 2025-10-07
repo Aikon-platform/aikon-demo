@@ -10,6 +10,10 @@ DATABASES = {
     }
 }
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 API_URL = f'http://localhost:{ENV("API_PORT", default=5000)}'
