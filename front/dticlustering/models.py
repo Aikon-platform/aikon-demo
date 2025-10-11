@@ -18,7 +18,7 @@ import shutil
 from typing import Dict
 
 from datasets.models import Dataset
-from tasking.models import AbstractAPITaskOnDataset
+from regions.models import AbstractAPITaskOnCrops
 
 User = get_user_model()
 
@@ -26,7 +26,7 @@ API_URL = getattr(settings, "API_URL", "http://localhost:5000")
 BASE_URL = getattr(settings, "BASE_URL", "http://localhost:8000")
 
 
-class DTIClustering(AbstractAPITaskOnDataset("dticlustering")):
+class DTIClustering(AbstractAPITaskOnCrops("dticlustering")):
     """
     Main model for a clustering query and result
     """

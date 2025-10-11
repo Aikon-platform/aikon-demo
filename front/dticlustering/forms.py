@@ -2,7 +2,7 @@ from django import forms
 
 from shared.forms import HiddenJsonField
 from .models import DTIClustering, SavedClustering
-from tasking.forms import AbstractTaskOnDatasetForm
+from tasking.forms import AbstractTaskOnCropsForm
 
 
 LEARNING_RATE_CHOICES = [
@@ -22,7 +22,7 @@ LEARNING_SOURCE_CHOICES = [
 ]
 
 
-class DTIClusteringForm(AbstractTaskOnDatasetForm):
+class DTIClusteringForm(AbstractTaskOnCropsForm):
     p_n_clusters = forms.IntegerField(
         label="Number of clusters",
         help_text="The number of different prototypes to generate from the dataset",
@@ -82,7 +82,7 @@ class DTIClusteringForm(AbstractTaskOnDatasetForm):
         },
     )
 
-    class Meta(AbstractTaskOnDatasetForm.Meta):
+    class Meta(AbstractTaskOnCropsForm.Meta):
         model = DTIClustering
 
     def clean_lr(self):

@@ -194,7 +194,7 @@ def AbstractAPITaskOnCrops(task_prefix: str):
             null=True,
             blank=True,
             on_delete=models.SET_NULL,
-            related_name="task_crops",
+            related_name=f"{task_prefix}_crops",
         )
 
         def get_task_kwargs(self) -> Dict[str, Any]:

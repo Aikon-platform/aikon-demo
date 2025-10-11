@@ -15,19 +15,15 @@
                 <span class="id-main">Dataset {{ dataset.name }}</span>
                 <span class="id-suffix">{{ dataset.id }}</span>
             </h1>
-
         </div>
         <div class="column is-one-third">
             <div class="columns is-vcentered">
 
-                <span class="column tag status content is-large m-1"
-                      title="Dataset format: {{ dataset.format }}"
-                >
+                <span class="column tag status content is-large m-1" title="Dataset format: {{ dataset.format }}">
                     {{ dataset.format }}
                 </span>
                 <span class="column tag status content icon-text is-large m-1"
-                      title="{{ dataset.document|length }} document{% if dataset.document|length > 1 %}s{% endif %}"
-                >
+                      title="{{ dataset.document|length }} document{% if dataset.document|length > 1 %}s{% endif %}">
                     <span>{{ dataset.documents|length }}</span>
                     <span class="icon has-text-white m-1">
                         <i class="iconify" data-icon="mdi:file-document-multiple"></i>
@@ -37,13 +33,10 @@
                       title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
                     <span>{{ dataset.image_count }}</span>
                     <span class="icon has-text-white">
-                        <i class="iconify" data-icon="mdi:file-image"
-                        ></i>
+                        <i class="iconify" data-icon="mdi:file-image"></i>
                     </span>
                 </span>
-                <a class="button is-light is-content is-large m-1"
-                   href="{% url 'datasets:delete' dataset.pk %}"
-                >
+                <a class="button is-light is-content is-large m-1" href="{% url 'datasets:delete' dataset.pk %}">
                     <span class="iconify" data-icon="mdi:delete"></span>
                 </a>
             </div>
@@ -55,27 +48,23 @@
         <h2>Dataset contents</h2>
         <div class="tabs is-centered is-normal tab-head-list">
             <ul>
-                <li id="tab-head-tree"
-                    class="tab-head is-active"
-                ><a>Document tree</a></li>
-                <li id="tab-head-images"
-                    class="tab-head"
-                ><a>Images</a></li>
+                <li id="tab-head-tree" class="tab-head is-active">
+                    <a>Document tree</a>
+                </li>
+                <li id="tab-head-images"class="tab-head">
+                    <a>Images</a>
+                </li>
             </ul>
         </div>
 
         <div class="tab-body-wrapper">
-            <div id="tab-body-tree"
-                 class="tab-body"
-            >
+            <div id="tab-body-tree"class="tab-body">
                 {% for document in dataset.documents %}
                     <h3 class="id-suffix">File structure of document #{{ forloop.counter }}</h3>
                     <div class="dataset-view-structure">{{ dataset.documents.0.document_tree|safe }}</div>
                 {% endfor %}
             </div>
-            <div id="tab-body-images"
-                 class="tab-body is-hidden"
-            >
+            <div id="tab-body-images" class="tab-body is-hidden">
                 <div id="document-image-browser"></div>
             </div>
         </div>
@@ -119,9 +108,7 @@
 </div>
 
 {{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}
-<script type="text/javascript"
-        id="generic-image-array-script"
->
+<script type="text/javascript" id="generic-image-array-script">
     document.addEventListener("DOMContentLoaded", () => {
         const docToImageArray = JSON.parse(document.getElementById('generic-image-array-script').textContent),
               datasetFormat = "{{ dataset.format }}",
