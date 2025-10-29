@@ -76,6 +76,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.pgpass
 
 # Specific for this project
 front/media/

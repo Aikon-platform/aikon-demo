@@ -174,13 +174,13 @@
                             alt="cl-proto"
                             class="prototype"
                         />
-                        {#if cluster.mask_url}
-                            <img
-                                src={(editor_state.base_url || "") + cluster.mask_url}
-                                alt="mask"
-                                class="mask"
-                            />
-                        {/if}
+                        <!--{#if cluster.mask_url}-->
+                        <!--    <img-->
+                        <!--        src={(editor_state.base_url || "") + cluster.mask_url}-->
+                        <!--        alt="mask"-->
+                        <!--        class="mask"-->
+                        <!--    />-->
+                        <!--{/if}-->
                     </div>
                 </div>
             {/if}
