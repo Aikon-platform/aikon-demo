@@ -47,9 +47,9 @@ class QueryForm(AbstractTaskOnCropsForm):
 
     class Meta(AbstractTaskOnCropsForm.Meta):
         model = Query
-        fields = AbstractTaskOnCropsForm.Meta.fields + ("index",)
+        fields = AbstractTaskOnCropsForm.Meta.fields + ("target_index",)
     
-    index = forms.ModelChoiceField(
+    target_index = forms.ModelChoiceField(
         queryset=Index.objects.filter(public=True),
         label="Index",
         help_text="Select the index to query",
@@ -57,9 +57,9 @@ class QueryForm(AbstractTaskOnCropsForm):
     )
 
     def __init__(self, *args, **kwargs):
-        selected_index = kwargs.pop("index", None)
+        selected_index = kwargs.pop("target_index", None)
         super().__init__(*args, **kwargs)
-        self.fields["index"].queryset = Index.objects.filter(
+        self.fields["target_index"].queryset = Index.objects.filter(
             Q(public=True) | Q(owner=self._user)
         )
-        self.fields["index"].initial = selected_index
+        self.fields["target_index"].initial = selected_index

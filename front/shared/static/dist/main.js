@@ -3257,9 +3257,9 @@ function Icon(e, b) {
 		get$2(D) && e(j);
 	}), append(e, k), pop();
 }
-var root_1$13 = /* @__PURE__ */ from_html("<span> </span>"), root$15 = /* @__PURE__ */ from_html("<button><!> <!></button>");
+var root_1$14 = /* @__PURE__ */ from_html("<span> </span>"), root$16 = /* @__PURE__ */ from_html("<button><!> <!></button>");
 function IconBtn(e, b) {
-	var x = root$15();
+	var x = root$16();
 	let S;
 	x.__click = function(...e) {
 		b.onclick?.apply(this, e);
@@ -3269,7 +3269,7 @@ function IconBtn(e, b) {
 		return b.icon;
 	} });
 	var w = sibling(C, 2), T = (e) => {
-		var x = root_1$13(), S = child(x, !0);
+		var x = root_1$14(), S = child(x, !0);
 		reset(x), template_effect(() => set_text(S, b.label)), append(e, x);
 	};
 	if_block(w, (e) => {
@@ -3451,7 +3451,7 @@ var NameProvider = class {
 		return b && (x = x.split(".").slice(0, -1).join("."), x.length >= 16 && (x = x.slice(0, 5) + "..." + x.slice(-10))), x;
 	}
 	getSourceName(e) {
-		return e === void 0 ? "" : (console.log(e, this.sources[e?.uid]), this.sources[e.uid]?.name || e.name || e.uid || "");
+		return e === void 0 ? "" : this.sources[e.uid]?.name || e.name || e.uid || "";
 	}
 	fetchIIIFNames(e) {
 		return new Promise(async (b, x) => {
@@ -3621,7 +3621,7 @@ function getEditorState() {
 function setEditorState(e) {
 	setContext("editor_state", e);
 }
-var root_1$12 = /* @__PURE__ */ from_html("<span class=\"has-text-danger\"> </span>"), root$14 = /* @__PURE__ */ from_html("<div class=\"match-exporter\"><!> <!></div>");
+var root_1$13 = /* @__PURE__ */ from_html("<span class=\"has-text-danger\"> </span>"), root$15 = /* @__PURE__ */ from_html("<div class=\"match-exporter\"><!> <!></div>");
 function CSVExporter(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ state(!1), S = /* @__PURE__ */ state(null);
@@ -3644,7 +3644,7 @@ function CSVExporter(e, b) {
 			set(x, !1);
 		}
 	};
-	var E = root$14(), D = child(E);
+	var E = root$15(), D = child(E);
 	IconBtn(D, {
 		icon: "mdi:download",
 		onclick: T,
@@ -3654,7 +3654,7 @@ function CSVExporter(e, b) {
 		label: "Export to CSV"
 	});
 	var O = sibling(D, 2), k = (e) => {
-		var b = root_1$12(), x = child(b, !0);
+		var b = root_1$13(), x = child(b, !0);
 		reset(b), template_effect(() => set_text(x, get$2(S))), append(e, b);
 	};
 	if_block(O, (e) => {
@@ -6988,7 +6988,7 @@ function Popper_content(e, b) {
 		x() ? e(T) : e(E, !1);
 	}), append(e, C);
 }
-var root_1$11 = /* @__PURE__ */ from_html("<!> <!>", 1);
+var root_1$12 = /* @__PURE__ */ from_html("<!> <!>", 1);
 function Popper_layer_inner(e, b) {
 	push(b, !0);
 	let x = prop(b, "interactOutsideBehavior", 3, "close"), S = prop(b, "trapFocus", 3, !0), C = prop(b, "isValidEvent", 3, () => !1), w = prop(b, "customAnchor", 3, null), T = prop(b, "isStatic", 3, !1), E = prop(b, "tooltip", 3, !1), D = /* @__PURE__ */ rest_props(b, /* @__PURE__ */ "$$slots.$$events.$$legacy.popper.onEscapeKeydown.escapeKeydownBehavior.preventOverflowTextSelection.id.onPointerDown.onPointerUp.side.sideOffset.align.alignOffset.arrowPadding.avoidCollisions.collisionBoundary.collisionPadding.sticky.hideWhenDetached.updatePositionStrategy.strategy.dir.preventScroll.wrapperId.style.onPlaced.onInteractOutside.onCloseAutoFocus.onOpenAutoFocus.onFocusOutside.interactOutsideBehavior.loop.trapFocus.isValidEvent.customAnchor.isStatic.enabled.ref.tooltip".split("."));
@@ -7058,7 +7058,7 @@ function Popper_layer_inner(e, b) {
 		},
 		content: (e, w) => {
 			let T = () => w?.().props, E = () => w?.().wrapperProps;
-			var O = root_1$11(), k = first_child(O), A = (e) => {
+			var O = root_1$12(), k = first_child(O), A = (e) => {
 				Scroll_lock(e, { get preventScroll() {
 					return b.preventScroll;
 				} });
@@ -8670,18 +8670,18 @@ function guessImageLink(e) {
 function ellipsis(e, b) {
 	return b < 0 || e.length <= b ? e : b < 12 ? e.slice(0, b) + "..." : e.slice(0, Math.max(5, b - 12)) + "..." + e.slice(-Math.min(9, b - 5));
 }
-var root_2$8 = /* @__PURE__ */ from_html("<br/> <span> </span>", 1), root_1$10 = /* @__PURE__ */ from_html("<span class=\"tag is-light is-bold mb-3\"> </span> <!>", 1), root_3$9 = /* @__PURE__ */ from_html("<p> </p>"), root$13 = /* @__PURE__ */ from_html("<!> <!>", 1);
+var root_2$8 = /* @__PURE__ */ from_html("<br/> <span> </span>", 1), root_1$11 = /* @__PURE__ */ from_html("<span class=\"tag is-light is-bold mb-3\"> </span> <!>", 1), root_3$9 = /* @__PURE__ */ from_html("<p> </p>"), root$14 = /* @__PURE__ */ from_html("<!> <!>", 1);
 function ImageInfos(e, b) {
 	push(b, !0);
 	let x = prop(b, "isTitle", 3, !1), S = prop(b, "prefix", 3, ""), C = prop(b, "filenameDisplay", 3, !0), w = /* @__PURE__ */ user_derived(() => x() ? "h4" : "span"), T = getNameProvider();
-	var E = root$13(), D = first_child(E);
+	var E = root$14(), D = first_child(E);
 	element(D, () => get$2(w), !1, (e, w) => {
 		attribute_effect(e, (e, b) => ({
 			class: "title-identification",
 			title: e,
 			[CLASS]: b
 		}), [() => T.getImageName(b.image), () => ({ "mt-2": x() })]);
-		var E = root_1$10(), D = first_child(E), O = child(D);
+		var E = root_1$11(), D = first_child(E), O = child(D);
 		reset(D);
 		var k = sibling(D, 2), A = (e) => {
 			var x = root_2$8(), S = sibling(first_child(x), 2), C = child(S, !0);
@@ -8956,20 +8956,20 @@ function ImageFileDisplay(e, b) {
 	}), append(e, T), pop();
 }
 delegate(["click"]);
-var on_click$3 = (e, b, x) => b(get$2(x)), root_2$6 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"cl-selecter\" aria-label=\"Select image\"></a>"), root_1$9 = /* @__PURE__ */ from_html("<div><!> <!></div>"), root_3$6 = /* @__PURE__ */ from_html("<p>∅</p>"), on_click_1$1 = (e, b, x) => {
+var on_click$3 = (e, b, x) => b(get$2(x)), root_2$6 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"cl-selecter\" aria-label=\"Select image\"></a>"), root_1$10 = /* @__PURE__ */ from_html("<div><!> <!></div>"), root_3$6 = /* @__PURE__ */ from_html("<p>∅</p>"), on_click_1$1 = (e, b, x) => {
 	b(!b()), b() && x.onexpand?.();
-}, root_4$2 = /* @__PURE__ */ from_html("<a class=\"cl-more card cl-placeholder\" href=\"javascript:void(0)\"> </a>"), root$12 = /* @__PURE__ */ from_html("<div><!> <!></div>");
+}, root_4$2 = /* @__PURE__ */ from_html("<a class=\"cl-more card cl-placeholder\" href=\"javascript:void(0)\"> </a>"), root$13 = /* @__PURE__ */ from_html("<div><!> <!></div>");
 function ImageList(e, b) {
 	push(b, !0);
 	let x = prop(b, "selectable", 3, !1), S = prop(b, "expanded", 15, !1), C = getEditorState();
 	function w(e) {
 		C.select_images("toggle", e);
 	}
-	var T = root$12();
+	var T = root$13();
 	let E;
 	var D = child(T);
 	each(D, 17, () => b.images.slice(0, b.limit), (e) => e.id, (e, S) => {
-		var T = root_1$9();
+		var T = root_1$10();
 		let E;
 		var D = child(T);
 		{
@@ -9020,9 +9020,9 @@ function ImageList(e, b) {
 	}), reset(T), template_effect((e) => E = set_class(T, 1, "cl-images", null, E, e), [() => ({ "cl-selectable": x() })]), append(e, T), pop();
 }
 delegate(["click"]);
-var root_1$8 = /* @__PURE__ */ from_html("<h3> </h3> <p><!></p>", 1), root_4$1 = /* @__PURE__ */ from_html("<form><input type=\"text\"/> <a href=\"javascript:void(0)\" class=\"btn\"><!></a></form>"), on_click$2 = (e, b) => {
+var root_1$9 = /* @__PURE__ */ from_html("<h3> </h3> <p><!></p>", 1), root_4$1 = /* @__PURE__ */ from_html("<form><input type=\"text\"/> <a href=\"javascript:void(0)\" class=\"btn\"><!></a></form>"), on_click$2 = (e, b) => {
 	set(b, !0);
-}, root_6$1 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"btn is-edit\" title=\"Rename\"><!></a>"), root_5$3 = /* @__PURE__ */ from_html("<span> </span> <!>", 1), root_8$1 = /* @__PURE__ */ from_html("<!> <!>", 1), root_7$3 = /* @__PURE__ */ from_html("<p><!></p>"), root_10 = /* @__PURE__ */ from_html("<p><!></p>"), root_3$5 = /* @__PURE__ */ from_html("<div class=\"cl-propinfo\"><div class=\"cl-cluster-title\"><!></div> <p> </p> <!></div>"), root_14 = /* @__PURE__ */ from_html("<img alt=\"mask\" class=\"mask\"/>"), root_11 = /* @__PURE__ */ from_html("<div class=\"cl-protoinfo\"><p><!></p> <div class=\"cl-proto\"><img alt=\"cl-proto\" class=\"prototype\"/> <!></div></div>"), on_click_1 = (e, b) => b(!0), root_15 = /* @__PURE__ */ from_html("<a class=\"cl-overlay cl-hoveroptions\" href=\"javascript:void(0)\"><!> <!></a>"), root$11 = /* @__PURE__ */ from_html("<div><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><!> <!></div> <!></div> <div class=\"cl-samples\"><!></div></div>");
+}, root_6$1 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"btn is-edit\" title=\"Rename\"><!></a>"), root_5$3 = /* @__PURE__ */ from_html("<span> </span> <!>", 1), root_8$1 = /* @__PURE__ */ from_html("<!> <!>", 1), root_7$3 = /* @__PURE__ */ from_html("<p><!></p>"), root_10 = /* @__PURE__ */ from_html("<p><!></p>"), root_3$5 = /* @__PURE__ */ from_html("<div class=\"cl-propinfo\"><div class=\"cl-cluster-title\"><!></div> <p> </p> <!></div>"), root_14 = /* @__PURE__ */ from_html("<img alt=\"mask\" class=\"mask\"/>"), root_11 = /* @__PURE__ */ from_html("<div class=\"cl-protoinfo\"><p><!></p> <div class=\"cl-proto\"><img alt=\"cl-proto\" class=\"prototype\"/> <!></div></div>"), on_click_1 = (e, b) => b(!0), root_15 = /* @__PURE__ */ from_html("<a class=\"cl-overlay cl-hoveroptions\" href=\"javascript:void(0)\"><!> <!></a>"), root$12 = /* @__PURE__ */ from_html("<div><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><!> <!></div> <!></div> <div class=\"cl-samples\"><!></div></div>");
 function ClusterElement(e, b) {
 	push(b, !0);
 	let x = prop(b, "cluster", 7), S = prop(b, "expanded", 7, !1), C = prop(b, "editing", 15, !1), w = prop(b, "editable", 3, !1), T = prop(b, "dti_transformed", 15, !1), E = prop(b, "thumbnail", 3, !1), D = prop(b, "selected", 3, !1), O = /* @__PURE__ */ state(!1), k = /* @__PURE__ */ state(void 0), A = /* @__PURE__ */ state(void 0), j = getEditorState(), M = getNameProvider(), N = {
@@ -9046,14 +9046,14 @@ function ClusterElement(e, b) {
 	user_effect(() => {
 		C() && R();
 	}), user_effect(() => {
-		console.log("Updating cluster", x().name), x().images.length, set(F, M.sortImages(x().images), !0);
+		x().images.length, set(F, M.sortImages(x().images), !0);
 	});
-	var z = root$11();
+	var z = root$12();
 	let B;
 	var V = child(z);
 	bind_this(V, (e) => set(k, e), () => get$2(k));
 	var H = sibling(V, 2), U = child(H), W = child(U), G = (e) => {
-		var b = root_1$8(), S = first_child(b), C = child(S, !0);
+		var b = root_1$9(), S = first_child(b), C = child(S, !0);
 		reset(S);
 		var w = sibling(S, 2), T = child(w), E = (e) => {
 			var b = text();
@@ -9376,7 +9376,7 @@ function ClusterAskModale(e, b) {
 	}), append(e, P), pop();
 }
 delegate(["click"]);
-var root_4 = /* @__PURE__ */ from_html("<!> <!>", 1), root_5$2 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><label class=\"label\">Actions on selection:</label> <!></div>"), root_2$4 = /* @__PURE__ */ from_html("<div class=\"toolbar-item cl-select-tools\"><label class=\"label\"> </label> <div class=\"field\"><!></div></div> <!>", 1), root_1$7 = /* @__PURE__ */ from_html("<div class=\"toolbar-content cl-editor-tools\"><!> <div class=\"toolbar-item toolbar-btn\"><!></div> <div class=\"toolbar-item toolbar-btn\"><!></div></div>"), root$10 = /* @__PURE__ */ from_html("<div><div class=\"toolbar cl-editor-toolbar\"><div class=\"toolbar-content\"><h2> </h2> <div class=\"toolbar-item\"><label class=\"label\">Sort by:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Size</option><option>ID</option><option>Name</option></select></div></div></div> <div class=\"toolbar-item\"><label class=\"label\">Display:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Grid</option><option>Rows</option></select></div></div></div> <!></div></div> <div><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div> <!></div> <!>", 1);
+var root_4 = /* @__PURE__ */ from_html("<!> <!>", 1), root_5$2 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><label class=\"label\">Actions on selection:</label> <!></div>"), root_2$4 = /* @__PURE__ */ from_html("<div class=\"toolbar-item cl-select-tools\"><label class=\"label\"> </label> <div class=\"field\"><!></div></div> <!>", 1), root_1$8 = /* @__PURE__ */ from_html("<div class=\"toolbar-content cl-editor-tools\"><!> <div class=\"toolbar-item toolbar-btn\"><!></div> <div class=\"toolbar-item toolbar-btn\"><!></div></div>"), root$11 = /* @__PURE__ */ from_html("<div><div class=\"toolbar cl-editor-toolbar\"><div class=\"toolbar-content\"><h2> </h2> <div class=\"toolbar-item\"><label class=\"label\">Sort by:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Size</option><option>ID</option><option>Name</option></select></div></div></div> <div class=\"toolbar-item\"><label class=\"label\">Display:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Grid</option><option>Rows</option></select></div></div></div> <!></div></div> <div><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div> <!></div> <!>", 1);
 function ClusterApp(e, b) {
 	push(b, !0);
 	let x = prop(b, "formfield", 7), S = proxy(new ClusterEditorState(b.clustering_data, b.base_url));
@@ -9391,7 +9391,7 @@ function ClusterApp(e, b) {
 	function E() {
 		x() && (x().value = JSON.stringify(S.content), x().form?.submit()), S.editing = !1;
 	}
-	var D = root$10(), O = first_child(D);
+	var D = root$11(), O = first_child(D);
 	let k;
 	var A = child(O), j = child(A), M = child(j), N = child(M);
 	reset(M);
@@ -9406,7 +9406,7 @@ function ClusterApp(e, b) {
 	var K = sibling(G);
 	K.value = K.__value = "rows", reset(W), reset(U), reset(H), reset(V);
 	var q = sibling(V, 2), J = (e) => {
-		var b = root_1$7(), C = child(b), w = (e) => {
+		var b = root_1$8(), C = child(b), w = (e) => {
 			var b = root_2$4(), x = first_child(b), C = child(x), w = child(C);
 			reset(C);
 			var T = sibling(C, 2), E = child(T), D = (e) => {
@@ -9536,7 +9536,7 @@ function unserializeClusterFile(e) {
 		background_urls: e.background_urls
 	};
 }
-var root_8 = /* @__PURE__ */ from_html("<div><span class=\"label\"> </span> <progress class=\"progress is-link bar\"></progress></div>"), root_7$1 = /* @__PURE__ */ from_html("<div class=\"tck-bar-list\"></div>"), root_6 = /* @__PURE__ */ from_html("<span> </span> <!> <pre> </pre>", 1), root$9 = /* @__PURE__ */ from_html("<div class=\"tck-progress\"><!></div>");
+var root_8 = /* @__PURE__ */ from_html("<div><span class=\"label\"> </span> <progress class=\"progress is-link bar\"></progress></div>"), root_7$1 = /* @__PURE__ */ from_html("<div class=\"tck-bar-list\"></div>"), root_6 = /* @__PURE__ */ from_html("<span> </span> <!> <pre> </pre>", 1), root$10 = /* @__PURE__ */ from_html("<div class=\"tck-progress\"><!></div>");
 function ProgressTracker(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ state(null), S = /* @__PURE__ */ user_derived(() => get$2(x)?.log?.errors?.join("\n")), C;
@@ -9548,7 +9548,7 @@ function ProgressTracker(e, b) {
 		});
 	}
 	user_effect(() => (w(), () => clearTimeout(C)));
-	var T = root$9(), E = child(T), D = (e) => {
+	var T = root$10(), E = child(T), D = (e) => {
 		var b = text();
 		template_effect(() => set_text(b, get$2(S))), append(e, b);
 	}, O = (e) => {
@@ -9628,21 +9628,18 @@ function unserializeSimilarityMatrix(e, b) {
 			source_index: b
 		});
 	}), {
-		matches: unserializeImageMatches(x.images, {
-			matches: S,
-			query_transpositions: x.transpositions
-		}, x),
+		matches: unserializeImageMatches(S, x, x),
 		index: x
 	};
 }
 function unserializeImageMatches(e, b, x) {
 	let S = [];
-	for (let C = 0; C < b.matches.length; C++) {
-		let w = e[C], T = b.matches[C].map((e) => ({
-			image: x.images[e.source_index],
+	for (let C = 0; C < e.length; C++) {
+		let w = x.images[C], T = e[C].map((e) => ({
+			image: b.images[e.source_index],
 			similarity: e.similarity,
-			q_transposition: b.query_transpositions[e.best_query_flip],
-			m_transposition: x.transpositions[e.best_source_flip]
+			q_transposition: x.transpositions[e.best_query_flip],
+			m_transposition: b.transpositions[e.best_source_flip]
 		})).sort((e, b) => b.similarity - e.similarity), E = {}, D = [];
 		T.forEach((e) => {
 			if (!E[e.image.document.uid]) {
@@ -9657,6 +9654,25 @@ function unserializeImageMatches(e, b, x) {
 		});
 	}
 	return S.sort((e, b) => b.matches[0].similarity - e.matches[0].similarity);
+}
+function unserializeSearchResults(e, b) {
+	console.log(b, e);
+	let x = unserializeSimilarityIndex(e), S = unserializeSimilarityIndex(b.query), C = S.images.map(() => []);
+	b.pairs.forEach(([e, b, x]) => {
+		C[b].push({
+			similarity: x,
+			best_source_flip: 0,
+			best_query_flip: 0,
+			query_index: b,
+			source_index: e
+		});
+	});
+	let w = unserializeImageMatches(C, x, S);
+	return {
+		source_index: x,
+		query_index: S,
+		matches: w
+	};
 }
 function connectedComponents(e, b, x) {
 	let S = /* @__PURE__ */ new Map();
@@ -9689,7 +9705,6 @@ function connectedComponents(e, b, x) {
 function graphFromSimilarityMatches(e, b) {
 	let x = [], S = /* @__PURE__ */ new Map();
 	for (let [b, x] of e.images.entries()) S.set(x.id, b);
-	console.log(S);
 	for (let e of b) {
 		let b = S.get(e.query.id);
 		for (let C of e.matches) {
@@ -9728,14 +9743,14 @@ function convertToClusteringFile(e, b, x) {
 		background_urls: e.sources.map((e) => e.src)
 	};
 }
-var root_1$6 = /* @__PURE__ */ from_html("<div class=\"cl-image card\"><!></div>"), root_2$3 = /* @__PURE__ */ from_html("<p>∅</p>"), root$8 = /* @__PURE__ */ from_html("<div class=\"cl-cluster box\"><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><div class=\"cl-propinfo\"><p class=\"cl-cluster-title\"><span> </span></p></div></div></div> <div class=\"cl-samples\"><div class=\"cl-images cl-limitheight\"></div></div></div>");
+var root_1$7 = /* @__PURE__ */ from_html("<div class=\"cl-image card\"><!></div>"), root_2$3 = /* @__PURE__ */ from_html("<p>∅</p>"), root$9 = /* @__PURE__ */ from_html("<div class=\"cl-cluster box\"><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><div class=\"cl-propinfo\"><p class=\"cl-cluster-title\"><span> </span></p></div></div></div> <div class=\"cl-samples\"><div class=\"cl-images cl-limitheight\"></div></div></div>");
 function ClusterPreviewBlock(e, b) {
 	push(b, !0);
-	var x = root$8(), S = sibling(child(x), 2), C = child(S), w = child(C), T = child(w), E = child(T), D = child(E);
+	var x = root$9(), S = sibling(child(x), 2), C = child(S), w = child(C), T = child(w), E = child(T), D = child(E);
 	reset(E), reset(T), reset(w), reset(C), reset(S);
 	var O = sibling(S, 2), k = child(O);
 	each(k, 20, () => b.cluster.members, (e) => e, (e, x) => {
-		var S = root_1$6(), C = child(S);
+		var S = root_1$7(), C = child(S);
 		ImageFileDisplay(C, { get image() {
 			return b.index.images[x];
 		} }), reset(S), append(e, S);
@@ -9744,7 +9759,7 @@ function ClusterPreviewBlock(e, b) {
 		append(e, b);
 	}), reset(k), reset(O), reset(x), template_effect(() => set_text(D, `${b.cluster.id >= 0 ? `Cluster ${b.cluster.id}` : "Unclustered"} (${b.cluster.members.length ?? ""})`)), append(e, x), pop();
 }
-var root_3$3 = /* @__PURE__ */ from_html("<div class=\"toolbar-item\"><label class=\"label is-expanded\" for=\"clustering-threshold\">Clustering threshold:</label> <div class=\"field\"><div class=\"control\"><input type=\"range\"/></div> <div class=\"control\"><input type=\"number\" class=\"input\" id=\"clustering-threshold\"/></div></div></div>"), root_1$5 = /* @__PURE__ */ from_html("<div class=\"toolbar\"><div class=\"toolbar-content\"><!> <!> <div class=\"toolbar-item toolbar-btn\"><!></div></div></div>"), root_7 = /* @__PURE__ */ from_html("<div><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div>"), root$7 = /* @__PURE__ */ from_html("<!> <div><!></div> <div class=\"mt-4\"></div>", 1);
+var root_3$3 = /* @__PURE__ */ from_html("<div class=\"toolbar-item\"><label class=\"label is-expanded\" for=\"clustering-threshold\">Clustering threshold:</label> <div class=\"field\"><div class=\"control\"><input type=\"range\"/></div> <div class=\"control\"><input type=\"number\" class=\"input\" id=\"clustering-threshold\"/></div></div></div>"), root_1$6 = /* @__PURE__ */ from_html("<div class=\"toolbar\"><div class=\"toolbar-content\"><!> <!> <div class=\"toolbar-item toolbar-btn\"><!></div></div></div>"), root_7 = /* @__PURE__ */ from_html("<div><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div>"), root$8 = /* @__PURE__ */ from_html("<!> <div><!></div> <div class=\"mt-4\"></div>", 1);
 function ClusteringTool(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ state(!1), S = /* @__PURE__ */ user_derived(() => Math.min(...b.matches.map((e) => Math.min(...e.matches.map((e) => e.similarity))))), C = /* @__PURE__ */ user_derived(() => Math.max(...b.matches.map((e) => Math.max(...e.matches.map((e) => e.similarity))))), w = /* @__PURE__ */ state(get$2(S) + .8 * (get$2(C) - get$2(S))), T = /* @__PURE__ */ user_derived(() => graphFromSimilarityMatches(b.index, b.matches)), E = /* @__PURE__ */ state(proxy([]));
@@ -9753,8 +9768,8 @@ function ClusteringTool(e, b) {
 			set(E, connectedComponents(get$2(T), get$2(w), b.index.images.length), !0);
 		});
 	});
-	var D = root$7(), O = first_child(D), k = (e) => {
-		var T = root_1$5(), E = child(T), D = child(E), O = (e) => {
+	var D = root$8(), O = first_child(D), k = (e) => {
+		var T = root_1$6(), E = child(T), D = child(E), O = (e) => {
 			var x = comment(), S = first_child(x);
 			snippet(S, () => b.extra_toolbar_items), append(e, x);
 		};
@@ -9827,7 +9842,7 @@ function ClusteringTool(e, b) {
 		hidden: !b.visible
 	})]), append(e, D), pop();
 }
-var root_5$1 = /* @__PURE__ */ from_html("<div>...</div>"), root_3$2 = /* @__PURE__ */ from_html("<!> <!>", 1), root_1$4 = /* @__PURE__ */ from_html("<!> <!> <!>", 1);
+var root_5$1 = /* @__PURE__ */ from_html("<div>...</div>"), root_3$2 = /* @__PURE__ */ from_html("<!> <!>", 1), root_1$5 = /* @__PURE__ */ from_html("<!> <!> <!>", 1);
 function Pagination_1(e, b) {
 	push(b, !0);
 	let x = prop(b, "page", 15);
@@ -9835,7 +9850,7 @@ function Pagination_1(e, b) {
 	{
 		let e = (e, b) => {
 			let x = () => b?.().pages;
-			var S = root_1$4(), C = first_child(S);
+			var S = root_1$5(), C = first_child(S);
 			component(C, () => Pagination_prev_button, (e, b) => {
 				b(e, {
 					class: "pagination-ctrl button",
@@ -9936,12 +9951,12 @@ function MatchCSVExporter(e, b) {
 		filename: "similarity-matches.csv"
 	}), pop();
 }
-var root_2$2 = /* @__PURE__ */ from_html("<!> ", 1), root_1$3 = /* @__PURE__ */ from_html("<div class=\"match-group\"><div><p><!></p> <div class=\"columns is-multiline match-items\"></div> <!></div></div>");
+var root_2$2 = /* @__PURE__ */ from_html("<!> ", 1), root_1$4 = /* @__PURE__ */ from_html("<div class=\"match-group\"><div><p><!></p> <div class=\"columns is-multiline match-items\"></div> <!></div></div>");
 function MatchGroup(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ state(!1);
 	var S = comment(), C = first_child(S), w = (e) => {
-		var S = root_1$3(), C = child(S), w = child(C), T = child(w), E = (e) => {
+		var S = root_1$4(), C = child(S), w = child(C), T = child(w), E = (e) => {
 			var x = root_2$2(), S = first_child(x);
 			Icon(S, { icon: "mdi:folder" });
 			var C = sibling(S);
@@ -9995,7 +10010,7 @@ function MatchGroup(e, b) {
 		(!b.threshold || b.matches[0].similarity >= b.threshold) && e(w);
 	}), append(e, S), pop();
 }
-var on_click = (e, b) => set(b, !get$2(b)), root_1$2 = /* @__PURE__ */ from_html("<p><a href=\"javascript:void(0)\"> </a></p>"), root$6 = /* @__PURE__ */ from_html("<div><div class=\"column match-query\"><!> <div class=\"columns is-multiline match-items is-centered\"><!></div> <!> <!></div> <div class=\"column columns match-results\"></div></div>");
+var on_click = (e, b) => set(b, !get$2(b)), root_1$3 = /* @__PURE__ */ from_html("<p><a href=\"javascript:void(0)\"> </a></p>"), root$7 = /* @__PURE__ */ from_html("<div><div class=\"column match-query\"><!> <div class=\"columns is-multiline match-items is-centered\"><!></div> <!> <!></div> <div class=\"column columns match-results\"></div></div>");
 function MatchRow(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ user_derived(() => b.group_by_source ? b.matches.matches_by_document : b.matches.matches.map((e) => [e])), S = /* @__PURE__ */ state(!1), C = /* @__PURE__ */ state(null);
@@ -10008,7 +10023,7 @@ function MatchRow(e, b) {
 	user_effect(() => {
 		b.highlit && untrack(w);
 	});
-	var T = root$6();
+	var T = root$7();
 	let E;
 	var D = child(T), O = child(D);
 	ImageInfos(O, { get image() {
@@ -10022,7 +10037,7 @@ function MatchRow(e, b) {
 		disable_pin: !0
 	}), reset(k);
 	var j = sibling(k, 2), M = (e) => {
-		var b = root_1$2(), x = child(b);
+		var b = root_1$3(), x = child(b);
 		x.__click = [on_click, S];
 		var C = child(x, !0);
 		reset(x), reset(b), template_effect(() => set_text(C, get$2(S) ? "Show only 5 best" : "Show all results")), append(e, b);
@@ -10061,7 +10076,7 @@ delegate(["click"]);
 function matchesHRef(e) {
 	return `#match-${e.id}`;
 }
-var root_3$1 = /* @__PURE__ */ from_html("<option> </option>"), root_2$1 = /* @__PURE__ */ from_html("<div class=\"toolbar-item\"><label class=\"checkbox is-normal\"><input type=\"checkbox\" class=\"checkbox mr-2\" name=\"group-by-source\" id=\"group-by-source\"/> Group by source document</label></div> <div class=\"toolbar-item\"><label class=\"label\">Filter by document:</label> <div class=\"field is-narrow\"><div class=\"select is-fullwidth\"><select><option>All</option><!></select></div></div></div>", 1), root$5 = /* @__PURE__ */ from_html("<div class=\"toolbar\"><div class=\"toolbar-content\"><!> <div class=\"toolbar-item\"><label class=\"label is-expanded\">Similarity threshold:</label> <div class=\"field\"><input type=\"range\"/> <span class=\"m-3\"> </span></div></div> <!></div> <!></div> <div class=\"viewer-table\"></div> <div class=\"mt-4\"></div> <!>", 1);
+var root_3$1 = /* @__PURE__ */ from_html("<option> </option>"), root_2$1 = /* @__PURE__ */ from_html("<div class=\"toolbar-item\"><label class=\"checkbox is-normal\"><input type=\"checkbox\" class=\"checkbox mr-2\" name=\"group-by-source\" id=\"group-by-source\"/> Group by source document</label></div> <div class=\"toolbar-item\"><label class=\"label\">Filter by document:</label> <div class=\"field is-narrow\"><div class=\"select is-fullwidth\"><select><option>All</option><!></select></div></div></div>", 1), root$6 = /* @__PURE__ */ from_html("<div class=\"toolbar\"><div class=\"toolbar-content\"><!> <div class=\"toolbar-item\"><label class=\"label is-expanded\">Similarity threshold:</label> <div class=\"field\"><input type=\"range\"/> <span class=\"m-3\"> </span></div></div> <!></div> <!></div> <div class=\"viewer-table\"></div> <div class=\"mt-4\"></div> <!>", 1);
 function SimBrowser(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ state(!1), S = /* @__PURE__ */ state(null), C = /* @__PURE__ */ user_derived(() => get$2(S) ? b.matches.filter((e) => e.query.document === get$2(S)) : b.matches), w = /* @__PURE__ */ state(1), T = /* @__PURE__ */ user_derived(() => Math.ceil(b.matches.length / 30)), E = /* @__PURE__ */ user_derived(() => Math.min(...b.matches.map((e) => Math.min(...e.matches.map((e) => e.similarity))))), D = /* @__PURE__ */ user_derived(() => Math.max(...b.matches.map((e) => Math.max(...e.matches.map((e) => e.similarity))))), O = /* @__PURE__ */ state(get$2(E) + .5 * (get$2(D) - get$2(E))), k = /* @__PURE__ */ state(null);
@@ -10071,7 +10086,7 @@ function SimBrowser(e, b) {
 			let x = e.slice(7);
 			set(k, x, !0);
 			let S = b.matches.findIndex((e) => e.query.id === x);
-			console.log(S), S !== -1 && set(w, Math.floor(S / 30) + 1);
+			S !== -1 && set(w, Math.floor(S / 30) + 1);
 			return;
 		}
 		set(k, null), e.startsWith("#page-") && set(w, parseInt(e.slice(6)), !0);
@@ -10079,7 +10094,7 @@ function SimBrowser(e, b) {
 	user_effect(() => (window.addEventListener("hashchange", A), A(), () => {
 		window.removeEventListener("hashchange", A);
 	}));
-	var j = root$5(), M = first_child(j), N = child(M), P = child(N), F = (e) => {
+	var j = root$6(), M = first_child(j), N = child(M), P = child(N), F = (e) => {
 		var x = comment(), S = first_child(x);
 		snippet(S, () => b.extra_toolbar_items), append(e, x);
 	};
@@ -10155,7 +10170,7 @@ function SimBrowser(e, b) {
 		set_attribute(R, "min", get$2(E)), set_attribute(R, "max", get$2(D)), set_text(B, e);
 	}, [() => get$2(O).toPrecision(4)]), bind_value(R, () => get$2(O), (e) => set(O, e)), append(e, j), pop();
 }
-var root_1$1 = /* @__PURE__ */ from_html("<p>Loading...</p>"), root_3 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><!></div>"), root_5 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><!></div>"), root_2 = /* @__PURE__ */ from_html("<!> <!>", 1), root$4 = /* @__PURE__ */ from_html("<!> <!>", 1);
+var root_1$2 = /* @__PURE__ */ from_html("<p>Loading...</p>"), root_3 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><!></div>"), root_5 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><!></div>"), root_2 = /* @__PURE__ */ from_html("<!> <!>", 1), root$5 = /* @__PURE__ */ from_html("<!> <!>", 1);
 function SimilarityApp(e, b) {
 	push(b, !0);
 	let x = prop(b, "mode", 7), S = /* @__PURE__ */ state(proxy({
@@ -10174,8 +10189,8 @@ function SimilarityApp(e, b) {
 			})([x.index, x.matches]), E.fetchIIIFNames(get$2(S).sources), set(w, !1);
 		});
 	});
-	var D = root$4(), O = first_child(D), k = (e) => {
-		var b = root_1$1();
+	var D = root$5(), O = first_child(D), k = (e) => {
+		var b = root_1$2();
 		append(e, b);
 	}, A = (e) => {
 		var b = root_2(), w = first_child(b);
@@ -10231,14 +10246,14 @@ function SimilarityApp(e, b) {
 	var j = sibling(O, 2);
 	ImageMagnifier(j, spread_props(() => T)), append(e, D), pop();
 }
-var root$3 = /* @__PURE__ */ from_html("<div class=\"image-generic-outer-wrapper svelte-1xln4oe\"><div class=\"image-generic-inner-wrapper\"><div class=\"image-generic-title\"><!></div> <div class=\"image-generic-content mb-1\"><!></div></div></div>");
+var root$4 = /* @__PURE__ */ from_html("<div class=\"image-generic-outer-wrapper svelte-1xln4oe\"><div class=\"image-generic-inner-wrapper\"><div class=\"image-generic-title\"><!></div> <div class=\"image-generic-content mb-1\"><!></div></div></div>");
 function ImageGeneric(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ state(!1);
 	user_effect(() => {
 		set(x, !0);
 	});
-	var S = root$3();
+	var S = root$4();
 	let C;
 	var w = child(S), T = child(w), E = child(T);
 	ImageInfos(E, {
@@ -10252,11 +10267,11 @@ function ImageGeneric(e, b) {
 		return b.image;
 	} }), reset(D), reset(w), reset(S), template_effect((e) => C = set_style(S, "", C, e), [() => ({ opacity: get$2(x) ? 1 : 0 })]), append(e, S), pop();
 }
-var root_1 = /* @__PURE__ */ from_html("<li class=\"column is-one-fourth is-flex\"><!></li>"), root$2 = /* @__PURE__ */ from_html("<ul class=\"columns is-mobile is-multiline list-invisible\"></ul>");
+var root_1$1 = /* @__PURE__ */ from_html("<li class=\"column is-one-fourth is-flex\"><!></li>"), root$3 = /* @__PURE__ */ from_html("<ul class=\"columns is-mobile is-multiline list-invisible\"></ul>");
 function ImageGenericList(e, b) {
-	var x = root$2();
+	var x = root$3();
 	each(x, 21, () => b.image_array, (e) => e.id, (e, b) => {
-		var x = root_1(), S = child(x);
+		var x = root_1$1(), S = child(x);
 		ImageGeneric(S, { get image() {
 			return get$2(b);
 		} }), reset(x), append(e, x);
@@ -10290,14 +10305,14 @@ function toDatasetImageBrowserInterface(e, b) {
 		datasetContents: b === "iiif" ? IIIFToDatasetContentsItemInterface(e) : nonIIIFToDatasetContentsItemInterface(e)
 	};
 }
-var root$1 = /* @__PURE__ */ from_html("<div class=\"dci-wrapper\"><div class=\"dci-title is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center\"><h3 class=\"id-suffix m-0\"> </h3> <!></div> <!></div>");
+var root$2 = /* @__PURE__ */ from_html("<div class=\"dci-wrapper\"><div class=\"dci-title is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center\"><h3 class=\"id-suffix m-0\"> </h3> <!></div> <!></div>");
 function DatasetContentItem(e, b) {
 	push(b, !0);
 	let x = /* @__PURE__ */ state(4), S = () => set(x, get$2(x) === 4 ? b.datasetContentsItem.images.length : 4, !0);
 	function C(e) {
 		return e.split("/").slice(5).join("/") + "/";
 	}
-	var w = root$1(), T = child(w), E = child(T), D = child(E);
+	var w = root$2(), T = child(w), E = child(T), D = child(E);
 	reset(E);
 	var O = sibling(E, 2), k = (e) => {
 		{
@@ -10325,12 +10340,12 @@ function DatasetContentItem(e, b) {
 	}
 	reset(w), template_effect((e) => set_text(D, `Images in ${e ?? ""}`), [() => b.datasetFormat === "iiif" ? `document #${b.itemIndex + 1}` : `folder ${C(b.datasetContentsItem.name)}`]), append(e, w), pop();
 }
-var root = /* @__PURE__ */ from_html("<div></div> <!>", 1);
+var root$1 = /* @__PURE__ */ from_html("<div></div> <!>", 1);
 function DatasetImageBrowser(e, b) {
 	push(b, !0);
 	let x = toDatasetImageBrowserInterface(b.dataset, b.datasetFormat), S = proxy({});
 	setMagnifyingContext(S);
-	var C = root(), w = first_child(C);
+	var C = root$1(), w = first_child(C);
 	each(w, 21, () => x.datasetContents, index, (e, x, S) => {
 		DatasetContentItem(e, {
 			get datasetContentsItem() {
@@ -10344,6 +10359,53 @@ function DatasetImageBrowser(e, b) {
 	}), reset(w);
 	var T = sibling(w, 2);
 	ImageMagnifier(T, {}), append(e, C), pop();
+}
+var root_1 = /* @__PURE__ */ from_html("<p>Loading...</p>"), root = /* @__PURE__ */ from_html("<!> <!>", 1);
+function SearchResults(e, b) {
+	push(b, !0);
+	let x = /* @__PURE__ */ state(proxy({
+		sources: [],
+		images: [],
+		transpositions: []
+	})), S = /* @__PURE__ */ state(proxy({
+		sources: [],
+		images: [],
+		transpositions: []
+	})), C = /* @__PURE__ */ state(proxy([])), w = /* @__PURE__ */ state(!0), T = proxy({});
+	setMagnifyingContext(T);
+	let E = new NameProvider();
+	setNameProvider(E), user_effect(() => {
+		Promise.all([fetch(b.source_index_url).then((e) => e.json()), fetch(b.query_result_url).then((e) => e.json())]).then(([e, b]) => {
+			console.log(e, b);
+			let T = unserializeSearchResults(e, b);
+			((e) => {
+				var b = to_array(e, 3);
+				set(x, b[0], !0), set(S, b[1], !0), set(C, b[2], !0);
+			})([
+				T.source_index,
+				T.query_index,
+				T.matches
+			]), E.fetchIIIFNames(get$2(x).sources), set(w, !1);
+		});
+	});
+	var D = root(), O = first_child(D), k = (e) => {
+		var b = root_1();
+		append(e, b);
+	}, A = (e) => {
+		SimBrowser(e, {
+			get index() {
+				return get$2(x);
+			},
+			get matches() {
+				return get$2(C);
+			}
+		});
+	};
+	if_block(O, (e) => {
+		get$2(w) ? e(k) : e(A, !1);
+	});
+	var j = sibling(O, 2);
+	ImageMagnifier(j, spread_props(() => T)), append(e, D), pop();
 }
 function initClusterViewer(e, b, x, S, C, w) {
 	mount(ClusterApp, {
@@ -10373,6 +10435,15 @@ function initSimilarityApp(e, b, x, S) {
 		}
 	});
 }
+function initSearchResults(e, b, x) {
+	mount(SearchResults, {
+		target: e,
+		props: {
+			source_index_url: b,
+			query_result_url: x
+		}
+	});
+}
 function initImageGenericList(e, b) {
 	mount(ImageGenericList, {
 		target: e,
@@ -10393,5 +10464,6 @@ window.DemoTools = {
 	initProgressTracker,
 	initSimilarityApp,
 	initImageGenericList,
-	initDatasetImageBrowser
+	initDatasetImageBrowser,
+	initSearchResults
 };

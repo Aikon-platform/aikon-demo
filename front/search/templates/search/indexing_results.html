@@ -1,0 +1,17 @@
+{% load static %}
+{% if object.status == "SUCCESS" %}
+    <div class="centerwrap details-wrapper detailed">
+        <h3>Indexing results</h3>
+
+        {% if not object.dataset %}
+            <div class="message mt-5">
+                <div class="message-body">
+                    <p>Dataset was deleted</p>
+                </div>
+            </div>
+        {% else %}
+            <p>Indexing completed successfully</p>
+            <p><a href="{% url 'search:query_start' %}?index={{ object.index.id }}">Search in this index</a></p>
+        {% endif %}
+    </div>
+{% endif %}

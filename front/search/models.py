@@ -6,6 +6,9 @@ from pathlib import Path
 from django.conf import settings
 from regions.models import AbstractAPITaskOnCrops
 from django.contrib.auth import get_user_model
+import requests
+
+from datasets.models import Dataset
 
 User = get_user_model()
 
@@ -16,18 +19,18 @@ class Index(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     dataset = models.ForeignKey(
-        "Dataset", on_delete=models.CASCADE, related_name="search_index"
+        Dataset, on_delete=models.CASCADE, related_name="search_index"
     )
 
-    index_id = models.CharField(max_length=511, index=True)
+    index_id = models.CharField(max_length=511, db_index=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
-    from_task = models.ForeignKey(
+    from_task = models.OneToOneField(
         "Indexing", on_delete=models.CASCADE, related_name="index"
     )
     owner = models.ForeignKey(
-        "User", on_delete=models.CASCADE, related_name="search_index"
+        User, on_delete=models.CASCADE, related_name="search_index"
     )
 
     use_transpositions = models.BooleanField(default=False, blank=True)
@@ -81,13 +84,13 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
             use_transpositions=len(self.parameters.get("transpositions", ["none"])) > 2,
         )
         
-        with open(self.task_full_path / f"{self.index_id}.json", "wb") as f:
+        with open(self.task_full_path / f"{self.index.index_id}.json", "wb") as f:
             f.write(orjson.dumps(output))
 
     def _load_output(self):
         if not self.dataset:
             return {}
-        with open(self.task_full_path / f"{self.index_id}.json", "rb") as f:
+        with open(self.task_full_path / f"{self.index.index_id}.json", "rb") as f:
             return orjson.loads(f.read())
     
     @property
@@ -113,18 +116,29 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
         self.status = "PROCESSING RESULTS"
         self.result_full_path.mkdir(parents=True, exist_ok=True)
 
-        print("OUTPUT FROM INDEX TASK", data)
-
         if data is not None:
             output = data.get("output", {})
             if not output:
                 self.on_task_error({"error": "No output data"})
                 return
-            self.save_output(output)
+
+            results_url = output.get("results_url", None)
+            if not results_url:
+                self.on_task_error({"error": "No results URL"})
+                return
+
+            result = requests.get(results_url)
+            if result.status_code != 200:
+                self.on_task_error({"error": "Failed to get results"})
+                return
+
+            result_json = result.json()
+            
+            self.save_output(result_json)
 
             try:
                 # Prepare dataset and crop images
-                if not self.prepare_dataset_from_api(output):
+                if not self.prepare_dataset_from_api(result_json):
                     return
 
                 # Prepare index data for browser
@@ -154,6 +168,16 @@ class Query(AbstractAPITaskOnCrops("search/query")):
             return f"Search Query on index {self.target_index.index_id}"
         return self.name
 
+    def get_task_kwargs(self):
+        kwargs = super().get_task_kwargs()
+        return {
+            **kwargs,
+            "parameters": {
+                **(kwargs["parameters"] or {}),
+                "index_id": self.target_index.index_id,
+            },
+        }
+
     def save_output(self, output: dict):
         with open(self.task_full_path / "output.json", "wb") as f:
             f.write(orjson.dumps(output))
@@ -176,7 +200,7 @@ class Query(AbstractAPITaskOnCrops("search/query")):
 
     @property
     def result_path(self):
-        return self.task_full_path / "result.json"
+        return self.result_full_path / "result.json"
 
     def prepare_sim_browser(self):
         query = self.output.get("query", {})
@@ -191,14 +215,25 @@ class Query(AbstractAPITaskOnCrops("search/query")):
         self.status = "PROCESSING RESULTS"
         self.result_full_path.mkdir(parents=True, exist_ok=True)
 
-        print("OUTPUT FROM INDEX TASK", data)
-
         if data is not None:
             output = data.get("output", {})
             if not output:
                 self.on_task_error({"error": "No output data"})
                 return
-            self.save_output(output)
+
+            results_url = output.get("results_url", None)
+            if not results_url:
+                self.on_task_error({"error": "No results URL"})
+                return
+            
+            result = requests.get(results_url)
+            if result.status_code != 200:
+                self.on_task_error({"error": "Failed to get results"})
+                return
+
+            result_json = result.json()
+            
+            self.save_output(result_json)
 
             try:
                 # Prepare dataset and crop images

@@ -18,10 +18,8 @@ LOGIN_REQUIRED = getattr(settings, "LOGIN_REQUIRED", True)
 
 
 class TaskMixin:
-    app_name = None
     task_name = None
-    task_url_prefix = None
-    model: AbstractTask = None
+    model: type(AbstractTask) = None
     form_class = None
     task_data = None
 
@@ -30,7 +28,8 @@ class TaskMixin:
         context["task_name"] = getattr(self, "task_name", self.model._meta.verbose_name)
         context["app_name"] = self.model.django_app_name
         context["task_data"] = self.task_data
-        context["url_prefix"] = f"{self.model.django_app_name}:{self.task_url_prefix or ''}"
+        context["url_prefix"] = self.model.url_prefix
+        context["results_template"] = f"{self.model.url_prefix.replace(':','/')}results.html"
         return context
 
 
@@ -267,7 +266,7 @@ class TaskDeleteView(LoginRequiredIfConfProtectedMixin, TaskMixin, DetailView):
     def get_success_url(self):
         if hasattr(self, "success_url"):
             return self.success_url
-        return reverse(f"{self.model.django_app_name}:list")
+        return reverse(f"{self.model.url_prefix}list")
 
 
 class TaskListView(LoginRequiredIfConfProtectedMixin, TaskMixin, ListView):
@@ -355,7 +354,7 @@ class ClearOldResultsView(LoginRequiredIfConfProtectedMixin, TaskMixin, View):
 
         # messages.error(self.request, "Front task clearing not implemented")
 
-        return redirect(f"{self.app_name}:monitor")
+        return redirect(f"{self.model.url_prefix}monitor")
 
 
 class ClearAPIOldResultsView(LoginRequiredIfConfProtectedMixin, TaskMixin, View):
@@ -384,4 +383,4 @@ class ClearAPIOldResultsView(LoginRequiredIfConfProtectedMixin, TaskMixin, View)
 
         # messages.error(self.request, "API task clearing not implemented")
 
-        return redirect(f"{self.app_name}:monitor")
+        return redirect(f"{self.model.url_prefix}monitor")

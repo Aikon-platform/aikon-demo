@@ -27,6 +27,7 @@ class DatasetMixin:
         context = super().get_context_data(**kwargs)
         context["task_name"] = "dataset"
         context["app_name"] = self.model.django_app_name
+        context["url_prefix"] = "datasets:"
         return context
 
 
