@@ -93,7 +93,9 @@ class TaskStartView(LoginRequiredIfConfProtectedMixin, TaskMixin, CreateView):
     template_name = "regions/start.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
+        print("get_context_data TaskStartView")
         context = super().get_context_data(**kwargs)
+        print(context)
         context["dataset_fields"] = DATASET_FIELDS
         return context
 

@@ -42,6 +42,15 @@ class IndexingForm(AbstractTaskOnCropsForm):
 
         return instance
 
+class IndexEditForm(forms.ModelForm):
+    class Meta:
+        model = Index
+        fields = ("name", "public")
+        help_texts = {
+            "name": "Public name of the index",
+            "public": "Make the searchable by all users",
+        }
+
 class QueryForm(AbstractTaskOnCropsForm):
     """Form for creating query tasks."""
 
@@ -56,6 +65,14 @@ class QueryForm(AbstractTaskOnCropsForm):
         widget=forms.Select(attrs={"extra-class": "preprocessing-field"}),
     )
 
+    use_transpositions = forms.BooleanField(
+        required=False,
+        initial=True,
+        label="Use Transpositions",
+        help_text="Include transposed images in similarity computation",
+        widget=forms.CheckboxInput(attrs={"extra-class": "preprocessing-field"}),
+    )
+
     def __init__(self, *args, **kwargs):
         selected_index = kwargs.pop("target_index", None)
         super().__init__(*args, **kwargs)
@@ -63,3 +80,19 @@ class QueryForm(AbstractTaskOnCropsForm):
             Q(public=True) | Q(owner=self._user)
         )
         self.fields["target_index"].initial = selected_index
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        parameters = {
+            "transpositions": (
+                ["none"] if not self.cleaned_data["use_transpositions"]
+                else ["none", "rot90", "rot180", "rot270"]
+            )
+        }
+        instance.parameters = parameters
+
+        if commit:
+            instance.save()
+
+        return instance

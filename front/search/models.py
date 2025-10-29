@@ -22,6 +22,8 @@ class Index(models.Model):
         Dataset, on_delete=models.CASCADE, related_name="search_index"
     )
 
+    name = models.CharField(max_length=511, blank=True, default="")
+
     index_id = models.CharField(max_length=511, db_index=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -37,7 +39,7 @@ class Index(models.Model):
     public = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
-        return f"Index {self.index_id}"
+        return f"Index {self.name}"
 
     @property
     def index_path(self):
@@ -78,6 +80,7 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
         
         self.index = Index.objects.create(
             dataset=self.dataset,
+            display_name=self.name,
             index_id=index_id,
             from_task=self,
             owner=self.requested_by,

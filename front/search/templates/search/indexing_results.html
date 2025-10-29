@@ -11,7 +11,8 @@
             </div>
         {% else %}
             <p>Indexing completed successfully</p>
-            <p><a href="{% url 'search:query_start' %}?index={{ object.index.id }}">Search in this index</a></p>
+            <p>Index built: {{ object.index.name }} ({{ object.index.public|yesno:"public,private" }}) </p>
+            <p>{% if editable %}<a class="button is-link" href="{% url 'search:index_edit' object.index.id %}"><span class="iconify mr-1" data-icon="mdi:pencil"></span><span>Edit</span></a> {% endif %}<a class="button is-link" href="{% url 'search:query_start' %}?index={{ object.index.id }}"><span class="iconify mr-1" data-icon="mdi:search"></span><span>Search in this index</span></a></p>
         {% endif %}
     </div>
 {% endif %}
