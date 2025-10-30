@@ -12,10 +12,6 @@ services:
       args:
         USERID: ${USERID}
         PORT: ${DJANGO_PORT}
-#    dns:
-#      - 8.8.8.8
-#      - 8.8.4.4
-#      - 1.1.1.1
     volumes:
       - staticfiles:/home/aikondemo/app/staticfiles
       - ${DATA_FOLDER}:/data
@@ -28,6 +24,8 @@ services:
       - "smtp.gmail.com:74.125.206.109"
     ports:
       - "${DJANGO_PORT:-8000}:${DJANGO_PORT:-8000}"
+    #extra_hosts:
+    #  - "smtp:host-gateway"
     depends_on:
       - db
       - redis

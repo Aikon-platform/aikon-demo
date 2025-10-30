@@ -1,0 +1,18 @@
+{% load static %}
+{% if object.status == "SUCCESS" %}
+    <div class="centerwrap details-wrapper detailed">
+        <h3>Indexing results</h3>
+
+        {% if not object.dataset %}
+            <div class="message mt-5">
+                <div class="message-body">
+                    <p>Dataset was deleted</p>
+                </div>
+            </div>
+        {% else %}
+            <p>Indexing completed successfully</p>
+            <p>Index built: {{ object.index.name }} ({{ object.index.public|yesno:"public,private" }}) </p>
+            <p>{% if editable %}<a class="button is-link" href="{% url 'search:index_edit' object.index.id %}"><span class="iconify mr-1" data-icon="mdi:pencil"></span><span>Edit</span></a> {% endif %}<a class="button is-link" href="{% url 'search:query_start' %}?index={{ object.index.id }}"><span class="iconify mr-1" data-icon="mdi:search"></span><span>Search in this index</span></a></p>
+        {% endif %}
+    </div>
+{% endif %}

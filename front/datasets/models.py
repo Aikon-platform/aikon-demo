@@ -25,7 +25,8 @@ User = get_user_model()
 path_datasets = PathAndRename("datasets/")
 
 BASE_URL = "http://nginx:8081"
-#BASE_URL = "http://195.221.193.74:8081"
+# BASE_URL = "http://195.221.193.74:8081"
+
 
 class AbstractDataset(models.Model):
     """
@@ -465,6 +466,23 @@ class Dataset(AbstractDataset):
             doc.uid: {im.id: im.to_dict() for im in doc.images}
             for doc in self.documents
         }
+
+    def add_urls_to_serialization(self, serialized: dict, crops: bool = False):
+        """
+        Add the URL field to the images in the serialized description from the API
+        Modifies the dict in place
+        """
+        doc_image_mapping = self.get_doc_image_mapping()
+
+        for im in serialized.get("images", []):
+            if crops:
+                im["url"] = self.get_url_for_crop(
+                    {"crop_id": im["id"]}, doc_uid=im["doc_uid"]
+                )
+            else:
+                img = doc_image_mapping.get(im["doc_uid"], {}).get(im["id"], None)
+                if img:
+                    im["url"] = img.url
 
     def clear_dataset(self) -> Dict:
         """

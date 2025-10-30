@@ -1,0 +1,34 @@
+{% load static %}
+{% if object.status == "SUCCESS" %}
+    <div class="centerwrap details-wrapper detailed">
+        <h3>Similarity results</h3>
+
+        {% if object.similarity %}
+            <a href="{{ object.get_download_json_url }}"
+               class="button is-link" download>
+                <span class="iconify" data-icon="mdi:json"></span>
+                <span>Download similarity matrix</span>
+            </a>
+        {% endif %}
+
+        {% if not object.dataset %}
+            <div class="message mt-5">
+                <div class="message-body">
+                    <p>Dataset was deleted</p>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="widen">
+            <div id="matches" class="matches-viewer"></div>
+        </div>
+
+        <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", () => {
+                DemoTools.initSearchResults(
+                    document.getElementById("matches"), "{{ object.target_index.index_url|escapejs }}",
+                    "{{ object.result_url|escapejs }}");
+            });
+        </script>
+    </div>
+{% endif %}

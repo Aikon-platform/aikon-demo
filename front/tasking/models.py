@@ -198,7 +198,7 @@ def AbstractTask(task_prefix: str):
             Returns the URL to notify the front-end
             """
             base_url = "http://web:8002"
-            return f"{base_url}{reverse(f'{self.django_app_name}:notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
+            return f"{base_url}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
 
         def get_task_kwargs(self):
             return {"parameters": self.parameters}
