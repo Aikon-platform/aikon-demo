@@ -52,6 +52,7 @@ def AbstractTask(task_prefix: str):
             verbose_name="Experiment name",
             help_text=f"Optional name to identify this {task_prefix} experiment",
         )
+        url_prefix = f"{task_prefix}:"
 
         notify_email = models.BooleanField(
             default=True,
@@ -92,10 +93,6 @@ def AbstractTask(task_prefix: str):
                 return f"{self.name}"
 
             return f"{self.__class__.__name__} task"
-
-        @property
-        def url_prefix(self):
-            return f"{self.django_app_name}:"
 
         # Util URLs and Paths
         def get_absolute_url(self):
