@@ -42,7 +42,9 @@ TypeDuration = TypedDict("TypeDuration", {"delta": str, "eval": TypeDurationEval
 def AbstractTask(task_prefix: str):
 
     app_name = task_prefix.split("/")[0]
-    task_specific_name = "" if task_prefix == app_name else f'{task_prefix.split("/")[1]}_'
+    task_specific_name = (
+        "" if task_prefix == app_name else f'{task_prefix.split("/")[1]}_'
+    )
 
     class AbstractTask(models.Model):
         """
@@ -56,6 +58,7 @@ def AbstractTask(task_prefix: str):
             verbose_name="Experiment name",
             help_text=f"Optional name to identify this {task_prefix} experiment",
         )
+        url_prefix = f"{task_prefix}:"
 
         notify_email = models.BooleanField(
             default=True,
@@ -534,7 +537,7 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                 return {
                     "status": "UNKNOWN",
                 }
-        
+
         def prepare_dataset_from_api(self, output: dict) -> bool:
             """
             Handle the connection between the dataset served by the API and the front-end dataset
@@ -554,7 +557,7 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                 )
                 return False
             return True
-    
+
         @classmethod
         def get_api_monitoring(cls):
             """

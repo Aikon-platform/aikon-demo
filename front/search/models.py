@@ -12,10 +12,12 @@ from datasets.models import Dataset
 
 User = get_user_model()
 
+
 class Index(models.Model):
     """
     A model that stores information about a searchable image index
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     dataset = models.ForeignKey(
@@ -44,7 +46,7 @@ class Index(models.Model):
     @property
     def index_path(self):
         return Path(settings.MEDIA_ROOT) / f"search/index-{self.id}.json"
-    
+
     @property
     def index_url(self):
         return f"{settings.MEDIA_URL}search/index-{self.id}.json"
@@ -58,26 +60,26 @@ class Index(models.Model):
         with open(self.index_path, "rb") as f:
             return orjson.loads(f.read())
 
-class Indexing(AbstractAPITaskOnCrops("search/indexing")):
 
+class Indexing(AbstractAPITaskOnCrops("search_indexing")):
     def __str__(self):
         if not self.name:
             param = getattr(self, "parameters", {})
             feat_net = param.get("feat_net", None)
             return f"Search Indexing{f' ({feat_net})' if feat_net else ''}"
         return self.name
-    
+
     def save_output(self, output: dict):
         """
         Save index data to file
         """
         if not self.dataset:
             return
-        
+
         index_id = output.get("metadata", {}).get("index_id", None)
         if not index_id:
             raise ValueError("Index ID not found in output")
-        
+
         self.index = Index.objects.create(
             dataset=self.dataset,
             display_name=self.name,
@@ -86,7 +88,7 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
             owner=self.requested_by,
             use_transpositions=len(self.parameters.get("transpositions", ["none"])) > 2,
         )
-        
+
         with open(self.task_full_path / f"{self.index.index_id}.json", "wb") as f:
             f.write(orjson.dumps(output))
 
@@ -95,22 +97,22 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
             return {}
         with open(self.task_full_path / f"{self.index.index_id}.json", "rb") as f:
             return orjson.loads(f.read())
-    
+
     @property
     def output(self):
         if not hasattr(self, "_output"):
             self._output = self._load_output()
         return self._output
-    
+
     def prepare_sim_browser(self):
         """
         Prepare index data for browser
         """
         if not self.dataset:
             return
-        
+
         output = self.output
-        
+
         index = output.get("index", {})
         self.dataset.add_urls_to_serialization(index, self.crops)
         self.index.set_index(index)
@@ -136,7 +138,7 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
                 return
 
             result_json = result.json()
-            
+
             self.save_output(result_json)
 
             try:
@@ -157,7 +159,8 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
 
         return super().on_task_success(data)
 
-class Query(AbstractAPITaskOnCrops("search/query")):
+
+class Query(AbstractAPITaskOnCrops("search_query")):
     """
     Query images on a given indexed dataset
     """
@@ -165,7 +168,7 @@ class Query(AbstractAPITaskOnCrops("search/query")):
     target_index = models.ForeignKey(
         Index, on_delete=models.CASCADE, related_name="queries"
     )
-    
+
     def __str__(self):
         if not self.name:
             return f"Search Query on index {self.target_index.index_id}"
@@ -190,13 +193,13 @@ class Query(AbstractAPITaskOnCrops("search/query")):
         if not hasattr(self, "_output"):
             self._output = self._load_output()
         return self._output
-    
+
     def _load_output(self):
         if not self.dataset:
             return {}
         with open(self.task_full_path / "output.json", "rb") as f:
             return orjson.loads(f.read())
-    
+
     @property
     def result_url(self):
         return f"{self.result_media_url}/result.json"
@@ -208,12 +211,12 @@ class Query(AbstractAPITaskOnCrops("search/query")):
     def prepare_sim_browser(self):
         query = self.output.get("query", {})
         pairs = self.output.get("pairs", [])
-        
+
         self.dataset.add_urls_to_serialization(query, self.crops)
-        
+
         with open(self.result_path, "wb") as f:
             f.write(orjson.dumps({"query": query, "pairs": pairs}))
-        
+
     def on_task_success(self, data):
         self.status = "PROCESSING RESULTS"
         self.result_full_path.mkdir(parents=True, exist_ok=True)
@@ -228,14 +231,14 @@ class Query(AbstractAPITaskOnCrops("search/query")):
             if not results_url:
                 self.on_task_error({"error": "No results URL"})
                 return
-            
+
             result = requests.get(results_url)
             if result.status_code != 200:
                 self.on_task_error({"error": "Failed to get results"})
                 return
 
             result_json = result.json()
-            
+
             self.save_output(result_json)
 
             try:
