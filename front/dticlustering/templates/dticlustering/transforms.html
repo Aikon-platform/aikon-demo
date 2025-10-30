@@ -116,7 +116,10 @@
                                 <label>
                                     <select class="parameter-select full-width" data-transform="spatial" disabled>
                                         <option value="affine">Affine</option>
+                                        <option value="translation">Translation</option>
                                         <option value="projective">Projective</option>
+                                        <option value="isotranslation">Isotropic scaling + Translation</option>
+{#                                        <option value="anisotranslation">Anisotropic scaling + Translation</option>#}
                                     </select>
                                 </label>
                             </div>
@@ -214,6 +217,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 'linearcolor': 'color',
                 'affine': 'spatial',
                 'projective': 'spatial',
+                'translation': 'spatial',
+                'isotranslation': 'spatial',
+                'anisotranslation': 'spatial',
                 'morpho': 'morpho',
                 'tps': 'tps'
             };
