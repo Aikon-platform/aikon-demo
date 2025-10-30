@@ -10,7 +10,7 @@
         </h2>
         {% if app_name != "datasets" and not filter and task.dataset %}
             <p>└ dataset
-                <a href="{% url app_name|add:':list_perdataset' task.dataset.pk %}">
+                <a href="{% url url_prefix|add:'list_perdataset' task.dataset.pk %}">
                     <span class="id-main">{{ task.dataset.name }}</span>
                     <span class="id-suffix">{{ task.dataset.id }}</span>
                 </a>

@@ -68,8 +68,8 @@ export function unserializeSimilarityMatrix(
     });
     return {
         matches: unserializeImageMatches(
-            index.images,
-            { matches: complex_matches, query_transpositions: index.transpositions },
+            complex_matches,
+            index,
             index
         ),
         index,
@@ -78,27 +78,27 @@ export function unserializeSimilarityMatrix(
 
 /**
  * Unserializes image matches
- * @param queries The queries
+ * @param query_index The queries
  * @param raw_matches The raw matches
- * @param index The index
+ * @param source_index The index
  * @returns The unserialized matches
  */
 function unserializeImageMatches(
-    queries: TImageInfo[],
     raw_matches: TSimilarityOutputRaw,
-    index: TSimilarityIndex
+    source_index: TSimilarityIndex,
+    query_index: TSimilarityIndex
 ): TSimilarityMatches[] {
     const matches: TSimilarityMatches[] = [];
-    for (let i = 0; i < raw_matches.matches.length; i++) {
-        const query = queries[i];
-        const matches_for_query = raw_matches.matches[i]
+    for (let i = 0; i < raw_matches.length; i++) {
+        const query = query_index.images[i];
+        const matches_for_query = raw_matches[i]
             .map((match) => {
-                const source_image = index.images[match.source_index];
+                const source_image = source_index.images[match.source_index];
                 return {
                     image: source_image,
                     similarity: match.similarity,
-                    q_transposition: raw_matches.query_transpositions[match.best_query_flip],
-                    m_transposition: index.transpositions[match.best_source_flip],
+                    q_transposition: query_index.transpositions[match.best_query_flip],
+                    m_transposition: source_index.transpositions[match.best_source_flip],
                 };
             })
             .sort((a, b) => b.similarity - a.similarity);
@@ -121,4 +121,31 @@ function unserializeImageMatches(
         });
     }
     return matches.sort((a, b) => b.matches[0].similarity - a.matches[0].similarity);
+}
+
+/**
+ * Unserializes search results
+ * @param raw_index The raw index
+ * @param raw_matches The raw matches
+ * @returns The unserialized index and matches
+ */
+export function unserializeSearchResults(
+    raw_index: TSimilarityIndexRaw,
+    raw_matches: { query: TSimilarityIndexRaw, pairs: TSimpleSimilarityMatchRaw[] }
+): { source_index: TSimilarityIndex; query_index: TSimilarityIndex; matches: TSimilarityMatches[] } {
+    console.log(raw_matches, raw_index);
+    const source_index = unserializeSimilarityIndex(raw_index);
+    const query_index = unserializeSimilarityIndex(raw_matches.query);
+    const complex_matches: TSimilarityMatchRaw[][] = query_index.images.map(() => []);
+    raw_matches.pairs.forEach(([source_index, query_index, similarity]) => {
+        complex_matches[query_index].push({
+            similarity,
+            best_source_flip: 0,
+            best_query_flip: 0,
+            query_index: query_index,
+            source_index: source_index,
+        });
+    });
+    const matches = unserializeImageMatches(complex_matches, source_index, query_index);
+    return { source_index, query_index, matches };
 }

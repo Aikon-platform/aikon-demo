@@ -40,6 +40,10 @@ TypeDuration = TypedDict("TypeDuration", {"delta": str, "eval": TypeDurationEval
 
 
 def AbstractTask(task_prefix: str):
+
+    app_name = task_prefix.split("/")[0]
+    task_specific_name = "" if task_prefix == app_name else f'{task_prefix.split("/")[1]}_'
+
     class AbstractTask(models.Model):
         """
         Abstract model for tasks that are sent to the API
@@ -68,7 +72,8 @@ def AbstractTask(task_prefix: str):
         )
         finished_on = models.DateTimeField(editable=False, blank=True, null=True)
 
-        django_app_name = task_prefix
+        django_app_name = app_name
+        url_prefix = f"{app_name}:{task_specific_name}"
 
         parameters = models.JSONField(null=True)
 
@@ -77,7 +82,7 @@ def AbstractTask(task_prefix: str):
             null=True,
             blank=True,
             on_delete=models.SET_NULL,
-            related_name=f"{task_prefix}_tasks",
+            related_name=f"{task_prefix.replace('/', '_')}_tasks",
         )
 
         class Meta:
@@ -95,14 +100,14 @@ def AbstractTask(task_prefix: str):
 
         # Util URLs and Paths
         def get_absolute_url(self):
-            return reverse(f"{self.django_app_name}:status", kwargs={"pk": self.pk})
+            return reverse(f"{self.url_prefix}status", kwargs={"pk": self.pk})
 
         @property
         def task_media_path(self) -> str:
             """
             Full path to the result folder
             """
-            return f"{self.django_app_name}/{self.id}"
+            return f"{task_prefix}/{self.id}"
 
         @property
         def result_media_path(self) -> str:
@@ -197,7 +202,7 @@ def AbstractTask(task_prefix: str):
             """
             Returns the URL to notify the front-end
             """
-            return f"{BASE_URL}{reverse(f'{self.django_app_name}:notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
+            return f"{BASE_URL}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
 
         def get_task_kwargs(self):
             return {"parameters": self.parameters}
@@ -400,7 +405,7 @@ def AbstractTaskOnDataset(task_prefix: str):
             null=True,
             blank=True,
             on_delete=models.SET_NULL,
-            related_name=f"{task_prefix}_tasks",
+            related_name=f"{task_prefix.replace('/', '_')}_tasks",
         )
         # parameters = models.JSONField(null=True)
 
@@ -529,7 +534,27 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                 return {
                     "status": "UNKNOWN",
                 }
+        
+        def prepare_dataset_from_api(self, output: dict) -> bool:
+            """
+            Handle the connection between the dataset served by the API and the front-end dataset
 
+            Returns:
+                bool: True if the dataset was prepared successfully, False otherwise
+            """
+            try:
+                dataset_url = output.get("dataset_url")
+
+                if dataset_url:
+                    self.dataset.api_url = dataset_url
+                    self.dataset.save()
+            except Exception as e:
+                self.on_task_error(
+                    {"error": f"Could not save dataset from {dataset_url}:\n{e}"}
+                )
+                return False
+            return True
+    
         @classmethod
         def get_api_monitoring(cls):
             """

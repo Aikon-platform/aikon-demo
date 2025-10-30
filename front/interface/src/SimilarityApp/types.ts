@@ -33,10 +33,7 @@ export interface TSimilarityMatchRaw {
     source_index: number;
 }
 
-export interface TSimilarityOutputRaw {
-    matches: TSimilarityMatchRaw[][]; // matches for each query image
-    query_transpositions: TMatchTransposition[];
-}
+export type TSimilarityOutputRaw = TSimilarityMatchRaw[][]; // matches for each query image
 
 export interface TSimilarityIndex {
     sources: TDocument[];

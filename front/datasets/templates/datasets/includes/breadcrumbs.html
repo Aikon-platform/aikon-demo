@@ -1,6 +1,6 @@
 {% if request.user.is_authenticated %}
 <p class="breadcrumbs">
-    <a class="button is-text" href="{% url app_name|add:':list' %}">
+    <a class="button is-text" href="{% url url_prefix|add:'list' %}">
         <span class="iconify" data-icon="mdi:arrow-left"></span>
         All datasets
     </a>

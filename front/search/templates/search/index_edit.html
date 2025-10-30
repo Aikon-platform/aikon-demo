@@ -1,0 +1,21 @@
+{% extends "demowebsite/base.html" %}
+
+{% block title %}Start a new {{ task_name }} task{% endblock %}
+
+{% block content %}
+<div class="centerwrap">
+
+    {% include "includes/breadcrumbs.html" %}
+
+    <h1 class="is-title is-size-2 py-3">Edit index {{ object.name }}</h1>
+    <form action="" method="post" enctype="multipart/form-data">
+        {% block form_content %}
+            {% include "demowebsite/baseform.html" %}
+        {% endblock %}
+
+        <p class="has-text-centered pt-3">
+            <input class="button is-link" type="submit" value="Save">
+        </p>
+    </form>
+</div>
+{% endblock %}

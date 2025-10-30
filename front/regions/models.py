@@ -74,18 +74,11 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                 )
                 return
 
-            dataset_url = output.get("dataset_url")
-            try:
-                if dataset_url:
-                    self.dataset.api_url = dataset_url
-                    self.dataset.save()
-            except Exception as e:
-                self.on_task_error(
-                    {"error": f"Could not save dataset from {dataset_url}:\n{e}"}
-                )
+            if not self.prepare_dataset_from_api(output):
                 return
 
             result = self.dataset.apply_cropping(self.get_bounding_boxes())
+
             if "error" in result:
                 # self.terminate_task(status="ERROR", error=traceback.format_exc())
                 self.on_task_error(result)
@@ -194,7 +187,7 @@ def AbstractAPITaskOnCrops(task_prefix: str):
             null=True,
             blank=True,
             on_delete=models.SET_NULL,
-            related_name=f"{task_prefix}_crops",
+            related_name="+",
         )
 
         def get_task_kwargs(self) -> Dict[str, Any]:
@@ -203,5 +196,24 @@ def AbstractAPITaskOnCrops(task_prefix: str):
             if self.crops:
                 kwargs["crops"] = self.crops.get_bounding_boxes()
             return kwargs
+        
+        def prepare_dataset_from_api(self, output: dict) -> bool:
+            """
+            Handle the connection between the dataset served by the API and the front-end dataset
+            Also crops the images if needed
+            """
+            
+            if not super().prepare_dataset_from_api(output):
+                return False
+
+            try:
+                if self.crops:
+                    self.dataset.apply_cropping(self.crops.get_bounding_boxes())
+            except Exception as e:
+                self.on_task_error(
+                    {"error": f"Could not crop images from {self.crops}:\n{e}"}
+                )
+                return False
+            return True
 
     return AbstractAPITaskOnCrops

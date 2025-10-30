@@ -71,14 +71,9 @@ class Similarity(AbstractAPITaskOnCrops("similarity")):
                 return
             self.save_similarity(output)
 
-            dataset_url = output.get("dataset_url")
-            if dataset_url:
-                self.dataset.api_url = dataset_url
-                self.dataset.save()
-
             try:
-                if self.crops:
-                    self.dataset.apply_cropping(self.crops.get_bounding_boxes())
+                if not self.prepare_dataset_from_api(output):
+                    return
 
                 self.prepare_sim_browser()
 
@@ -138,17 +133,7 @@ class Similarity(AbstractAPITaskOnCrops("similarity")):
         sim_index = self.similarity.get("index", {})
         sim_pairs = self.similarity.get("pairs", [])
 
-        doc_image_mapping = self.dataset.get_doc_image_mapping()
-
-        for im in sim_index.get("images", []):
-            if self.crops:
-                im["url"] = self.dataset.get_url_for_crop(
-                    {"crop_id": im["id"]}, doc_uid=im["doc_uid"]
-                )
-            else:
-                img = doc_image_mapping.get(im["doc_uid"], {}).get(im["id"], None)
-                if img:
-                    im["url"] = img.url
+        self.dataset.add_urls_to_serialization(sim_index, self.crops)
 
         with open(self.result_full_path / "index.json", "wb") as f:
             f.write(orjson.dumps(sim_index))
