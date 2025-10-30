@@ -2,11 +2,9 @@
     <select id="init-{{ component }}" class="init-select full-width" data-component="{{ component }}">
         <option value="constant">Constant</option>
         <option value="gaussian" selected>Gaussian</option>
+        <option value="sample">Mean</option>
         {% if component == "mask" %}
             <option value="random">Random</option>
-            <option value="sample">Sample</option>
-        {% else %}
-            <option value="mean">Mean</option>
         {% endif %}
     </select>
 </label>

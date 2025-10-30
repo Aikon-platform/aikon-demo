@@ -82,7 +82,6 @@ class DTIClustering(AbstractAPITaskOnCrops("dticlustering")):
         """
         URL to the full result in a zip file
         """
-        # TODO check because contains prototypes for sprites where summary is empty
         return f"{self.result_media_url}/results.zip"
 
     def get_task_kwargs(self):
@@ -104,7 +103,6 @@ class DTIClustering(AbstractAPITaskOnCrops("dticlustering")):
         self.retrieve_results(data["output"]["result_url"])
 
     def retrieve_results(self, result_url: str):
-        # TODO find why the task is not starting
         from zipfile import ZipFile
 
         try:
@@ -118,27 +116,25 @@ class DTIClustering(AbstractAPITaskOnCrops("dticlustering")):
                 for chunk in res.iter_content(chunk_size=8192):
                     f.write(chunk)
 
-            # unzip the results
             with ZipFile(zip_result_file, "r") as zip_obj:
                 zip_obj.extractall(self.result_full_path)
 
-            # create a summary.zip file, with cherry-picked content
-            summary_zip = self.result_full_path / "summary.zip"
-            cherrypick = [
-                "*.csv",
-                "clusters.html",
-                "clusters/**/*_raw.*",
-                "backgrounds/*",
-                "masked_prototypes/*",
-                "prototypes/*",
-            ]
+            # # create a summary.zip file, with cherry-picked content
+            # summary_zip = self.result_full_path / "summary.zip"
+            # cherrypick = [
+            #     # "*.csv",
+            #     "clusters.html",
+            #     "clusters/**/*_raw.*",
+            #     # "backgrounds/*",
+            #     # "masked_prototypes/*",
+            #     "prototypes/*",
+            # ]
+            #
+            # with ZipFile(summary_zip, "w") as zipObj:
+            #     for cp in cherrypick:
+            #         for f in self.result_full_path.glob(cp):
+            #             zipObj.write(f, f.relative_to(self.result_full_path))
 
-            with ZipFile(summary_zip, "w") as zipObj:
-                for cp in cherrypick:
-                    for f in self.result_full_path.glob(cp):
-                        zipObj.write(f, f.relative_to(self.result_full_path))
-
-            # mark the self as finished
             self.terminate_task()
         except Exception:
             self.terminate_task(status="ERROR", error=traceback.format_exc())
@@ -234,15 +230,21 @@ class DTIClustering(AbstractAPITaskOnCrops("dticlustering")):
             proto_url = try_and_get_url(
                 f"masked_prototypes/prototype{p}.png",
                 f"masked_prototypes/prototype{p}.jpg",
-                f"prototypes/prototype{p}.png",
-                f"prototypes/prototype{p}.jpg",
                 f"masked_prototypes/proto{p}.png",
                 f"masked_prototypes/proto{p}.jpg",
+                f"prototypes/prototype{p}.png",
+                f"prototypes/prototype{p}.jpg",
                 f"prototypes/proto{p}.png",
                 f"prototypes/proto{p}.jpg",
+                f"prototypes/foreground/proto{p}.png",
+                f"prototypes/foreground/proto{p}.jpg",
+                f"prototypes/foreground/frg{p}.png",
+                f"prototypes/foreground/frg{p}.jpg",
             )
 
-            mask_url = try_and_get_url(f"masks/mask{p}.png", f"masks/mask{p}.jpg")
+            mask_url = try_and_get_url(
+                f"prototypes/masks/mask{p}.png", f"prototypes/masks/mask{p}.jpg"
+            )
 
             clusters[p] = {
                 "proto_url": proto_url,
@@ -288,7 +290,8 @@ class DTIClustering(AbstractAPITaskOnCrops("dticlustering")):
                     img_ext_data = image_data[str(img_id)]
                     assert img_ext_data["cluster_id"] == p
                     img_data["path"] = img_ext_data["path"]
-                    img_data["distance"] = img_ext_data["distance"]
+                    dist_key = "distance" if old_format else f"dist_cluster_{p}"
+                    img_data["distance"] = img_ext_data.get(dist_key, 100.0)
 
                 clusters[p]["images"].append(img_data)
 

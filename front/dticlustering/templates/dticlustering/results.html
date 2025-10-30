@@ -24,11 +24,11 @@
     <h3>Raw results:</h3>
     <p>
         {% if object.result_zip_exists %}
-            <a href="{{ object.result_summary_url }}" class="button is-link">
-                <span class="iconify" data-icon="mdi:folder-download"></span> <span>Download results</span>
-            </a>
+{#            <a href="{{ object.result_summary_url }}" class="button is-link">#}
+{#                <span class="iconify" data-icon="mdi:folder-download"></span> <span>Download results</span>#}
+{#            </a>#}
             <a href="{{ object.result_zip_url }}" class="button is-link is-light">
-                <span class="iconify" data-icon="mdi:folder-download"></span> <span>Full training output</span>
+                <span class="iconify" data-icon="mdi:folder-download"></span> <span>Download results</span>
             </a>
         {% endif %}
         {% if object.expanded_results.csv_export_file %}
