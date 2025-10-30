@@ -93,6 +93,10 @@ def AbstractTask(task_prefix: str):
 
             return f"{self.__class__.__name__} task"
 
+        @property
+        def url_prefix(self):
+            return f"{self.django_app_name}:"
+
         # Util URLs and Paths
         def get_absolute_url(self):
             return reverse(f"{self.django_app_name}:status", kwargs={"pk": self.pk})
