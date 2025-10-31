@@ -61,7 +61,7 @@ class Index(models.Model):
             return orjson.loads(f.read())
 
 
-class Indexing(AbstractAPITaskOnCrops("search_indexing")):
+class Indexing(AbstractAPITaskOnCrops("search/indexing")):
     def __str__(self):
         if not self.name:
             param = getattr(self, "parameters", {})
