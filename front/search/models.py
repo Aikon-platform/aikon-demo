@@ -21,7 +21,7 @@ class Index(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     dataset = models.ForeignKey(
-        Dataset, on_delete=models.CASCADE, related_name="search/index"
+        Dataset, on_delete=models.CASCADE, related_name="search_index"
     )
 
     name = models.CharField(max_length=511, blank=True, default="")
@@ -61,7 +61,7 @@ class Index(models.Model):
             return orjson.loads(f.read())
 
 
-class Indexing(AbstractAPITaskOnCrops("search_indexing")):
+class Indexing(AbstractAPITaskOnCrops("search/indexing")):
     def __str__(self):
         if not self.name:
             param = getattr(self, "parameters", {})
