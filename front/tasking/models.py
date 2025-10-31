@@ -58,8 +58,6 @@ def AbstractTask(task_prefix: str):
             verbose_name="Experiment name",
             help_text=f"Optional name to identify this {task_prefix} experiment",
         )
-        url_prefix = f"{task_prefix}:"
-
         notify_email = models.BooleanField(
             default=True,
             verbose_name="Notify by email",
