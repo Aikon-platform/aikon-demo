@@ -160,7 +160,7 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
         return super().on_task_success(data)
 
 
-class Query(AbstractAPITaskOnCrops("search_query")):
+class Query(AbstractAPITaskOnCrops("search/query")):
     """
     Query images on a given indexed dataset
     """
