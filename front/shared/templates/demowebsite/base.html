@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
     <link rel="icon" type="image/png" href="{% static "img/favicon.png" %}"/>
-    {% if debug and False %}{# Set true to enable to develop locally using pnpm run dev #}
+    {% if debug and True %}{# Set true to enable to develop locally using pnpm run dev #}
     <script type="module" src="http://localhost:5173/src/main.ts"></script>
     {% else %}
     <script type="module" src="{% static "dist/main.js" %}"></script>
@@ -51,7 +51,7 @@
                     <a href="{% url 'dticlustering:list' %}" class="navbar-item">
                         DTI clustering
                     </a>
-                    <a href="{% url 'pipelines:list' %}" class="navbar-item">
+                    <a href="{% url 'watermarks:list' %}" class="navbar-item">
                         Watermark detection
                     </a>
                     <a href="{% url 'regions:list' %}" class="navbar-item">

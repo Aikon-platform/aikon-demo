@@ -78,13 +78,20 @@ def AbstractTask(task_prefix: str):
 
         parameters = models.JSONField(null=True)
 
-        pipeline = models.ForeignKey(
-            "pipelines.Pipeline",
+        watermarks_pipeline = models.ForeignKey(
+            "watermarks.WatermarksPipeline",
             null=True,
             blank=True,
             on_delete=models.SET_NULL,
             related_name=f"{task_prefix.replace('/', '_')}_tasks",
         )
+
+        @property
+        def pipeline(self):
+            # When there will be more than one pipeline type, this will switch
+            # between them based on which is null
+            # (Alternative solution: genericforeignkey)
+            return self.watermarks_pipeline
 
         class Meta:
             abstract = True
@@ -174,14 +181,18 @@ def AbstractTask(task_prefix: str):
             return {"delta": delta, "eval": eval}
 
         # @cached_property
+        @property
         def full_log(self):
             """
             Returns the full log file content
             """
-            if not self.log_file_path.exists():
-                return None
-            with open(self.log_file_path, "r") as f:
-                return f.read()
+            if not hasattr(self, "_full_log"):
+                if not self.log_file_path.exists():
+                    self._full_log = None
+                else:
+                    with open(self.log_file_path, "r") as f:
+                        self._full_log = f.read()
+            return self._full_log
 
         def write_log(self, text: str, mode="a"):
             """
@@ -190,6 +201,8 @@ def AbstractTask(task_prefix: str):
             self.log_file_path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.log_file_path, mode) as f:
                 f.write(text)
+            if hasattr(self, "_full_log"):
+                del self._full_log
 
         def get_token(self):
             """
