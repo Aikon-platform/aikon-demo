@@ -23,6 +23,9 @@ def AbstractPipelineOnDataset(prefix):
         pipeline = None
         task_names: List[str] # static version
 
+        class Meta:
+            abstract = True
+
         # overridable dynamic version
         def get_task_names(self):
             return self.task_names

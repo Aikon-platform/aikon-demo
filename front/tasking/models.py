@@ -83,7 +83,7 @@ def AbstractTask(task_prefix: str):
             null=True,
             blank=True,
             on_delete=models.SET_NULL,
-            related_name=f"{task_prefix.replace('/', '_')}_tasks",
+            related_name="+",
         )
 
         @property
