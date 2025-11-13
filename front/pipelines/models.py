@@ -8,6 +8,7 @@ import zipfile
 import json
 import uuid
 from typing import List, Optional
+from inspect import getmro as mro
 
 from tasking.models import AbstractTaskOnDataset
 from regions.models import Regions
@@ -17,113 +18,77 @@ from datasets.models import Dataset
 User = get_user_model()
 
 
-class Pipeline(AbstractTaskOnDataset("pipelines")):
-    pipeline = None
+def AbstractPipelineOnDataset(prefix):
+    class Pipeline(AbstractTaskOnDataset(prefix)):
+        pipeline = None
+        task_names: List[str] # static version
 
-    # specific to watermark pipelines
-    regions_task = models.ForeignKey(
-        Regions,
-        verbose_name="Use existing regions...",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="+",
-    )
-    similarity_task = models.ForeignKey(
-        Similarity,
-        verbose_name="Use existing similarity...",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="+",
-    )
+        class Meta:
+            abstract = True
 
-    tasks = ["regions", "similarity"]
+        # overridable dynamic version
+        def get_task_names(self):
+            return self.task_names
 
-    # Generic pipeline methods
-    def get_task(self, task_prefix):
-        return getattr(self, f"{task_prefix}_task")
+        # alias
+        @property
+        def tasks(self):
+            print(self, self.get_task_names, self.get_task_names())
+            return self.get_task_names()
 
-    def all_tasks(self) -> List[Optional[AbstractTaskOnDataset]]:
-        return [self.get_task(task) for task in self.tasks]
+        # Generic pipeline methods
+        def get_task(self, task_prefix):
+            return getattr(self, f"{task_prefix}_task")
 
-    def on_task_finished(self, task: AbstractTaskOnDataset):
-        if task.status == "SUCCESS":
-            self.next()
-        else:
-            self.status = "ERROR"
+        def all_tasks(self) -> List[Optional[AbstractTaskOnDataset]]:
+            return [self.get_task(task) for task in self.tasks]
+
+        def on_task_finished(self, task: AbstractTaskOnDataset):
+            if task.status == "SUCCESS":
+                self.next()
+            else:
+                self.status = "ERROR"
+                self.set_fields_on_terminate()
+                self.save()
+
+        def next(self):
+            self.status = "RUNNING"
+            for task in self.tasks:
+                print("NEXT TASK IN LIST \n", task, self.get_task(task))
+                if not self.get_task(task):
+                    getattr(self, f"start_{task}_task")()
+                    return
+            self.status = "SUCCESS"
             self.set_fields_on_terminate()
             self.save()
 
-    def next(self):
-        self.status = "RUNNING"
-        for task in self.tasks:
-            print("NEXT TASK IN LIST \n", task, self.get_task(task))
-            if not self.get_task(task):
-                getattr(self, f"start_{task}_task")()
-                return
-        self.status = "SUCCESS"
-        self.set_fields_on_terminate()
-        self.save()
+        def start_task(self):
+            self.next()
 
-    def start_task(self):
-        self.next()
+        def cancel_task(self):
+            for task in self.tasks:
+                t = self.get_task(task)
+                if t and not t.is_finished:
+                    t.cancel_task()
+            self.status = "CANCELLED"
+            self.set_fields_on_terminate()
+            self.save()
 
-    def cancel_task(self):
-        for task in self.tasks:
-            t = self.get_task(task)
-            if t and not t.is_finished:
-                t.cancel_task()
-        self.status = "CANCELLED"
-        self.set_fields_on_terminate()
-        self.save()
+        def get_progress(self):
+            for k, t in enumerate(reversed(self.tasks)):
+                task = self.get_task(t)
+                if task:
+                    return task.get_progress()
+                    return f"RUNNING SUBTASK {len(self.tasks) - k} OF {len(self.tasks)} ({t.upper()})\n\n{task.get_progress()}"
+            return {}
 
-    def get_progress(self):
-        for k, t in enumerate(reversed(self.tasks)):
-            task = self.get_task(t)
-            if task:
-                return task.get_progress()
-                return f"RUNNING SUBTASK {len(self.tasks) - k} OF {len(self.tasks)} ({t.upper()})\n\n{task.get_progress()}"
-        return {}
+        @property
+        def full_log(self):
+            log = ""
+            for t in reversed(self.tasks):
+                task = self.get_task(t)
+                if task:
+                    log += f"TASK {t.upper()}\n\n{task.full_log}\n\n"
+            return log
 
-    @property
-    def full_log(self):
-        log = ""
-        for t in reversed(self.tasks):
-            task = self.get_task(t)
-            if task:
-                log += f"TASK {t.upper()}\n\n{task.full_log}\n\n"
-        return log
-
-    # Specific pipeline methods
-    def start_regions_task(self):
-        self.regions_task = Regions.objects.create(
-            dataset=self.dataset,
-            requested_by=self.requested_by,
-            notify_email=False,
-            pipeline=self,
-            parameters={
-                "model": "fasterrcnn_watermark_extraction",
-                "postprocess": {"squarify": True, "h_margin": 0.05, "v_margin": 0.05},
-            },
-        )
-        self.regions_task.save()
-        self.save()
-        self.regions_task.start_task()
-
-    def start_similarity_task(self):
-        self.similarity_task = Similarity.objects.create(
-            dataset=self.dataset,
-            requested_by=self.requested_by,
-            notify_email=False,
-            pipeline=self,
-            parameters={
-                "feat_net": "resnet18_watermarks",
-                "algorithm": "cosine",
-                "transpositions": ["none", "rot90", "rot270", "hflip", "vflip"],
-            },
-            crops=self.regions_task,
-        )
-        self.similarity_task.save()
-        self.save()
-        self.similarity_task.start_task()
+    return Pipeline

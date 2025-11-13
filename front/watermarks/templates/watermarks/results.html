@@ -1,60 +1,78 @@
-{% load static %}
-{% if object.status != "SUCCESS" %}
-<div class="centerwrap">
-    <details>
-        <summary>Full log</summary>
-        <pre>
-{% if object.annotations.items %}
-{% for k, v in object.annotations.items %}
-{{ k }}: {{ v }}
-{% endfor %}
-{% else %}
-{{ object.annotations }}
-{% endif %}{% if object.full_log %}{{ object.full_log }}{% endif %}
-        </pre>
-    </details>
-</div>
-{% endif %}
-
-{% if object.detect %}
+{% load static %} {% if object.status == "SUCCESS" %}
 <div class="centerwrap details-wrapper detailed">
-    <h3>Watermark detection {% if object.compare_to %}<a href="javascript:void(0)" class="button is-light is-link" style="vertical-align:middle" onclick="this.parentNode.parentNode.classList.toggle('detailed')">Show/hide</a>{% endif %}</h3>
-    <div class="details-content">
-        {% if object.status == "SUCCESS" and not object.get_bounding_boxes %}
-            <p class="status">No watermarks detected</p>
-        {% endif %}
-        <div class="regions-viewer">
-            <div class="regions">
-                <img src="{{ object.image.url }}" alt="Detected watermark">
-                {% for bbox in object.get_bounding_boxes_for_display %}
-                    <div class="bbox" style="left: {{ bbox.x }}%; top: {{ bbox.y }}%; width: {{ bbox.width }}%; height: {{ bbox.height }}%; opacity: {{ bbox.score }}"><span class="score">{{ bbox.score|floatformat:2 }}</span></div>
-                {% endfor %}
-            </div>
+    <h3>Watermarks {{ object.analysis_type }} results</h3>
+
+    {% if not object.dataset %}
+    <div class="message mt-5">
+        <div class="message-body">
+            <p>Dataset was deleted</p>
         </div>
     </div>
+    {% else %} 
+
+        {% if object.analysis_type == "similarity" %}
+            <div class="widen">
+                <div id="matches" class="matches-viewer"></div>
+            </div>
+
+            <script type="text/javascript">
+                document.addEventListener("DOMContentLoaded", () => {
+                    DemoTools.initSimilarityApp(
+                        document.getElementById("matches"),
+                        "{{ object.similarity_task.index_url|escapejs }}",
+                        "{{ object.similarity_task.similarity_matrix_url|escapejs }}",
+                        "cluster"
+                    );
+                });
+            </script>
+        {% elif object.analysis_type == "indexing" %}
+            <p>Indexing completed successfully</p>
+            <p>
+                Index built: {{ object.indexing_task.index.name }} ({{ object.indexing_task.index.public|yesno:"public,private" }})
+            </p>
+            <p>
+                {% if editable %}<a
+                    class="button is-link"
+                    href="{% url 'search:index_edit' object.indexing_task.index.id %}?next={{ object.get_absolute_url }}"
+                    ><span class="iconify mr-1" data-icon="mdi:pencil"></span><span>Edit</span></a
+                >
+                {% endif %}
+                <a
+                    class="button is-link"
+                    href="{% url 'watermarks:start' %}?analysis_type=query&index={{ object.indexing_task.index.id }}"
+                    ><span class="iconify mr-1" data-icon="mdi:search"></span
+                    ><span>Search in this index</span></a
+                >
+            </p>
+        {% elif object.analysis_type == "query" %} 
+            {% if object.query_task.similarity %}
+            <a href="{{ object.query_task.get_download_json_url }}" class="button is-link" download>
+                <span class="iconify" data-icon="mdi:json"></span>
+                <span>Download similarity matrix</span>
+            </a>
+            {% endif %}
+            <a
+                class="button is-link"
+                href="{% url 'watermarks:start' %}?analysis_type=query&index={{ object.query_task.target_index.id }}"
+                ><span class="iconify mr-1" data-icon="mdi:search"></span
+                ><span>Start a new search</span></a
+            >
+
+            <div class="widen">
+                <div id="matches" class="matches-viewer"></div>
+            </div>
+
+            <script type="text/javascript">
+                document.addEventListener("DOMContentLoaded", () => {
+                    DemoTools.initSearchResults(
+                        document.getElementById("matches"),
+                        "{{ object.query_task.target_index.index_url|escapejs }}",
+                        "{{ object.query_task.result_url|escapejs }}"
+                    );
+                });
+            </script>
+        {% endif %} 
+
+    {% endif %}
 </div>
 {% endif %}
-
-{% if object.compare_to %}
-    <h3>Watermark matching</h3>
-    <p>On source {{ object.compare_to.name }} ({{ object.compare_to.uid }})</p>
-    <div id="matches" class="watermark-matches"></div>
-
-    {{ object.annotations|json_script:"annotations"}}
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", () => {
-            const annotations = JSON.parse(document.getElementById("annotations").textContent);
-            DemoTools.initWatermarkMatches(
-                document.getElementById("matches"), "{{ object.image.url|escapejs }}",
-                annotations, "{{ object.compare_to.data_folder_url|escapejs}}/");
-        });
-    </script>
-{% endif %}
-
-<div class="centerwrap mt-4">
-    <h2 class="is-title is-size-3 pb-3 mt-0">Process a new image</h2>
-    <form method="post" enctype="multipart/form-data" action="{% url 'watermarks:start' %}">
-        {% include "demowebsite/baseform.html" %}
-        <button type="submit" class="button is-link">Submit</button>
-    </form>
-</div>

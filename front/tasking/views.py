@@ -184,7 +184,7 @@ class TaskProgressView(
         progress_logs = progress_data.get("log", {})
         if progress_logs:
             if progress_info := progress_logs.get("infos", []):
-                logs = self.object.full_log() or ""
+                logs = self.object.full_log or ""
                 for info in progress_info:
                     if info not in logs:
                         self.object.write_log(f"{info}\n")

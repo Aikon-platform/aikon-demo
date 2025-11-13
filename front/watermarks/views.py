@@ -1,135 +1,49 @@
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, DetailView, ListView, View
-from django.views.generic.detail import SingleObjectMixin
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
-from typing import Any
-import traceback
-from django.shortcuts import redirect
+from django.views.generic import View
+from django.http import FileResponse, Http404, HttpResponse
 
-from tasking.views import (
-    TaskStartView,
-    TaskStatusView,
-    TaskProgressView,
-    TaskCancelView,
-    TaskWatcherView,
-    TaskDeleteView,
-    TaskListView,
-)
-
-from .models import WatermarkProcessing, WatermarksSource
-from .forms import WatermarkProcessingForm
+from .forms import WatermarksPipelineForm
+from .models import WatermarksPipeline
+from tasking.views import task_view_set
 
 
-class WatermarkProcessingMixin:
+# instanciate all views from tasking.views, override to add custom behavior
+@task_view_set
+class WatermarksMixin:
     """
-    Mixin for DTI clustering views
+    Mixin for Watermark Pipeline extractions views
     """
 
-    model = WatermarkProcessing
-    form_class = WatermarkProcessingForm
-    task_name = "Watermark Analysis"
+    model = WatermarksPipeline
+    form_class = WatermarksPipelineForm
+    task_name = "Watermark Pipeline"
+    app_name = "Watermarks"
+    task_data = "dataset"
 
 
-class WatermarkProcessingStart(WatermarkProcessingMixin, TaskStartView):
-    pass
+class WatermarksList(WatermarksMixin.List):
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("dataset")
 
 
-class WatermarkProcessingResult(WatermarkProcessingMixin, TaskStatusView):
-    model = WatermarkProcessing
-
+class WatermarksStatusView(WatermarksMixin.Status):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form"] = WatermarkProcessingForm(user=self.request.user)
+        if self.object.analysis_type == "indexing" and self.object.indexing_task and self.object.indexing_task.index:
+            context["editable"] = (self.object.indexing_task.index.owner == self.request.user) or self.request.user.is_superuser
         return context
 
+class WatermarksStartMixin:
+    template_name = "watermarks/start.html"
 
-class WatermarkProcessingProgress(WatermarkProcessingMixin, TaskProgressView):
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["query_target_index"] = self.request.GET.get("index")
+        kwargs["analysis_type"] = self.request.GET.get("analysis_type")
+        return kwargs
+        
+
+class WatermarksStartView(WatermarksStartMixin, WatermarksMixin.Start):
     pass
 
-
-class WatermarkProcessingCancel(WatermarkProcessingMixin, TaskCancelView):
+class WatermarksStartFromView(WatermarksStartMixin, WatermarksMixin.StartFrom):
     pass
-
-
-class WatermarkProcessingWatcher(WatermarkProcessingMixin, TaskWatcherView):
-    pass
-
-
-class WatermarkProcessingDelete(WatermarkProcessingMixin, TaskDeleteView):
-    pass
-
-
-class WatermarkProcessingList(WatermarkProcessingMixin, TaskListView):
-    permission_see_all = "WatermarkProcessing.monitor_WatermarkProcessing"
-
-
-# ADMIN
-
-
-class SourcesManageView(PermissionRequiredMixin, LoginRequiredMixin, ListView):
-    """
-    Monitoring view
-    """
-
-    permission_required = "watermarks.monitor_watermarks"
-    template_name = "watermarks/sources.html"
-    context_object_name = "sources"
-    model = WatermarksSource
-
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        try:
-            known_sources = {source.uid for source in self.object_list}
-            context["extra_sources"] = [
-                source
-                for source in WatermarksSource.get_available_sources()
-                if source["uid"] not in known_sources
-            ]
-        except Exception as e:
-            context["api_error"] = traceback.format_exc(1)
-        return context
-
-
-class SourcesAddView(
-    PermissionRequiredMixin, LoginRequiredMixin, SingleObjectMixin, View
-):
-    """
-    Add a new source
-    """
-
-    permission_required = "watermarks.monitor_watermarks"
-    model = WatermarksSource
-
-    def post(self, request, *args, **kwargs):
-        source = WatermarksSource.from_api(request.POST["uid"])
-        source.download_images()
-        return redirect(reverse_lazy("watermarks:source-manage"))
-
-
-class SourcesActionView(
-    PermissionRequiredMixin, LoginRequiredMixin, SingleObjectMixin, View
-):
-    """
-    Action on a source
-    """
-
-    permission_required = "watermarks.monitor_watermarks"
-    model = WatermarksSource
-
-    def post(self, request, *args, **kwargs):
-        if "sync" in request.POST:
-            self.get_object().download_images()
-        elif "deprecate" in request.POST:
-            obj = self.get_object()
-            obj.active = False
-            obj.save()
-        return redirect(reverse_lazy("watermarks:source-manage"))
-
-
-class SourcesSimView(DetailView):
-    """
-    Browse the similarity matrix of a source
-    """
-
-    model = WatermarksSource
-    template_name = "watermarks/source_sim.html"

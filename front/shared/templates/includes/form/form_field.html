@@ -25,7 +25,7 @@
             {% include "includes/form/checkbox_multiple.html" %}
         {% elif field|field_type == "Select" %}
             {% include "includes/form/select.html" %}
-        {% elif field|field_type == "RadioSelect" %}
+        {% elif "RadioSelect" in field|field_type %}
             {% include "includes/form/radio.html" %}
         {% elif field|field_type == "ClearableFileInput" or "FileInput" in field|field_type %}
             {% include "includes/form/file.html" %}

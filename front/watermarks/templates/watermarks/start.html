@@ -1,0 +1,32 @@
+{% extends "tasking/start.html" %}
+
+{% block title %}Start a new Watermarks pipeline{% endblock %}
+
+{% block content %}
+<div class="centerwrap">
+
+    {% include "includes/breadcrumbs.html" %}
+
+    <h1 class="is-title is-size-2 py-3">Start a new Watermarks pipeline</h1>
+    {% if from_task %}
+        <p>Using same configuration as Watermarks pipeline <a href="{{ from_task.get_absolute_url }}">#{{ from_task.id }}</a></p>
+    {% endif %}
+    <form action="" method="post" enctype="multipart/form-data">
+        <div id="task_form">
+            {% block form_content %}
+                {% include "tasking/task_form.html" %}
+            {% endblock %}
+        </div>
+
+        <p class="has-text-centered pt-3">
+            <input class="button is-link" type="submit" value="Start processing">
+        </p>
+    </form>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", () => {
+        DemoTools.initWatermarksForm(document.getElementById("task_form"));
+    });
+</script>
+{% endblock %}

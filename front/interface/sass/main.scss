@@ -9,6 +9,7 @@
 @use "shared" as *;
 @use "SimilarityApp" as *;
 @use "RegionsApp" as *;
+@use "WatermarksApp" as *;
 
 *, *::before, *::after {
     box-sizing: border-box;

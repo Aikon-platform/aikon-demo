@@ -1,0 +1,11 @@
+<span class="option-head">
+    <span class="is-bold index-title">{{ radio.data.value.instance.name|default:"Untitled Index" }}</span>
+    {% if radio.data.value.instance.description %}
+    <span class="is-italic">{{ radio.data.value.instance.description }}</span>
+    {% endif %}
+</span>
+<span class="is-size-7"
+    >Created on {{ radio.data.value.instance.created_at }}, with 
+    {{ radio.data.value.instance.feat_net }}, on dataset 
+    {{ radio.data.value.instance.dataset.name }}</span
+>
