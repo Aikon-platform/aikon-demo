@@ -1,5 +1,5 @@
 <script lang="ts">
-    import DatasetChooseForm from "../../DatasetApp/components/DatasetChooseForm.svelte";
+    import DatasetComposeForm from "../../DatasetApp/components/DatasetComposeForm.svelte";
     import AnalysisTypeSelect from "./AnalysisTypeSelect.svelte";
     import IndexSelect from "./IndexSelect.svelte";
     import NeedRegionsToggle from "./NeedRegionsToggle.svelte";
@@ -24,6 +24,8 @@
     let need_regions_value = $state(need_regions_field.checked);
 
     let errors = originalForm.querySelectorAll(".errorlist");
+    let submit_button = analysis_type_field.form!.querySelector("input[type=submit]") as HTMLButtonElement;
+    let dataset_ready = $state(false);
 
     $effect(() => {
         if (analysis_type_value === "query") {
@@ -31,6 +33,10 @@
         } else {
             experiment_name_field.value = analysis_type_value.charAt(0).toUpperCase() + analysis_type_value.slice(1);
         }
+    });
+
+    $effect(() => {
+        submit_button.disabled = analysis_type_value === "" || (analysis_type_value === "query" && index_value === "") || !dataset_ready;
     });
 </script>
 
@@ -59,8 +65,11 @@
     What is your dataset?
     {/if}
 </h4>
-<DatasetChooseForm form={dataset_form} />
+<div class="box has-background-light">
+    <DatasetComposeForm form={dataset_form} bind:ready={dataset_ready} />
+</div>
 
 <h4 class="mt-6 mb-5">Are those image cropped and centered?</h4>
 <NeedRegionsToggle bind:value={need_regions_value} field={need_regions_field} />
+<div class="mb-4"></div>
 {/if}

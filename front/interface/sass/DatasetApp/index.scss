@@ -93,4 +93,25 @@
         z-index: 1000;
         pointer-events: none;
     }
+
+    .dataset-reuse-toggle {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+
+        [data-toggle-root] {
+            border-radius: var(--bulma-radius);
+            border: 1px solid var(--bulma-text-soft);
+            padding: 0.5rem;
+            background-color: var(--bulma-background);
+
+            &[aria-pressed="true"] {
+                border-color: var(--bulma-link);
+                color: var(--bulma-link);
+                font-weight: bold;
+                background-color: hsl(var(--bulma-light-h), var(--bulma-light-s), var(--bulma-light-l)) !important;
+            }
+        }
+    }
 }

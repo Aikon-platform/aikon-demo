@@ -10,7 +10,7 @@ urlpatterns = [
     path("<uuid:pk>/progress", WatermarksMixin.Progress.as_view(), name="progress"),
     path("<uuid:pk>/cancel", WatermarksMixin.Cancel.as_view(), name="cancel"),
     path("<uuid:pk>/watch", WatermarksMixin.Watcher.as_view(), name="notify"),
-    path("<uuid:pk>/restart", WatermarksMixin.StartFrom.as_view(), name="restart"),
+    path("<uuid:pk>/restart", WatermarksStartFromView.as_view(), name="restart"),
     path("<uuid:pk>/delete", WatermarksMixin.Delete.as_view(), name="delete"),
     # Admin views
     path(

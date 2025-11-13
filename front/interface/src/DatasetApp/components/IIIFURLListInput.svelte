@@ -4,11 +4,10 @@
 
     interface Props {
         field: HTMLTextAreaElement;
+        value?: string[][];
     }
 
-    let { field }: Props = $props();
-
-    let value:string[][] = $state([]);
+    let { field, value = $bindable([]) }: Props = $props();
 
     onMount(() => {
         value = JSON.parse(field.value);
@@ -38,7 +37,7 @@
 
     function onPaste(e: ClipboardEvent) {
         let text = e.clipboardData?.getData("text/plain");
-        let lines = text?.split("\n");
+        let lines = text?.split(/\s+/);
         if (lines) {
             value.push(...lines.map(line => [line.trim()]).filter(line => line[0] != ""));
             field.value = JSON.stringify(value);

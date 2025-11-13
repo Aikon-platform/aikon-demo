@@ -42,7 +42,6 @@ class WatermarksPipeline(AbstractPipelineOnDataset("watermarks")):
             ("indexing", "Index this dataset for future queries"),
             ("query", "Search inside an indexed dataset"),
         ],
-        default="similarity",
     )
     need_regions = models.BooleanField(
         "Detect and crop watermarks", 

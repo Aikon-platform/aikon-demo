@@ -32,7 +32,7 @@ class WatermarksStatusView(WatermarksMixin.Status):
             context["editable"] = (self.object.indexing_task.index.owner == self.request.user) or self.request.user.is_superuser
         return context
 
-class WatermarksStartView(WatermarksMixin.Start):
+class WatermarksStartMixin:
     template_name = "watermarks/start.html"
 
     def get_form_kwargs(self):
@@ -41,3 +41,9 @@ class WatermarksStartView(WatermarksMixin.Start):
         kwargs["analysis_type"] = self.request.GET.get("analysis_type")
         return kwargs
         
+
+class WatermarksStartView(WatermarksStartMixin, WatermarksMixin.Start):
+    pass
+
+class WatermarksStartFromView(WatermarksStartMixin, WatermarksMixin.StartFrom):
+    pass
