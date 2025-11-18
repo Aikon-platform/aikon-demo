@@ -56,8 +56,8 @@ EXPOSE ${PORT}
 RUN mkdir -p /home/${USER}/app/staticfiles && chown ${USER}:${USER} /home/${USER}/app/staticfiles
 
 COPY --chown=${USER} docker/manage.sh /home/${USER}/manage.sh
-RUN chmod +x /home/${USER}/manage.sh
-RUN /home/${USER}/manage.sh
+#RUN chmod +x /home/${USER}/manage.sh
+#RUN /home/${USER}/manage.sh
 
 # Launch app
 CMD export LC_ALL=C.UTF-8 && export LANG=C.UTF-8 && \

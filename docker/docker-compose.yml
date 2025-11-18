@@ -12,10 +12,6 @@ services:
       args:
         USERID: ${USERID}
         PORT: ${DJANGO_PORT}
-#    dns:
-#      - 8.8.8.8
-#      - 8.8.4.4
-#      - 1.1.1.1
     volumes:
       - staticfiles:/home/aikondemo/app/staticfiles
       - ${DATA_FOLDER}:/data
@@ -24,6 +20,8 @@ services:
       - ../front/.env
     environment:
       <<: *proxy-settings
+    extra_hosts:
+        - "host.docker.internal:host-gateway" 
     ports:
       - "${DJANGO_PORT:-8000}:${DJANGO_PORT:-8000}"
     depends_on:
