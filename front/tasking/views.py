@@ -29,7 +29,9 @@ class TaskMixin:
         context["app_name"] = self.model.django_app_name
         context["task_data"] = self.task_data
         context["url_prefix"] = self.model.url_prefix
-        context["results_template"] = f"{self.model.url_prefix.replace(':','/')}results.html"
+        context[
+            "results_template"
+        ] = f"{self.model.url_prefix.replace(':','/')}results.html"
         return context
 
 
@@ -93,9 +95,7 @@ class TaskStartView(LoginRequiredIfConfProtectedMixin, TaskMixin, CreateView):
     template_name = "regions/start.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
-        print("get_context_data TaskStartView")
         context = super().get_context_data(**kwargs)
-        print(context)
         context["dataset_fields"] = DATASET_FIELDS
         return context
 
