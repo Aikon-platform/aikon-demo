@@ -1,5 +1,6 @@
 <script lang="ts">
     import Icon from "@iconify/svelte";
+    import { Button } from "bits-ui";
     import type { ClassValue } from "svelte/elements";
 
     interface Props {
@@ -12,9 +13,9 @@
     let { icon, label, onclick, disabled, class: className }: Props = $props();
 </script>
 
-<button class={[className || "is-link is-light mr-2", "button"]} onclick={onclick} class:disabled={disabled}>
+<Button.Root class={[className || "is-link is-light mr-2", "button", disabled ? "disabled" : ""]} onclick={onclick} disabled={disabled}>
     <Icon icon={icon} />
     {#if label}
         <span>{label}</span>
     {/if}
-</button>
+</Button.Root>

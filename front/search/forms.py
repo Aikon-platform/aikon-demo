@@ -2,6 +2,7 @@ from django.db.models import Q
 from .models import Indexing, Query, Index
 from tasking.forms import AbstractTaskOnCropsForm
 from django import forms
+from .widgets import IndexRadioSelect
 
 class IndexingForm(AbstractTaskOnCropsForm):
     """Form for creating indexing tasks."""
@@ -45,10 +46,11 @@ class IndexingForm(AbstractTaskOnCropsForm):
 class IndexEditForm(forms.ModelForm):
     class Meta:
         model = Index
-        fields = ("name", "public")
+        fields = ("name", "public", "description")
         help_texts = {
             "name": "Public name of the index",
             "public": "Make the searchable by all users",
+            "description": "Description of the index",
         }
 
 class QueryForm(AbstractTaskOnCropsForm):
@@ -62,7 +64,7 @@ class QueryForm(AbstractTaskOnCropsForm):
         queryset=Index.objects.filter(public=True),
         label="Index",
         help_text="Select the index to query",
-        widget=forms.Select(attrs={"extra-class": "preprocessing-field"}),
+        widget=IndexRadioSelect(),
     )
 
     use_transpositions = forms.BooleanField(
@@ -76,9 +78,7 @@ class QueryForm(AbstractTaskOnCropsForm):
     def __init__(self, *args, **kwargs):
         selected_index = kwargs.pop("target_index", None)
         super().__init__(*args, **kwargs)
-        self.fields["target_index"].queryset = Index.objects.filter(
-            Q(public=True) | Q(owner=self._user)
-        )
+        self.fields["target_index"].queryset = Index.available_indexes(self._user)
         self.fields["target_index"].initial = selected_index
 
     def save(self, commit=True):
