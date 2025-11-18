@@ -11,9 +11,10 @@ urlpatterns = [
     path("dti/", include("dticlustering.urls")),
     path("similarity/", include("similarity.urls")),
     path("regions/", include("regions.urls")),
-    # path("watermarks/", include("watermarks.urls")),
+    path("search/", include("search.urls")),
+    path("watermarks/", include("watermarks.urls")),
     path("datasets/", include("datasets.urls")),
-    path("watermarks/", include("pipelines.urls")),
+    # path("watermarks/", include("pipelines.urls")),
 ]
 
 # Serve media files in development

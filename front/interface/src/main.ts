@@ -9,6 +9,8 @@ import DatasetImageBrowser from "./DatasetApp/components/DatasetImageBrowser.sve
 import type { TDatasetFormatType, TDjangoDatasetInterface } from "./DatasetApp/types";
 
 import "../sass/main.scss";
+import SearchResults from "./SimilarityApp/components/SearchResults.svelte";
+import { initWatermarksForm } from "./WatermarksApp/form";
 
 /**
  * Mount the cluster viewer in the given target root.
@@ -77,6 +79,26 @@ function initSimilarityApp(
 }
 
 /**
+ * Mount the similarity app in the given target root.
+ * @param target_root the root element to mount the similarity app in
+ * @param source_index_url the url to the source index
+ * @param query_result_url the url to the query result
+ */
+function initSearchResults(
+    target_root: HTMLElement,
+    source_index_url: string,
+    query_result_url: string
+) {
+    mount(SearchResults, {
+        target: target_root,
+        props: {
+            source_index_url,
+            query_result_url,
+        },
+    });
+}
+
+/**
  * Mount the image generic list in the given target root.
  * @param target_root the root element to mount the image generic list in
  * @param image_array the array of images to display
@@ -115,5 +137,7 @@ function initDatasetImageBrowser(
     initProgressTracker,
     initSimilarityApp,
     initImageGenericList,
-    initDatasetImageBrowser
+    initDatasetImageBrowser,
+    initSearchResults,
+    initWatermarksForm
 };

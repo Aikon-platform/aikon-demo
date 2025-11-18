@@ -4,8 +4,8 @@
 
 {% include "includes/form/field_group.html" with included_fields="name,notify_email" %}
 
-<div class="box has-background-light mt-5">
-    <h3 class="title mb-2">Dataset</h3>
+<div class="box has-background-light mt-5 dataset-form">
+    <h3 class="title mb-2">{{ dataset_label|default:"Dataset" }}</h3>
     <span id="crop-help" class="help">Select either a dataset or crops.</span>
     {% include "includes/form/field_group.html" with included_fields="reuse_dataset" %}
     {% include "includes/form/field_group.html" with included_fields=dataset_fields|remove_from_list:"reuse_dataset" %}

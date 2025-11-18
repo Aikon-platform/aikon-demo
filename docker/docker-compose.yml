@@ -24,6 +24,8 @@ services:
         - "host.docker.internal:host-gateway" 
     ports:
       - "${DJANGO_PORT:-8000}:${DJANGO_PORT:-8000}"
+    #extra_hosts:
+    #  - "smtp:host-gateway"
     depends_on:
       - db
       - redis

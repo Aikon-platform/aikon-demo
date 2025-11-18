@@ -15,6 +15,7 @@ DEMO_APPS = [
     "watermarks",
     "regions",
     "pipelines",
+    "search",
 ]
 
 INSTALLED_APPS = [
