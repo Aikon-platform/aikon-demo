@@ -40,12 +40,13 @@ def send_newaccount_notification(user):
         Q(groups__permissions__codename="add_user")
         | Q(user_permissions__codename="add_user")
     ).distinct():
+        base_url = "https://aikon-demo.enpc.fr"
         send_mail(
             "[AIKON Demo] User Account requested",
             (
                 f"Dear {admin_user.first_name},\n\n"
                 f"A new account request was submitted by {user.username}.\n"
-                f"Please review it on the admin page at {settings.BASE_URL + reverse('accounts_admin')}.\n\n"
+                f"Please review it on the admin page at {base_url + reverse('accounts_admin')}.\n\n"
                 "Best regards,\n"
                 "The AIKON team"
             ),

@@ -259,9 +259,10 @@ def AbstractTask(task_prefix: str):
 
             if notify and self.notify_email:
                 try:
+                    base_url = "https://aikon-demo.enpc.fr"
                     send_mail(
                         f"[AIKON-demo] Task {self.status}",
-                        f"Your task {self} on AIKON-demo has finished with status {self.status}.\n\nYou can access the results at: {BASE_URL}{self.get_absolute_url()}",
+                        f"Your task {self} on AIKON-demo has finished with status {self.status}.\n\nYou can access the results at: {base_url}{self.get_absolute_url()}",
                         settings.DEFAULT_FROM_EMAIL,
                         [self.requested_by.email],
                         fail_silently=False,
