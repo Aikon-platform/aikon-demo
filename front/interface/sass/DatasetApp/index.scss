@@ -62,3 +62,56 @@
         }
     }
 }
+
+.dataset-compose-form {
+    [data-tabs-trigger] {
+        border-radius: 5px;
+        border: 1px solid var(--bulma-text-soft);
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem;
+        width: 100%;
+
+        &[aria-selected="true"] {
+            border-color: var(--bulma-link);
+            color: var(--bulma-link);
+            font-weight: bold;
+            background-color: hsl(var(--bulma-light-h), var(--bulma-light-s), var(--bulma-light-l)) !important;
+        }
+
+        &:hover {
+            border-color: var(--bulma-link);
+        }
+    }
+
+    .dropper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        pointer-events: none;
+    }
+
+    .dataset-reuse-toggle {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+
+        [data-toggle-root] {
+            border-radius: var(--bulma-radius);
+            border: 1px solid var(--bulma-text-soft);
+            padding: 0.5rem;
+            background-color: var(--bulma-background);
+
+            &[aria-pressed="true"] {
+                border-color: var(--bulma-link);
+                color: var(--bulma-link);
+                font-weight: bold;
+                background-color: hsl(var(--bulma-light-h), var(--bulma-light-s), var(--bulma-light-l)) !important;
+            }
+        }
+    }
+}

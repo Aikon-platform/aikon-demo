@@ -3,11 +3,14 @@ import orjson
 import traceback
 import uuid
 from pathlib import Path
-from django.conf import settings
-from regions.models import AbstractAPITaskOnCrops
-from django.contrib.auth import get_user_model
 import requests
+from typing import Optional
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+
+from regions.models import AbstractAPITaskOnCrops
 from datasets.models import Dataset
 
 User = get_user_model()
@@ -25,6 +28,7 @@ class Index(models.Model):
     )
 
     name = models.CharField(max_length=511, blank=True, default="")
+    description = models.TextField(blank=True, default="")
 
     index_id = models.CharField(max_length=511, db_index=True)
 
@@ -39,6 +43,8 @@ class Index(models.Model):
 
     use_transpositions = models.BooleanField(default=False, blank=True)
     public = models.BooleanField(default=False, blank=True)
+
+    feat_net = models.CharField(max_length=511, blank=True, default="")
 
     def __str__(self):
         return f"Index {self.name}"
@@ -57,8 +63,17 @@ class Index(models.Model):
             f.write(orjson.dumps(index))
 
     def get_index(self):
+        if not self.index_path.exists():
+            return None
         with open(self.index_path, "rb") as f:
             return orjson.loads(f.read())
+
+    @classmethod
+    def available_indexes(cls, user: Optional[User]=None):
+        filt = Q(public=True)
+        if user:
+            filt = filt | Q(owner=user)
+        return cls.objects.filter(filt)
 
 
 class Indexing(AbstractAPITaskOnCrops("search/indexing")):
@@ -82,11 +97,12 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
 
         self.index = Index.objects.create(
             dataset=self.dataset,
-            display_name=self.name,
+            name=self.name,
             index_id=index_id,
             from_task=self,
             owner=self.requested_by,
             use_transpositions=len(self.parameters.get("transpositions", ["none"])) > 2,
+            feat_net=self.parameters.get("feat_net", ""),
         )
 
         with open(self.task_full_path / f"{self.index.index_id}.json", "wb") as f:
