@@ -15,7 +15,7 @@ def send_activation_email(user: User):
     form.save(
         subject_template_name="registration/mails/activation_subject.txt",
         email_template_name="registration/mails/activation_body.txt",
-        domain_override=settings.BASE_URL,
+        domain_override="https://aikon-demo.enpc.fr",  # settings.BASE_URL
         use_https=True,
     )
 
