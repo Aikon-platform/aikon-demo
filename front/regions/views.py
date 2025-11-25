@@ -1,5 +1,6 @@
 from django.views.generic import View
 from django.http import FileResponse, Http404, HttpResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .forms import RegionsForm
 from .models import Regions
@@ -12,6 +13,7 @@ class RegionsMixin:
     """
     Mixin for Regions extractions views
     """
+
     model = Regions
     form_class = RegionsForm
     task_name = "Regions Extraction"
@@ -23,6 +25,28 @@ class RegionsMixin:
 class RegionsList(RegionsMixin.List):
     def get_queryset(self):
         return super().get_queryset().prefetch_related("dataset")
+
+
+class RegionsStatus(RegionsMixin.Status):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.object.is_finished and self.object.status == "SUCCESS":
+            bboxes = self.object.get_bounding_boxes_for_display()
+
+            paginator = Paginator(bboxes, 10)
+            page = self.request.GET.get("page", 1)
+
+            try:
+                bboxes_page = paginator.page(page)
+            except PageNotAnInteger:
+                bboxes_page = paginator.page(1)
+            except EmptyPage:
+                bboxes_page = paginator.page(paginator.num_pages)
+
+            context["bboxes_page"] = bboxes_page
+
+        return context
 
 
 class RegionsDownloadZip(View):
