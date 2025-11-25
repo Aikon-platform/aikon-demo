@@ -2,9 +2,9 @@
 
 {% if page_obj %}
     <nav class="pagination" role="navigation" aria-label="pagination">
-        <a class="pagination-link" {% if page_obj.has_previous %}href="{% url_get_replace request "page" page_obj.previous_page_number %}"{% else %} disabled{% endif %}>Previous</a>
-        <a class="pagination-next" {% if page_obj.has_next %}href="{% url_get_replace request "page" page_obj.next_page_number %}"{% else %} disabled{% endif %}>Next page</a>
-        <ul class="pagination-list">
+        <a class="pagination-item pagination-link" {% if page_obj.has_previous %}href="{% url_get_replace request "page" page_obj.previous_page_number %}"{% else %} disabled{% endif %}>Previous</a>
+        <a class="pagination-item pagination-next" {% if page_obj.has_next %}href="{% url_get_replace request "page" page_obj.next_page_number %}"{% else %} disabled{% endif %}>Next page</a>
+        <ul class="pagination-item pagination-list">
             {% if page_obj.has_previous %}
                 <li><a class="pagination-link" href="{% url_get_replace request "page" 1 %}">1</a></li>
                 {% if page_obj.previous_page_number > 1 %}
@@ -23,3 +23,13 @@
         </ul>
     </nav>
 {% endif %}
+
+<style>
+    .pagination-item {
+        margin-top: .75rem !important;
+        margin-bottom: .75rem !important;
+    }
+    .pagination-item li {
+        margin: 0 !important;
+    }
+</style>
