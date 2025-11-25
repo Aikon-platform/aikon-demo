@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from environ import Env
 
 from .base import *
 
@@ -22,6 +23,12 @@ DATABASES = {
 API_URL = ENV("PROD_API_URL")
 BASE_URL = ENV("BASE_URL", default="https://aikon-demo.enpc.fr/")
 DOMAIN_NAME = urlparse(BASE_URL).netloc
+
+if ENV.bool("IS_API_ON_SAME_SERVER", default=False):
+    DOCKER_PORT = ENV.int("DJANGO_PORT", 8000)
+    INTERNAL_URL = f"http://web:{DOCKER_PORT}"
+else:
+    INTERNAL_URL = BASE_URL
 
 hosts = ENV.list("ALLOWED_HOSTS", default=[]) + [DOMAIN_NAME, "localhost"]
 hosts += ["web"]  # for docker nginx service
