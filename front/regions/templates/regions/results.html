@@ -4,9 +4,7 @@
         <div class="centerwrap">
             <details>
                 <summary>Full log</summary>
-                <pre>
-{{ object.full_log }}
-            </pre>
+                <pre>{{ object.full_log }}</pre>
             </details>
         </div>
     {% endif %}
@@ -15,13 +13,11 @@
         <h3>Regions extraction</h3>
         <div class="details-content">
             {% if object.has_crops %}
-                <a href="{{ object.get_download_zip_url }}"
-                   class="button is-link" download>
+                <a href="{{ object.get_download_zip_url }}" class="button is-link" download>
                     <span class="iconify" data-icon="mdi:folder-download"></span>
                     <span>Download cropped images</span>
                 </a>
-                <a href="{{ object.get_download_json_url }}"
-                   class="button is-link" download>
+                <a href="{{ object.get_download_json_url }}" class="button is-link" download>
                     <span class="iconify" data-icon="mdi:json"></span>
                     <span>Download bounding boxes</span>
                 </a>
@@ -39,46 +35,49 @@
                 </div>
             {% endif %}
 
-            <table class="table is-fullwidth">
-                <tbody>
-                {% for item in object.get_bounding_boxes_for_display %}
-                    <tr class="is-fullwidth">
-                        <th class="center-flex is-narrow" style="width: 300px; margin-bottom: -1px;">
-                            <div class="center-flex" style="position: relative">
-                                <img class="card" src="{{ item.image.url }}" alt="{{ item.image.name }}"
-                                     style="max-width: 100%; display: block; margin:0;">
-                                {% for crop in item.crops %}
-                                    <div class="bbox" style="
-                                            position: absolute;
+            {% if bboxes_page %}
+                <div class="my-2">
+                    {% include "includes/pagination.html" with page_obj=bboxes_page %}
+                </div>
+
+
+                <table class="table is-fullwidth">
+                    <tbody>
+                    {% for item in bboxes_page %}
+                        <tr class="is-fullwidth">
+                            <th class="center-flex is-narrow" style="width: 300px; margin-bottom: -1px;">
+                                <div class="center-flex" style="position: relative">
+                                    <img class="card" src="{{ item.image.url }}" alt="{{ item.image.name }}"
+                                         style="max-width: 100%; display: block; margin:0;">
+                                    {% for crop in item.crops %}
+                                        <div class="bbox" style="
                                             left: {{ crop.x }}%;
                                             top: {{ crop.y }}%;
                                             width: {{ crop.width }}%;
-                                            height: {{ crop.height }}%;
-                                            border: 2px solid #cc0000;
-                                            pointer-events: none;
-                                            "></div>
-                                {% endfor %}
-                            </div>
-                        </th>
+                                            height: {{ crop.height }}%;">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </th>
 
-                        <td style="width: 100%">
-                            <div class="grid is-col-min-5">
-                                {% for crop in item.crops %}
-                                    <div class="cell region is-center p-4" style="width: 130px;">
-                                        <figure class="image card region-image"
-                                                style="height: 130px; min-width: 130px;">
-                                            <img class="region-img" src="{{ crop.url }}" alt="Extracted region">
-                                        </figure>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                            <td style="width: 100%">
+                                <div class="grid is-col-min-5">
+                                    {% for crop in item.crops %}
+                                        <div class="cell region is-center p-4" style="width: 130px;">
+                                            <figure class="image card region-image" style="height: 130px; min-width: 130px;">
+                                                <img class="region-img" src="{{ crop.url }}" alt="Extracted region">
+                                            </figure>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
 
-
+                {% include "includes/pagination.html" with page_obj=bboxes_page %}
+            {% endif %}
         </div>
     </div>
 {% endif %}
@@ -87,5 +86,10 @@
     .region-img {
         object-fit: contain;
         height: 100% !important;
+    }
+    .bbox {
+        position: absolute;
+        border: 1px solid var(--bulma-link);
+        pointer-events: none;
     }
 </style>

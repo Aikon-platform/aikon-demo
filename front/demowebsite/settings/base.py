@@ -2,10 +2,11 @@ from pathlib import Path
 from environ import Env
 from django.urls import reverse_lazy
 
+# path to front/
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Read environment variables from .env file
 ENV = Env()
+# Read environment variables from .env file
 Env.read_env(env_file=f"{BASE_DIR}/.env")
 
 # Application definition
