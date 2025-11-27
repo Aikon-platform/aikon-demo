@@ -14,9 +14,11 @@
     }
     let { source_index_url, sim_matrix_url, mode }: Props = $props();
 
-    let index:TSimilarityIndex = $state({sources: [], images: [], transpositions: []});
-    let matches:TSimilarityMatches[] = $state([]);
+    let index:TSimilarityIndex = $state.raw({sources: [], images: [], transpositions: []});
+    let matches:TSimilarityMatches[] = $state.raw([]);
     let loading = $state(true);
+    // If clustering tool has been shown once, keep it hidden but active so parameters are still available
+    let keep_clustering_tool = $state(mode == "cluster");
 
     let magnifying = $state({});
     setMagnifyingContext(magnifying);
@@ -35,11 +37,18 @@
             loading = false;
         });
     });
+
+    $effect(() => {
+        if (mode == "cluster") {
+            keep_clustering_tool = true;
+        }
+    });
 </script>
 
 {#if loading}
     <p>Loading...</p>
 {:else}
+    {#if keep_clustering_tool}
     <ClusteringTool index={index!} matches={matches!} visible={mode == "cluster"}>
         {#snippet extra_toolbar_items()}
         <div class="toolbar-item toolbar-btn">
@@ -47,6 +56,7 @@
         </div>
         {/snippet}
     </ClusteringTool>
+    {/if}
     {#if mode == "browse"}
         <SimBrowser index={index!} matches={matches!}>
             {#snippet extra_toolbar_items()}
