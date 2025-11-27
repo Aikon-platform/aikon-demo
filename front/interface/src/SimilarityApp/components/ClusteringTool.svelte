@@ -2,7 +2,12 @@
     import { untrack, type Snippet } from "svelte";
     import ClusterApp from "../../ClusterApp/components/ClusterApp.svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import { connectedComponents, convertToClusteringFile, graphFromSimilarityMatches, type TSimpleCluster } from "../clustering";
+    import {
+        connectedComponents,
+        convertToClusteringFile,
+        graphFromSimilarityMatches,
+        type TSimpleCluster,
+    } from "../clustering";
     import type { TSimilarityIndex, TSimilarityMatches } from "../types";
     import ClusterPreviewBlock from "./ClusterPreviewBlock.svelte";
 
@@ -15,71 +20,83 @@
     let { index, matches, visible, extra_toolbar_items }: Props = $props();
 
     let isFinal = $state(false);
-    let minThreshold = $derived(Math.min(...matches.map(match => Math.min(...match.matches.map(m => m.similarity)))));
-    let maxThreshold = $derived(Math.max(...matches.map(match => Math.max(...match.matches.map(m => m.similarity)))));
+    let minThreshold = $derived(
+        Math.min(...matches.map((match) => Math.min(...match.matches.map((m) => m.similarity))))
+    );
+    let maxThreshold = $derived(
+        Math.max(...matches.map((match) => Math.max(...match.matches.map((m) => m.similarity))))
+    );
     // svelte-ignore state_referenced_locally
-    let threshold = $state(minThreshold + 0.8*(maxThreshold-minThreshold));
+    let threshold = $state(minThreshold + 0.8 * (maxThreshold - minThreshold));
 
-    let graph = $derived(graphFromSimilarityMatches(index, matches));
-    let clusters:TSimpleCluster[] = $state([]);
+    let graph = graphFromSimilarityMatches(index, matches);
+    let clusters: TSimpleCluster[] = $state([]);
+    let clustering: number | null = $state(null);
 
     $effect(() => {
         const trigger = threshold;
         untrack(() => {
-            clusters = connectedComponents(graph, threshold, index.images.length);
+            if (clustering) clearTimeout(clustering);
+            clustering = setTimeout(() => {
+                connectedComponents(graph, threshold, index.images.length).then((res) => {
+                    clusters = res;
+                    clustering = null;
+                });
+            }, 300);
         });
     });
-        
 </script>
 
 {#if visible}
-<div class="toolbar">
-    <div class="toolbar-content">
-        {#if extra_toolbar_items}
-            {@render extra_toolbar_items()}
-        {/if}
-        {#if !isFinal}
-            <div class="toolbar-item">
-                <label class="label is-expanded" for="clustering-threshold">Clustering threshold: </label>
-                <div class="field">
-                    <div class="control">
-                        <input
-                            type="range"
-                            min={minThreshold}
-                            max={maxThreshold}
-                            step={0.001}
-                            bind:value={threshold}
-                        />
-                    </div>
-                    <div class="control">
-                        <input
-                            type="number"
-                            class="input"
-                            bind:value={threshold}
-                            id="clustering-threshold"
-                        />
+    <div class="toolbar">
+        <div class="toolbar-content">
+            {#if extra_toolbar_items}
+                {@render extra_toolbar_items()}
+            {/if}
+            {#if !isFinal}
+                <div class="toolbar-item">
+                    <label class="label is-expanded" for="clustering-threshold"
+                        >Clustering threshold:
+                    </label>
+                    <div class="field">
+                        <div class="control">
+                            <input
+                                type="range"
+                                min={minThreshold}
+                                max={maxThreshold}
+                                step={0.001}
+                                bind:value={threshold}
+                            />
+                        </div>
+                        <div class="control">
+                            <input
+                                type="number"
+                                class="input"
+                                bind:value={threshold}
+                                id="clustering-threshold"
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
-        {/if}
-        <div class="toolbar-item toolbar-btn">
-            {#if isFinal}
-                <IconBtn
-                    icon="mdi:autorenew"
-                    onclick={() => (isFinal = false)}
-                    label="Redo automatic clustering"
-                />
-            {:else}
-                <IconBtn
-                    class="is-link"
-                    icon="mdi:check-bold"
-                    onclick={() => (isFinal = true)}
-                    label="Apply clustering"
-                />
             {/if}
+            <div class="toolbar-item toolbar-btn">
+                {#if isFinal}
+                    <IconBtn
+                        icon="mdi:autorenew"
+                        onclick={() => (isFinal = false)}
+                        label="Redo automatic clustering"
+                    />
+                {:else}
+                    <IconBtn
+                        class="is-link"
+                        icon="mdi:check-bold"
+                        onclick={() => (isFinal = true)}
+                        label="Apply clustering"
+                    />
+                {/if}
+            </div>
         </div>
     </div>
-</div>
 {/if}
 <div class="cluster-viewer" class:viewer-table={!isFinal} class:hidden={!visible}>
     {#if isFinal}
@@ -88,9 +105,12 @@
             editable={true}
         />
     {:else}
+        {#if clustering}
+            <p>Clustering in progress...</p>
+        {/if}
         <div class={"cl-cluster-list cl-display-grid"}>
             {#each clusters as cluster (cluster.id)}
-                <ClusterPreviewBlock {cluster} index={index} />
+                <ClusterPreviewBlock {cluster} {index} />
             {/each}
             <div class="cl-cluster box cl-filler"></div>
             <div class="cl-cluster box cl-filler"></div>
