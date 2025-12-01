@@ -29,11 +29,11 @@ export interface TSimpleCluster {
  * @param graph_size The size of the graph (number of nodes)
  * @returns The connected components
  */
-export function connectedComponents(
+export async function connectedComponents(
     graph: TGraph,
     threshold: number,
     graph_size: number
-): TSimpleCluster[] {
+): Promise<TSimpleCluster[]> {
     const clusters = new Map<number, TRCluster>();
 
     for (const edge of graph.edges) {
