@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
     import ImageMagnifier, { setMagnifyingContext } from "../../shared/components/ImageMagnifier.svelte";
     import NameProvider, { setNameProvider } from "../../shared/naming.svelte";
@@ -9,8 +10,9 @@
     interface Props {
         source_index_url: string;
         query_result_url: string;
+        metadata_url?: string;
     }
-    let { source_index_url, query_result_url }: Props = $props();
+    let { source_index_url, query_result_url, metadata_url }: Props = $props();
 
     let source_index: TSimilarityIndex = $state({sources: [], images: [], transpositions: []});
     let query_index: TSimilarityIndex = $state({sources: [], images: [], transpositions: []});
@@ -23,7 +25,7 @@
     let name_provider = new NameProvider();
     setNameProvider(name_provider);
     
-    $effect(() => {
+    onMount(() => {
         Promise.all([
             fetch(source_index_url).then(response => response.json()),
             fetch(query_result_url).then(response => response.json())
@@ -34,6 +36,10 @@
             name_provider.fetchIIIFNames(source_index.sources);
             loading = false;
         });
+
+        if (metadata_url && metadata_url !== "" && metadata_url != "None") {
+            name_provider.fetchMetadataNames(metadata_url);
+        }
     });
 </script>
 

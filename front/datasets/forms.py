@@ -102,6 +102,14 @@ class AbstractDatasetForm(forms.ModelForm):
             attrs={"extra-class": "format-pdf format-field new-dataset-field"}
         ),
     )
+    metadata_file = ContentRestrictedFileField(
+        label="Metadata",
+        help_text="A .csv file containing metadata for the images (matching will be made based on folder/file prefix)",
+        accepted_types=["csv", "text/csv"],
+        required=False,
+        max_size=settings.MAX_UPLOAD_SIZE,
+        widget=forms.ClearableFileInput(),
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -122,3 +130,25 @@ class DatasetForm(AbstractDatasetForm):
     class Meta(AbstractDatasetForm.Meta):
         model = Dataset
         fields = AbstractDatasetForm.Meta.fields
+
+class DatasetAddMetadataForm(forms.ModelForm):
+    metadata_file = ContentRestrictedFileField(
+        label="Metadata",
+        help_text="A .csv file containing metadata for the images (matching will be made based on folder/file prefix)",
+        accepted_types=["csv", "text/csv"],
+        required=False,
+        max_size=settings.MAX_UPLOAD_SIZE,
+        widget=forms.ClearableFileInput(),
+    )
+    class Meta:
+        model = Dataset
+        fields = ["metadata_file"]
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if commit:
+            instance.save()
+
+        instance.clean_metadata()
+        return instance

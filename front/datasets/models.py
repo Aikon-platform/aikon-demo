@@ -1,9 +1,11 @@
+from logging import root
 import shutil
 import requests
 import uuid
 import json
 import traceback
 import os
+import csv
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -237,6 +239,8 @@ class Dataset(AbstractDataset):
     pdf_file = models.FileField(upload_to=path_datasets, max_length=500, null=True)
     img_files = models.FileField(upload_to=path_datasets, max_length=500, null=True)
 
+    metadata_file = models.FileField(upload_to=path_datasets, max_length=500, null=True)
+
     api_url = models.URLField(
         null=True,
         blank=True,
@@ -253,8 +257,7 @@ class Dataset(AbstractDataset):
     def get_absolute_url(self):
         # TODO change when detailed view for dataset is created
         key = self.pk
-        # return reverse(f"datasets:detail", kwargs={"pk": self.pk})
-        return reverse(f"datasets:list")
+        return reverse(f"datasets:view", kwargs={"pk": self.pk})
 
     @property
     def format(self):
@@ -383,6 +386,9 @@ class Dataset(AbstractDataset):
 
         if doc_to_extract:
             print(f"Could not extract {doc_to_extract.keys()}")
+
+        # process metadata
+        self.clean_metadata()
 
     def download_and_extract(self) -> None:
         """
@@ -661,6 +667,91 @@ class Dataset(AbstractDataset):
             info[prop_value].append(task)
         return info
 
+    ## Metadata
+    @property
+    def cleaned_metadata_path(self) -> Path:
+        if self.metadata_file:
+            return self.full_path / "metadata.json"
+        return None
+    
+    @property
+    def cleaned_metadata_url(self) -> str:
+        path = self.cleaned_metadata_path
+        if path:
+            return f"{settings.MEDIA_URL}{path.relative_to(Path(settings.MEDIA_ROOT))}"
+        return None
+
+    def clean_metadata(self):
+        """
+        Create a clean version of the metadata csv file, ready for display
+        """
+        if not self.metadata_file:
+            return
+        
+        with open(self.metadata_file.path, "r") as f:
+            reader = csv.reader(f)
+            rows = list(reader)
+
+        labels = rows[0]
+        normalized_labels = [label.lower().strip() for label in labels]
+
+        # Find title and description
+        col_title = 0
+        col_desc = 1
+        col_url = None
+        if "title" in normalized_labels:
+            col_title = normalized_labels.index("title")
+        elif "name" in normalized_labels:
+            col_title = normalized_labels.index("name")
+        if "description" in normalized_labels:
+            col_desc = normalized_labels.index("description")
+        elif "document" in normalized_labels:
+            col_desc = normalized_labels.index("document")
+        if "url" in normalized_labels:
+            col_url = normalized_labels.index("url")
+
+        def clean_source(row):
+            source = {
+                "name": row[col_title-1],
+                "description": row[col_desc-1],
+                "url": row[col_url-1] if col_url is not None else None,
+                "metadata": {
+                    k: v for i, (k, v) in enumerate(zip(labels[1:], row)) if normalized_labels[i] not in ["title", "description", "url"]
+                }
+            }
+            return source
+
+        sources = {
+            key: clean_source(row)
+            for key, *row in rows[1:]
+        }
+        max_keylen = max(len(key) for key in sources.keys())
+
+        images = [im for doc in self.documents for im in doc.images]
+        matched_sources = {key: False for key in sources.keys()}
+
+        def best_match(path):
+            # returns longest prefix in sources
+            for k in range(max_keylen, 0, -1):
+                if path[:k] in sources:
+                    matched_sources[path[:k]] = True
+                    return path[:k]
+            return None
+
+        image_matches = {
+            str(im.src): best_match(str(im.src)) for im in images
+        }
+
+        if not any(matched_sources.values()):
+            print("Some metadata keys were not matched:", [k for k, v in matched_sources.items() if not v])
+        
+        self.cleaned_metadata_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.cleaned_metadata_path, "w") as f:
+            json.dump(
+                {
+                    "sources": {k:v for k,v in sources.items() if matched_sources[k]}, 
+                    "mapping": image_matches
+                }, f)
 
 @receiver(pre_delete, sender=Dataset)
 def delete_dataset_files(sender, instance: Dataset, **kwargs):

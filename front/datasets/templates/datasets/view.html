@@ -36,8 +36,11 @@
                         <i class="iconify" data-icon="mdi:file-image"></i>
                     </span>
                 </span>
-                <a class="button is-light is-content is-large m-1" href="{% url 'datasets:delete' dataset.pk %}">
+                <a class="button is-light is-content is-large m-1" href="{% url 'datasets:delete' dataset.pk %}" title="Delete dataset">
                     <span class="iconify" data-icon="mdi:delete"></span>
+                </a>
+                <a class="button is-light is-content is-large m-1" href="{% url 'datasets:metadata' dataset.pk %}" title="Add metadata">
+                    <span class="iconify" data-icon="mdi:file-document-edit"></span>
                 </a>
             </div>
         </div>
@@ -114,7 +117,11 @@
               datasetFormat = "{{ dataset.format }}",
               htmlId = "document-image-browser";
 
-        DemoTools.initDatasetImageBrowser(document.getElementById(htmlId), docToImageArray, datasetFormat);
+        DemoTools.initDatasetImageBrowser(
+            document.getElementById(htmlId), 
+            docToImageArray, 
+            datasetFormat, 
+            "{{ dataset.cleaned_metadata_url|escapejs }}");
     });
 </script>
 

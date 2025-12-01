@@ -26,8 +26,11 @@
         <script type="text/javascript">
             document.addEventListener("DOMContentLoaded", () => {
                 DemoTools.initSimilarityApp(
-                    document.getElementById("matches"), "{{ object.index_url|escapejs }}",
-                    "{{ object.similarity_matrix_url|escapejs }}", "browse");
+                    document.getElementById("matches"), 
+                    "{{ object.index_url|escapejs }}",
+                    "{{ object.similarity_matrix_url|escapejs }}", 
+                    "browse", 
+                    "{{ object.dataset.cleaned_metadata_url|escapejs }}");
             });
         </script>
     </div>

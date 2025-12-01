@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
     import ImageMagnifier, { setMagnifyingContext } from "../../shared/components/ImageMagnifier.svelte";
     import NameProvider, { setNameProvider } from "../../shared/naming.svelte";
@@ -10,9 +11,10 @@
     interface Props {
         source_index_url: string;
         sim_matrix_url: string;
+        metadata_url?: string;
         mode?: "cluster" | "browse";
     }
-    let { source_index_url, sim_matrix_url, mode }: Props = $props();
+    let { source_index_url, sim_matrix_url, metadata_url, mode }: Props = $props();
 
     let index:TSimilarityIndex = $state.raw({sources: [], images: [], transpositions: []});
     let matches:TSimilarityMatches[] = $state.raw([]);
@@ -26,7 +28,7 @@
     let name_provider = new NameProvider();
     setNameProvider(name_provider);
     
-    $effect(() => {
+    onMount(() => {
         Promise.all([
             fetch(source_index_url).then(response => response.json()),
             fetch(sim_matrix_url).then(response => response.json())
@@ -36,6 +38,10 @@
             name_provider.fetchIIIFNames(index.sources);
             loading = false;
         });
+
+        if (metadata_url && metadata_url !== "" && metadata_url != "None") {
+            name_provider.fetchMetadataNames(metadata_url);
+        }
     });
 
     $effect(() => {
@@ -43,6 +49,8 @@
             keep_clustering_tool = true;
         }
     });
+
+    $inspect(name_provider.sources);
 </script>
 
 {#if loading}
