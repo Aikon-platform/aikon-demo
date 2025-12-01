@@ -9506,7 +9506,7 @@ function ImageInfos(e, n) {
 		reset(u);
 		var f = sibling(u, 2), p = (e) => {
 			var i = root_2$12(), a = sibling(first_child(i), 2), o = child(a, !0);
-			reset(a), template_effect((e) => set_text(o, e), [() => ellipsis(c.getImageTitle(n.image), 16)]), append(e, i);
+			reset(a), template_effect((e) => set_text(o, e), [() => ellipsis(c.getImageTitle(n.image), 32)]), append(e, i);
 		};
 		if_block(f, (e) => {
 			o() && e(p);
@@ -14473,7 +14473,7 @@ function DatasetComposeForm(e, n) {
 	function T(e) {
 		e.preventDefault(), e.stopPropagation(), set(S, !1);
 		let n = e.dataTransfer?.files;
-		n && (n[0].type.startsWith("image/") && C(Array.from(n).filter((e) => e.type.startsWith("image/"))), n[0].type.startsWith("application/zip") && (set(_, n[0].name, !0), set(x, "zip")), n[0].type.startsWith("application/pdf") && (set(v, n[0].name, !0), set(x, "pdf")));
+		n && (n[0].type.startsWith("image/") && C(Array.from(n).filter((e) => e.type.startsWith("image/"))), n[0].type.startsWith("application/zip") && (d.files = n, set(_, n[0].name, !0), set(x, "zip")), n[0].type.startsWith("application/pdf") && (f.files = n, set(v, n[0].name, !0), set(x, "pdf")));
 	}
 	function E(e) {
 		l.value = e == "images" ? "zip" : e;
