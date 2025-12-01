@@ -5,37 +5,65 @@ import type { TDocument, TImageInfo } from "./types";
  * This module defines a class that handles the mapping [imageId -> name]
  */
 
-interface SourceInfo {
-    name: string;
-    metadata: Record<string, string>;
-    images: Record<string, string>;
+
+/**
+ * Metadata for an image, or a source.
+ * Recursive interface to allow various document structures.
+ */
+interface TImageMetadata {
+    name?: string;
+    description?: string;
+    url?: string;
+    metadata?: Record<string, any>;
+    source?: TImageMetadata;
 }
 
 interface TNameProvider {
     sortImages: (images: TImageInfo[]) => TImageInfo[];
-    getImageName: (image: TImageInfo, ellipsis?: boolean) => string;
-    getSourceName: (source?: TDocument) => string;
+    getImageTitle: (image: TImageInfo, ellipsis?: boolean) => string;
+    getImageDescription: (image?: TImageInfo) => string;
     fetchIIIFNames: (documents: TDocument[]) => Promise<any>;
+    fetchMetadataNames: (metadata_url: string) => Promise<void>;
 }
 
 export default class NameProvider implements TNameProvider {
-    sources: Record<string, SourceInfo> = $state({});
+    mapping: Record<string, string> = $state.raw({});
+    sources: Record<string, TImageMetadata> = $state.raw({});
 
-    constructor(sources?: Record<string, SourceInfo>) {
+    constructor(sources?: Record<string, TImageMetadata>, mapping?: Record<string, string>) {
         this.sources = sources || {};
+        this.mapping = mapping || {};
     }
 
     /**
-     * Get the name of an image.
+     * Resolve the key for an image.
+     * @param image The image.
+     * @returns The key.
+     */
+    private resolveKey(image: TImageInfo): string {
+        return this.mapping[image.src || image.id] || this.mapping[image.id] || image.src || image.id;
+    }
+
+    /**
+     * Look for a field in the sources, including in recursive sources.
+     * @param key The key.
+     * @param field The field.
+     * @returns The value of the field.
+     */
+    private resolveField(key: string, field: "name" | "description" | "url"): string {
+        if (this.sources[key]?.[field]) return this.sources[key][field];
+        return "";
+    }
+
+    /**
+     * Get the title of an image, to be displayed.
      * @param image The image.
      * @param ellipsis Whether to truncate the name.
      * @returns The name of the image.
      */
-    getImageName(image: TImageInfo, ellipsis = false): string {
-        let name =
-            (image.document &&
-                this.sources[image.document.uid]?.images[image.src || image.id]) ||
-            image.id;
+    getImageTitle(image: TImageInfo, ellipsis = false): string {
+        const key = this.resolveKey(image);
+        let name: string = this.resolveField(key, "name") || key;
         if (ellipsis) {
             name = name.split(".").slice(0, -1).join(".");
             if (name.length >= 16) {
@@ -46,13 +74,16 @@ export default class NameProvider implements TNameProvider {
     }
 
     /**
-     * Get the name of a source.
+     * Get the description of an image (usually, name of source).
      * @param source The source.
      * @returns The name of the source.
      */
-    getSourceName(source?: TDocument): string {
-        if (source === undefined) return "";
-        return this.sources[source.uid]?.name || source.name || source.uid || "";
+    getImageDescription(image?: TImageInfo): string {
+        if (image === undefined) return "";
+        const description = this.resolveField(this.resolveKey(image), "description");
+        if (description) return description;
+        if (image.document) return this.resolveField(image.document.uid, "name") || "";
+        return "";
     }
 
     /**
@@ -91,7 +122,7 @@ export default class NameProvider implements TNameProvider {
                         // extract image names?
                         const canvases =
                             manifest.sequences && manifest.sequences[0]?.canvases;
-                        const image_labels =
+                        const image_labels: Record<string, string> =
                             canvases &&
                             Object.fromEntries(
                                 canvases.map((canvas: any) => {
@@ -111,14 +142,51 @@ export default class NameProvider implements TNameProvider {
                                 })
                             );
 
-                        this.sources[source.uid] = {
-                            name: metadata.title,
+                        const document_source = {
+                            description: metadata.title,
                             metadata,
                             images: image_labels,
                         };
+
+                        const image_sources = Object.fromEntries(
+                            Object.entries(image_labels).map(([id, label]) => [
+                                id,
+                                {
+                                    name: label,
+                                    metadata,
+                                    source: document_source,
+                                },
+                            ])
+                        );
+
+                        this.sources = {
+                            ...this.sources,
+                            ...image_sources,
+                        }
+
+                        // no need for mapping, image_sources is already referenced with image id
+
+                        this.sources[source.uid] = document_source;
                     });
                 // slow down the requests
                 await new Promise((resolve) => setTimeout(resolve, 300));
+            }
+        });
+    }
+
+    fetchMetadataNames(metadata_url: string): Promise<void> {
+        return fetch(metadata_url).then(response => response.json()).then(data => {
+            const sources: Record<string, { name: string; description: string, [key: string]: any }> = data["sources"];
+            const mapping: Record<string, string> = data["mapping"];
+
+            this.sources = {
+                ...this.sources,
+                ...sources,
+            }
+
+            this.mapping = {
+                ...this.mapping,
+                ...mapping,
             }
         });
     }
@@ -130,11 +198,11 @@ export default class NameProvider implements TNameProvider {
      */
     sortImages(images: TImageInfo[]) {
         const sortfn = (a: TImageInfo, b: TImageInfo) => {
-            const source_a = this.getSourceName(a.document);
-            const source_b = this.getSourceName(b.document);
+            const source_a = this.getImageDescription(a);
+            const source_b = this.getImageDescription(b);
             if (source_a === source_b) {
-                return this.getImageName(a).localeCompare(
-                    this.getImageName(b)
+                return this.getImageTitle(a).localeCompare(
+                    this.getImageTitle(b)
                 );
             }
             return (source_a || "").localeCompare(source_b || "");
@@ -145,9 +213,10 @@ export default class NameProvider implements TNameProvider {
 
 const no_name_provider: TNameProvider = {
     sortImages: (images: TImageInfo[]) => images,
-    getImageName: (image: TImageInfo) => image.name || image.id,
-    getSourceName: (source?: TDocument) => source?.name || source?.uid || "",
+    getImageTitle: (image: TImageInfo) => image.name || image.id,
+    getImageDescription: (image?: TImageInfo) => image?.document?.name || image?.document?.uid || "",
     fetchIIIFNames: async (documents: TDocument[]) => {},
+    fetchMetadataNames: async (metadata_url: string) => {},
 }
 
 export function getNameProvider(): TNameProvider {

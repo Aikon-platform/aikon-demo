@@ -20,9 +20,11 @@
     let scrollRef = $state<HTMLElement | null>(null);
 
     function scrollToHighlit() {
-        if (scrollRef) {
-            scrollRef.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
+        setTimeout(() => {
+            if (scrollRef) {
+                scrollRef.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }, 500);
     }
 
     $effect(() => {

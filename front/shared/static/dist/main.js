@@ -9190,22 +9190,35 @@ function IconBtn(e, n) {
 	append(e, i);
 }
 var NameProvider = class {
+	#mapping;
+	get mapping() {
+		return get$2(this.#mapping);
+	}
+	set mapping(e) {
+		set(this.#mapping, e);
+	}
 	#sources;
 	get sources() {
 		return get$2(this.#sources);
 	}
 	set sources(e) {
-		set(this.#sources, e, !0);
+		set(this.#sources, e);
 	}
-	constructor(e) {
-		this.#sources = /* @__PURE__ */ state(proxy({})), this.sources = e || {};
+	constructor(e, n) {
+		this.#mapping = /* @__PURE__ */ state({}), this.#sources = /* @__PURE__ */ state({}), this.sources = e || {}, this.mapping = n || {};
 	}
-	getImageName(e, n = !1) {
-		let i = e.document && this.sources[e.document.uid]?.images[e.src || e.id] || e.id;
-		return n && (i = i.split(".").slice(0, -1).join("."), i.length >= 16 && (i = i.slice(0, 5) + "..." + i.slice(-10))), i;
+	resolveKey(e) {
+		return this.mapping[e.src || e.id] || this.mapping[e.id] || e.src || e.id;
 	}
-	getSourceName(e) {
-		return e === void 0 ? "" : this.sources[e.uid]?.name || e.name || e.uid || "";
+	resolveField(e, n) {
+		return this.sources[e]?.[n] ? this.sources[e][n] : "";
+	}
+	getImageTitle(e, n = !1) {
+		let i = this.resolveKey(e), a = this.resolveField(i, "name") || i;
+		return n && (a = a.split(".").slice(0, -1).join("."), a.length >= 16 && (a = a.slice(0, 5) + "..." + a.slice(-10))), a;
+	}
+	getImageDescription(e) {
+		return e === void 0 ? "" : this.resolveField(this.resolveKey(e), "description") || e.document && this.resolveField(e.document.uid, "name") || "";
 	}
 	fetchIIIFNames(e) {
 		return new Promise(async (n, i) => {
@@ -9218,27 +9231,47 @@ var NameProvider = class {
 					let a = e.sequences && e.sequences[0]?.canvases, o = a && Object.fromEntries(a.map((e) => {
 						let n = e.label || e.title || e.images && e.images[0].label || e["@id"] || e.id;
 						return [e.images && e.images[0].resource && e.images[0].resource["@id"] || e["@id"] || e.id, n];
-					}));
-					this.sources[n.uid] = {
-						name: i.title,
+					})), s = {
+						description: i.title,
 						metadata: i,
 						images: o
-					};
+					}, c = Object.fromEntries(Object.entries(o).map(([e, n]) => [e, {
+						name: n,
+						metadata: i,
+						source: s
+					}]));
+					this.sources = {
+						...this.sources,
+						...c
+					}, this.sources[n.uid] = s;
 				}), await new Promise((e) => setTimeout(e, 300));
 			}
 		});
 	}
+	fetchMetadataNames(e) {
+		return fetch(e).then((e) => e.json()).then((e) => {
+			let n = e.sources, i = e.mapping;
+			this.sources = {
+				...this.sources,
+				...n
+			}, this.mapping = {
+				...this.mapping,
+				...i
+			};
+		});
+	}
 	sortImages(e) {
 		return e.sort((e, n) => {
-			let i = this.getSourceName(e.document), a = this.getSourceName(n.document);
-			return i === a ? this.getImageName(e).localeCompare(this.getImageName(n)) : (i || "").localeCompare(a || "");
+			let i = this.getImageDescription(e), a = this.getImageDescription(n);
+			return i === a ? this.getImageTitle(e).localeCompare(this.getImageTitle(n)) : (i || "").localeCompare(a || "");
 		});
 	}
 }, no_name_provider = {
 	sortImages: (e) => e,
-	getImageName: (e) => e.name || e.id,
-	getSourceName: (e) => e?.name || e?.uid || "",
-	fetchIIIFNames: async (e) => {}
+	getImageTitle: (e) => e.name || e.id,
+	getImageDescription: (e) => e?.document?.name || e?.document?.uid || "",
+	fetchIIIFNames: async (e) => {},
+	fetchMetadataNames: async (e) => {}
 };
 function getNameProvider() {
 	return getContext("name_provider") || no_name_provider;
@@ -9438,9 +9471,9 @@ function ClusterCSVExporter(e, n) {
 			yield [
 				a.id,
 				a.name,
-				i.getImageName(n),
+				i.getImageTitle(n),
 				n.src || n.id,
-				i.getSourceName(n.document),
+				i.getImageDescription(n.document),
 				n.document?.src || "",
 				...o
 			];
@@ -9468,12 +9501,12 @@ function ImageInfos(e, n) {
 			class: "title-identification",
 			title: e,
 			[CLASS]: n
-		}), [() => c.getImageName(n.image), () => ({ "mt-2": i() })]);
+		}), [() => c.getImageTitle(n.image), () => ({ "mt-2": i() })]);
 		var l = root_1$16(), u = first_child(l), d = child(u);
 		reset(u);
 		var f = sibling(u, 2), p = (e) => {
 			var i = root_2$12(), a = sibling(first_child(i), 2), o = child(a, !0);
-			reset(a), template_effect((e) => set_text(o, e), [() => ellipsis(c.getImageName(n.image), 16)]), append(e, i);
+			reset(a), template_effect((e) => set_text(o, e), [() => ellipsis(c.getImageTitle(n.image), 16)]), append(e, i);
 		};
 		if_block(f, (e) => {
 			o() && e(p);
@@ -9482,7 +9515,7 @@ function ImageInfos(e, n) {
 	});
 	var d = sibling(u, 2), f = (e) => {
 		var i = root_3$11(), a = child(i, !0);
-		reset(i), template_effect((e) => set_text(a, e), [() => c.getSourceName(n.image.document) || n.image.document?.name || n.image.subtitle || ""]), append(e, i);
+		reset(i), template_effect((e) => set_text(a, e), [() => c.getImageDescription(n.image) || n.image.document?.name || n.image.subtitle || ""]), append(e, i);
 	};
 	if_block(d, (e) => {
 		i() && e(f);
@@ -10731,10 +10764,10 @@ function MatchCSVExporter(e, n) {
 		for (let n of a) {
 			let a = Array.from(e).map((e) => (n.image.metadata || n.image.document?.metadata || {})[e] || "");
 			yield [
-				i.getImageName(n.image),
+				i.getImageTitle(n.image),
 				n.image.src || n.image.id,
 				n.similarity,
-				i.getSourceName(n.image.document),
+				i.getImageDescription(n.image.document),
 				n.image.document?.src || "",
 				...a
 			];
@@ -10809,10 +10842,12 @@ function MatchRow(e, n) {
 	push(n, !0);
 	let i = /* @__PURE__ */ user_derived(() => n.group_by_source ? n.matches.matches_by_document : n.matches.matches.map((e) => [e])), a = /* @__PURE__ */ state(!1), o = /* @__PURE__ */ state(null);
 	function s() {
-		get$2(o) && get$2(o).scrollIntoView({
-			behavior: "smooth",
-			block: "center"
-		});
+		setTimeout(() => {
+			get$2(o) && get$2(o).scrollIntoView({
+				behavior: "smooth",
+				block: "center"
+			});
+		}, 500);
 	}
 	user_effect(() => {
 		n.highlit && untrack(s);
@@ -10974,14 +11009,14 @@ function SimilarityApp(e, n) {
 	}), o = /* @__PURE__ */ state([]), s = /* @__PURE__ */ state(!0), c = /* @__PURE__ */ state(i() == "cluster"), l = proxy({});
 	setMagnifyingContext(l);
 	let u = new NameProvider();
-	setNameProvider(u), user_effect(() => {
+	setNameProvider(u), onMount(() => {
 		Promise.all([fetch(n.source_index_url).then((e) => e.json()), fetch(n.sim_matrix_url).then((e) => e.json())]).then(([e, n]) => {
 			let i = unserializeSimilarityMatrix(n, e);
 			((e) => {
 				var n = to_array(e, 2);
 				set(a, n[0]), set(o, n[1]);
 			})([i.index, i.matches]), u.fetchIIIFNames(get$2(a).sources), set(s, !1);
-		});
+		}), n.metadata_url && n.metadata_url !== "" && n.metadata_url != "None" && u.fetchMetadataNames(n.metadata_url);
 	}), user_effect(() => {
 		i() == "cluster" && set(c, !0);
 	});
@@ -11143,10 +11178,14 @@ function DatasetContentItem(e, n) {
 var root$5 = /* @__PURE__ */ from_html("<div></div> <!>", 1);
 function DatasetImageBrowser(e, n) {
 	push(n, !0);
-	let i = toDatasetImageBrowserInterface(n.dataset, n.datasetFormat), a = proxy({});
-	setMagnifyingContext(a);
-	var o = root$5(), s = first_child(o);
-	each(s, 21, () => i.datasetContents, index, (e, i, a) => {
+	let i = new NameProvider();
+	setNameProvider(i);
+	let a = toDatasetImageBrowserInterface(n.dataset, n.datasetFormat), o = proxy({});
+	setMagnifyingContext(o), onMount(() => {
+		n.metadataURL && n.metadataURL !== "" && n.metadataURL != "None" && i.fetchMetadataNames(n.metadataURL);
+	});
+	var s = root$5(), c = first_child(s);
+	each(c, 21, () => a.datasetContents, index, (e, i, a) => {
 		DatasetContentItem(e, {
 			get datasetContentsItem() {
 				return get$2(i);
@@ -11156,9 +11195,9 @@ function DatasetImageBrowser(e, n) {
 			},
 			itemIndex: a
 		});
-	}), reset(s);
-	var c = sibling(s, 2);
-	ImageMagnifier(c, {}), append(e, o), pop();
+	}), reset(c);
+	var l = sibling(c, 2);
+	ImageMagnifier(l, {}), append(e, s), pop();
 }
 var root_1$5 = /* @__PURE__ */ from_html("<p>Loading...</p>"), root$4 = /* @__PURE__ */ from_html("<!> <!>", 1);
 function SearchResults(e, n) {
@@ -11174,7 +11213,7 @@ function SearchResults(e, n) {
 	})), o = /* @__PURE__ */ state(proxy([])), s = /* @__PURE__ */ state(!0), c = proxy({});
 	setMagnifyingContext(c);
 	let l = new NameProvider();
-	setNameProvider(l), user_effect(() => {
+	setNameProvider(l), onMount(() => {
 		Promise.all([fetch(n.source_index_url).then((e) => e.json()), fetch(n.query_result_url).then((e) => e.json())]).then(([e, n]) => {
 			console.log(e, n);
 			let c = unserializeSearchResults(e, n);
@@ -11186,7 +11225,7 @@ function SearchResults(e, n) {
 				c.query_index,
 				c.matches
 			]), l.fetchIIIFNames(get$2(i).sources), set(s, !1);
-		});
+		}), n.metadata_url && n.metadata_url !== "" && n.metadata_url != "None" && l.fetchMetadataNames(n.metadata_url);
 	});
 	var u = root$4(), d = first_child(u), f = (e) => {
 		var n = root_1$5();
@@ -14950,22 +14989,24 @@ function initProgressTracker(e, n) {
 		props: { tracking_url: n }
 	});
 }
-function initSimilarityApp(e, n, i, a) {
+function initSimilarityApp(e, n, i, a, o) {
 	mount(SimilarityApp, {
 		target: e,
 		props: {
 			source_index_url: n,
 			sim_matrix_url: i,
-			mode: a
+			mode: a,
+			metadata_url: o
 		}
 	});
 }
-function initSearchResults(e, n, i) {
+function initSearchResults(e, n, i, a) {
 	mount(SearchResults, {
 		target: e,
 		props: {
 			source_index_url: n,
-			query_result_url: i
+			query_result_url: i,
+			metadata_url: a
 		}
 	});
 }
@@ -14975,12 +15016,13 @@ function initImageGenericList(e, n) {
 		props: { image_array: n }
 	});
 }
-function initDatasetImageBrowser(e, n, i) {
+function initDatasetImageBrowser(e, n, i, a) {
 	mount(DatasetImageBrowser, {
 		target: e,
 		props: {
 			dataset: n,
-			datasetFormat: i
+			datasetFormat: i,
+			metadataURL: a
 		}
 	});
 }
