@@ -34,9 +34,9 @@
                 yield [
                     cluster.id,
                     cluster.name,
-                    name_provider.getImageName(image),
+                    name_provider.getImageTitle(image),
                     image.src || image.id,
-                    name_provider.getSourceName(image.document),
+                    name_provider.getImageDescription(image.document),
                     image.document?.src || "",
                     ...metadata,
                 ];

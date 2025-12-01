@@ -2,12 +2,12 @@ from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
-from django.views.generic import ListView, DetailView, DetailView
+from django.views.generic import ListView, DetailView, UpdateView
 from django.shortcuts import redirect
 from django.urls import reverse
 
 from tasking.views import LoginRequiredIfConfProtectedMixin, TaskMixin
-from .forms import DatasetForm
+from .forms import DatasetForm, DatasetAddMetadataForm
 from .models import Dataset
 
 User = get_user_model()
@@ -95,3 +95,11 @@ class DatasetMainView(DatasetMixin, DetailView):
     """
 
     template_name = "datasets/view.html"
+
+class DatasetAddMetadataView(DatasetMixin, LoginRequiredIfConfProtectedMixin, UpdateView):
+    """
+    Add metadata to a dataset
+    """
+
+    template_name = "datasets/metadata_form.html"
+    form_class = DatasetAddMetadataForm

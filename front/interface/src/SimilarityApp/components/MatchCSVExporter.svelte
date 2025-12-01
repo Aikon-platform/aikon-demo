@@ -39,10 +39,10 @@
                 (key) => (match.image.metadata || match.image.document?.metadata || {})[key] || ""
             );
             yield [
-                name_provider.getImageName(match.image),
+                name_provider.getImageTitle(match.image),
                 match.image.src || match.image.id,
                 match.similarity,
-                name_provider.getSourceName(match.image.document),
+                name_provider.getImageDescription(match.image.document),
                 match.image.document?.src || "",
                 ...metadata,
             ];
