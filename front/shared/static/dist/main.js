@@ -9211,7 +9211,7 @@ var NameProvider = class {
 		return this.mapping[e.src || e.id] || this.mapping[e.id] || e.src || e.id;
 	}
 	resolveField(e, n) {
-		return this.sources[e]?.[n] ? this.sources[e][n] : "";
+		if (this.sources[e]?.[n]) return this.sources[e][n];
 	}
 	getImageTitle(e, n = !1) {
 		let i = this.resolveKey(e), a = this.resolveField(i, "name") || i;
@@ -9219,6 +9219,18 @@ var NameProvider = class {
 	}
 	getImageDescription(e) {
 		return e === void 0 ? "" : this.resolveField(this.resolveKey(e), "description") || e.document && this.resolveField(e.document.uid, "name") || "";
+	}
+	getImageMetadata(e) {
+		if (e === void 0) return {};
+		let n = {
+			...e.metadata,
+			...this.resolveField(this.resolveKey(e), "metadata")
+		};
+		return e.document && (n = {
+			...n,
+			...e.document.metadata,
+			...this.resolveField(e.document.uid, "metadata") || {}
+		}), n;
 	}
 	fetchIIIFNames(e) {
 		return new Promise(async (n, i) => {
@@ -9270,6 +9282,7 @@ var NameProvider = class {
 	sortImages: (e) => e,
 	getImageTitle: (e) => e.name || e.id,
 	getImageDescription: (e) => e?.document?.name || e?.document?.uid || "",
+	getImageMetadata: (e) => ({}),
 	fetchIIIFNames: async (e) => {},
 	fetchMetadataNames: async (e) => {}
 };
@@ -10751,8 +10764,10 @@ function MatchCSVExporter(e, n) {
 			similarity: 1,
 			q_transposition: "none",
 			m_transposition: "none"
-		}), a.forEach((n) => {
-			Object.keys(n.image.document?.metadata || {}).forEach((n) => e.add(n)), Object.keys(n.image.metadata || {}).forEach((n) => e.add(n));
+		});
+		let o = a.map((e) => i.getImageMetadata(e.image));
+		o.forEach((n) => {
+			Object.keys(n).forEach((n) => e.add(n));
 		}), yield [
 			"Image",
 			"Source",
@@ -10761,15 +10776,15 @@ function MatchCSVExporter(e, n) {
 			"Document URL",
 			...Array.from(e).map((e) => (e.charAt(0).toUpperCase() + e.slice(1)).replace(/[^\w\s]/g, " "))
 		];
-		for (let n of a) {
-			let a = Array.from(e).map((e) => (n.image.metadata || n.image.document?.metadata || {})[e] || "");
+		for (let n of o.keys()) {
+			let s = a[n], c = Array.from(e).map((e) => o[n][e] || "");
 			yield [
-				i.getImageTitle(n.image),
-				n.image.src || n.image.id,
-				n.similarity,
-				i.getImageDescription(n.image.document),
-				n.image.document?.src || "",
-				...a
+				i.getImageTitle(s.image),
+				s.image.src || s.image.id,
+				s.similarity,
+				i.getImageDescription(s.image),
+				s.image.document?.src || "",
+				...c
 			];
 		}
 	}
