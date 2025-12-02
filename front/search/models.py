@@ -159,7 +159,7 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
 
             try:
                 # Prepare dataset and crop images
-                if not self.prepare_dataset_from_api(result_json):
+                if not self.prepare_dataset_from_api(output):
                     return
 
                 # Prepare index data for browser
