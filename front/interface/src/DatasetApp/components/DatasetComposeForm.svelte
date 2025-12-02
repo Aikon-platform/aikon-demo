@@ -106,10 +106,12 @@
                 addImages(Array.from(files).filter((file) => file.type.startsWith("image/")));
             }
             if (files[0].type.startsWith("application/zip")) {
+                zip_field.files = files;
                 zip_file_name = files[0].name;
                 tab = "zip";
             }
             if (files[0].type.startsWith("application/pdf")) {
+                pdf_field.files = files;
                 pdf_file_name = files[0].name;
                 tab = "pdf";
             }

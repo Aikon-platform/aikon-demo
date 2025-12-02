@@ -22,7 +22,7 @@
     </span>
     {#if filenameDisplay}
         <br/>
-        <span>{ellipsis(name_provider.getImageTitle(image), 16)}</span>
+        <span>{ellipsis(name_provider.getImageTitle(image), 32)}</span>
     {/if}
 </svelte:element>
 {#if isTitle}
