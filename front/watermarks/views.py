@@ -28,7 +28,7 @@ class WatermarksList(WatermarksMixin.List):
 class WatermarksStatusView(WatermarksMixin.Status):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.object.analysis_type == "indexing" and self.object.indexing_task and self.object.indexing_task.index:
+        if self.object.analysis_type == "indexing" and self.object.indexing_task and hasattr(self.object.indexing_task, "index"):
             context["editable"] = (self.object.indexing_task.index.owner == self.request.user) or self.request.user.is_superuser
         return context
 

@@ -15,11 +15,10 @@
         const ematches = matches.matches.filter(m => !threshold || m.similarity >= threshold);
         ematches.unshift({image: matches.query, similarity: 1, q_transposition: "none", m_transposition: "none"});
 
-        ematches.forEach((match) => {
-            Object.keys(match.image.document?.metadata || {}).forEach((key) =>
-                metadata_fields.add(key)
-            );
-            Object.keys(match.image.metadata || {}).forEach((key) => metadata_fields.add(key));
+        const all_metadata = ematches.map(match => name_provider.getImageMetadata(match.image));
+
+        all_metadata.forEach((meta) => {
+            Object.keys(meta).forEach((key) => metadata_fields.add(key));
         });
 
         const linted_metadata = Array.from(metadata_fields).map((s) =>
@@ -34,15 +33,16 @@
             "Document URL",
             ...linted_metadata,
         ];
-        for (const match of ematches) {
+        for (const k of all_metadata.keys()) {
+            const match = ematches[k];
             const metadata = Array.from(metadata_fields).map(
-                (key) => (match.image.metadata || match.image.document?.metadata || {})[key] || ""
+                (key) => all_metadata[k][key] || ""
             );
             yield [
                 name_provider.getImageTitle(match.image),
                 match.image.src || match.image.id,
                 match.similarity,
-                name_provider.getImageDescription(match.image.document),
+                name_provider.getImageDescription(match.image),
                 match.image.document?.src || "",
                 ...metadata,
             ];

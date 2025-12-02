@@ -719,7 +719,7 @@ class Dataset(AbstractDataset):
                 "description": row[col_desc-1],
                 "url": row[col_url-1] if col_url is not None else None,
                 "metadata": {
-                    k: v for i, (k, v) in enumerate(zip(labels[1:], row)) if normalized_labels[i] not in ["title", "description", "url"]
+                    k: v for i, (k, v) in enumerate(zip(labels[1:], row)) if normalized_labels[i+1] not in ["title", "description", "url"]
                 }
             }
             return source

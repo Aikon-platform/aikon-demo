@@ -22,6 +22,7 @@ interface TNameProvider {
     sortImages: (images: TImageInfo[]) => TImageInfo[];
     getImageTitle: (image: TImageInfo, ellipsis?: boolean) => string;
     getImageDescription: (image?: TImageInfo) => string;
+    getImageMetadata: (image?: TImageInfo) => Record<string, any>;
     fetchIIIFNames: (documents: TDocument[]) => Promise<any>;
     fetchMetadataNames: (metadata_url: string) => Promise<void>;
 }
@@ -50,9 +51,9 @@ export default class NameProvider implements TNameProvider {
      * @param field The field.
      * @returns The value of the field.
      */
-    private resolveField(key: string, field: "name" | "description" | "url"): string {
+    private resolveField<K extends keyof TImageMetadata>(key: string, field: K): TImageMetadata[K] {
         if (this.sources[key]?.[field]) return this.sources[key][field];
-        return "";
+        return undefined;
     }
 
     /**
@@ -84,6 +85,25 @@ export default class NameProvider implements TNameProvider {
         if (description) return description;
         if (image.document) return this.resolveField(image.document.uid, "name") || "";
         return "";
+    }
+
+    /**
+     * Get the metadata of an image.
+     * @param image The image.
+     * @returns The metadata of the image.
+     */
+    getImageMetadata(image?: TImageInfo): Record<string, any> {
+        if (image === undefined) return {};
+        let metadata = {
+            ...image.metadata,
+            ...this.resolveField(this.resolveKey(image), "metadata")
+        };
+        if (image.document) metadata = {
+            ...metadata,
+            ...image.document.metadata,
+            ...this.resolveField(image.document.uid, "metadata") || {}
+        };
+        return metadata;
     }
 
     /**
@@ -215,6 +235,7 @@ const no_name_provider: TNameProvider = {
     sortImages: (images: TImageInfo[]) => images,
     getImageTitle: (image: TImageInfo) => image.name || image.id,
     getImageDescription: (image?: TImageInfo) => image?.document?.name || image?.document?.uid || "",
+    getImageMetadata: (image?: TImageInfo) => {return {}},
     fetchIIIFNames: async (documents: TDocument[]) => {},
     fetchMetadataNames: async (metadata_url: string) => {},
 }
