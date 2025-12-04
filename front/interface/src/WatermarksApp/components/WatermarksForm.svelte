@@ -21,7 +21,8 @@
     let dataset_form = originalForm.querySelector(".dataset-form") as HTMLFormElement;
 
     let need_regions_field = originalForm.querySelector("#id_need_regions") as HTMLInputElement;
-    let need_regions_value = $state(need_regions_field.checked);
+
+    let are_sketches_field = originalForm.querySelector("#id_are_sketches") as HTMLInputElement;
 
     let errors = originalForm.querySelectorAll(".errorlist");
     let submit_button = analysis_type_field.form!.querySelector("input[type=submit]") as HTMLButtonElement;
@@ -69,7 +70,7 @@
     <DatasetComposeForm form={dataset_form} bind:ready={dataset_ready} />
 </div>
 
-<h4 class="mt-6 mb-5">Are those image cropped and centered?</h4>
-<NeedRegionsToggle bind:value={need_regions_value} field={need_regions_field} />
-<div class="mb-4"></div>
+<h4 class="mt-6 mb-5">What kind of images is it?</h4>
+<NeedRegionsToggle field={need_regions_field} are_sketches_field={analysis_type_value === "indexing" ? are_sketches_field : undefined} />
 {/if}
+<div class="mb-4"></div>
