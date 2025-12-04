@@ -66,7 +66,8 @@ function initSimilarityApp(
     target_root: HTMLElement,
     source_index_url: string,
     sim_matrix_url: string,
-    mode?: "cluster" | "browse"
+    mode?: "cluster" | "browse",
+    metadata_url?: string,
 ) {
     mount(SimilarityApp, {
         target: target_root,
@@ -74,6 +75,7 @@ function initSimilarityApp(
             source_index_url,
             sim_matrix_url,
             mode,
+            metadata_url,
         },
     });
 }
@@ -87,13 +89,15 @@ function initSimilarityApp(
 function initSearchResults(
     target_root: HTMLElement,
     source_index_url: string,
-    query_result_url: string
+    query_result_url: string,
+    metadata_url?: string,
 ) {
     mount(SearchResults, {
         target: target_root,
         props: {
             source_index_url,
             query_result_url,
+            metadata_url,
         },
     });
 }
@@ -121,13 +125,15 @@ function initImageGenericList(target_root: HTMLElement, image_array: TImageInfo[
 function initDatasetImageBrowser(
     target_root: HTMLElement,
     dataset: TDjangoDatasetInterface,
-    datasetFormat: TDatasetFormatType
+    datasetFormat: TDatasetFormatType,
+    metadataURL: string
 ) {
     mount(DatasetImageBrowser, {
         target: target_root,
         props: {
             dataset,
             datasetFormat,
+            metadataURL,
         },
     });
 }

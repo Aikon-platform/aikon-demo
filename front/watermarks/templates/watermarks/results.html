@@ -67,7 +67,8 @@
                     DemoTools.initSearchResults(
                         document.getElementById("matches"),
                         "{{ object.query_task.target_index.index_url|escapejs }}",
-                        "{{ object.query_task.result_url|escapejs }}"
+                        "{{ object.query_task.result_url|escapejs }}",
+                        "{{ object.query_task.target_index.dataset.cleaned_metadata_url|escapejs }}"
                     );
                 });
             </script>

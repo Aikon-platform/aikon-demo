@@ -33,7 +33,6 @@ def AbstractPipelineOnDataset(prefix):
         # alias
         @property
         def tasks(self):
-            print(self, self.get_task_names, self.get_task_names())
             return self.get_task_names()
 
         # Generic pipeline methods
