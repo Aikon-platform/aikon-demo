@@ -9540,7 +9540,7 @@ function getMagnifyingContext() {
 function setMagnifyingContext(e) {
 	setContext("magnify", e);
 }
-var on_click$6 = (e) => e.stopPropagation(), root_6$4 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_5$5 = /* @__PURE__ */ from_html("<div class=\"magnifying-item\"><div class=\"display-image\"><img class=\"display-img\"/></div> <div class=\"magnifying-info\"><!> <!></div></div>"), on_click_1$2 = (e) => e.stopPropagation(), root_7$6 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_4$8 = /* @__PURE__ */ from_html("<div class=\"magnifying-content\"><!>  <div class=\"magnifying-item\"><div class=\"display-image\"><img/></div> <div class=\"magnifying-info\"><!> <p class=\"actions my-2\"><!> <!> <!></p> <!></div></div></div>"), root_3$10 = /* @__PURE__ */ from_html("<div><!> <!> <!></div>");
+var on_click$6 = (e) => e.stopPropagation(), root_6$4 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_5$6 = /* @__PURE__ */ from_html("<div class=\"magnifying-item\"><div class=\"display-image\"><img class=\"display-img\"/></div> <div class=\"magnifying-info\"><!> <!></div></div>"), on_click_1$2 = (e) => e.stopPropagation(), root_7$6 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_4$8 = /* @__PURE__ */ from_html("<div class=\"magnifying-content\"><!>  <div class=\"magnifying-item\"><div class=\"display-image\"><img/></div> <div class=\"magnifying-info\"><!> <p class=\"actions my-2\"><!> <!> <!></p> <!></div></div></div>"), root_3$10 = /* @__PURE__ */ from_html("<div><!> <!> <!></div>");
 function ImageMagnifier(e, n) {
 	push(n, !0);
 	let i = /* @__PURE__ */ user_derived(getMagnifyingContext), a = /* @__PURE__ */ user_derived(() => get$2(i).image), o = /* @__PURE__ */ user_derived(() => get$2(i).comparison), s = /* @__PURE__ */ user_derived(() => get$2(i).transpositions), c = /* @__PURE__ */ user_derived(() => get$2(s) || []), l = /* @__PURE__ */ user_derived(() => get$2(a) && guessImageLink(get$2(a))), u = /* @__PURE__ */ user_derived(() => get$2(o) && guessImageLink(get$2(o)));
@@ -9590,7 +9590,7 @@ function ImageMagnifier(e, n) {
 										class: "magnifier modal-content",
 										children: (e, n) => {
 											var i = root_4$8(), s = child(i), d = (e) => {
-												var n = root_5$5();
+												var n = root_5$6();
 												n.__click = [on_click$6];
 												var i = child(n), a = child(i);
 												reset(i);
@@ -9668,7 +9668,7 @@ function ImageMagnifier(e, n) {
 	}), append(e, m), pop();
 }
 delegate(["click"]);
-var on_click$5 = (e) => e.stopPropagation(), root_5$4 = /* @__PURE__ */ from_html("<a class=\"image-source\" target=\"_blank\" title=\"See in context\"><!></a>"), root_7$5 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-pin\" title=\"Pin as comparison\"><!></a>"), root_8$4 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-pin always-visible\" title=\"Pin as comparison\"><!></a>"), root_9 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-magnify\" title=\"Magnify\"><!></a>"), root_10$1 = /* @__PURE__ */ from_html("<a class=\"image-focus\" title=\"Show detail\"><!></a>"), root_4$7 = /* @__PURE__ */ from_html("<div class=\"display-tools\"><!> <!> <!> <!></div>"), root_11$1 = /* @__PURE__ */ from_html("<span class=\"similarity\"> </span>"), root_3$9 = /* @__PURE__ */ from_html("<div class=\"display-image\"><img/></div> <!> <!>", 1), root_12 = /* @__PURE__ */ from_html("<div class=\"display-image\"><img/></div> <!>", 1), root_2$11 = /* @__PURE__ */ from_html("<!> <!>", 1);
+var on_click$5 = (e) => e.stopPropagation(), root_5$5 = /* @__PURE__ */ from_html("<a class=\"image-source\" target=\"_blank\" title=\"See in context\"><!></a>"), root_7$5 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-pin\" title=\"Pin as comparison\"><!></a>"), root_8$4 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-pin always-visible\" title=\"Pin as comparison\"><!></a>"), root_9 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-magnify\" title=\"Magnify\"><!></a>"), root_10$1 = /* @__PURE__ */ from_html("<a class=\"image-focus\" title=\"Show detail\"><!></a>"), root_4$7 = /* @__PURE__ */ from_html("<div class=\"display-tools\"><!> <!> <!> <!></div>"), root_11$1 = /* @__PURE__ */ from_html("<span class=\"similarity\"> </span>"), root_3$9 = /* @__PURE__ */ from_html("<div class=\"display-image\"><img/></div> <!> <!>", 1), root_12 = /* @__PURE__ */ from_html("<div class=\"display-image\"><img/></div> <!>", 1), root_2$11 = /* @__PURE__ */ from_html("<!> <!>", 1);
 function ImageFileDisplay(e, n) {
 	push(n, !0);
 	let i = getMagnifyingContext(), a = /* @__PURE__ */ user_derived(() => i.comparison?.id === n.image.id);
@@ -9700,7 +9700,7 @@ function ImageFileDisplay(e, n) {
 											var c = root_4$7();
 											c.__click = [on_click$5];
 											var l = child(c), u = (e) => {
-												var i = root_5$4(), a = child(i);
+												var i = root_5$5(), a = child(i);
 												Icon(a, { icon: "mdi:book-open-blank-variant" }), reset(i), template_effect(() => set_attribute(i, "href", n.image.link)), append(e, i);
 											};
 											if_block(l, (e) => {
@@ -9856,7 +9856,7 @@ function ImageList(e, n) {
 delegate(["click"]);
 var root_1$14 = /* @__PURE__ */ from_html("<h3> </h3> <p><!></p>", 1), root_4$5 = /* @__PURE__ */ from_html("<form><input type=\"text\"/> <a href=\"javascript:void(0)\" class=\"btn\"><!></a></form>"), on_click$3 = (e, n) => {
 	set(n, !0);
-}, root_6$3 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"btn is-edit\" title=\"Rename\"><!></a>"), root_5$3 = /* @__PURE__ */ from_html("<span> </span> <!>", 1), root_8$3 = /* @__PURE__ */ from_html("<!> <!>", 1), root_7$4 = /* @__PURE__ */ from_html("<p><!></p>"), root_10 = /* @__PURE__ */ from_html("<p><!></p>"), root_3$7 = /* @__PURE__ */ from_html("<div class=\"cl-propinfo\"><div class=\"cl-cluster-title\"><!></div> <p> </p> <!></div>"), root_11 = /* @__PURE__ */ from_html("<div class=\"cl-protoinfo\"><p><!></p> <div class=\"cl-proto\"><img alt=\"cl-proto\" class=\"prototype\"/></div></div>"), on_click_1 = (e, n) => n(!0), root_14$1 = /* @__PURE__ */ from_html("<a class=\"cl-overlay cl-hoveroptions\" href=\"javascript:void(0)\"><!> <!></a>"), root$16 = /* @__PURE__ */ from_html("<div><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><!> <!></div> <!></div> <div class=\"cl-samples\"><!></div></div>");
+}, root_6$3 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"btn is-edit\" title=\"Rename\"><!></a>"), root_5$4 = /* @__PURE__ */ from_html("<span> </span> <!>", 1), root_8$3 = /* @__PURE__ */ from_html("<!> <!>", 1), root_7$4 = /* @__PURE__ */ from_html("<p><!></p>"), root_10 = /* @__PURE__ */ from_html("<p><!></p>"), root_3$7 = /* @__PURE__ */ from_html("<div class=\"cl-propinfo\"><div class=\"cl-cluster-title\"><!></div> <p> </p> <!></div>"), root_11 = /* @__PURE__ */ from_html("<div class=\"cl-protoinfo\"><p><!></p> <div class=\"cl-proto\"><img alt=\"cl-proto\" class=\"prototype\"/></div></div>"), on_click_1 = (e, n) => n(!0), root_14$1 = /* @__PURE__ */ from_html("<a class=\"cl-overlay cl-hoveroptions\" href=\"javascript:void(0)\"><!> <!></a>"), root$16 = /* @__PURE__ */ from_html("<div><div class=\"cl-anchor\"></div> <div class=\"cl-props\"><div class=\"cl-propcontent\"><!> <!></div> <!></div> <div class=\"cl-samples\"><!></div></div>");
 function ClusterElement(e, n) {
 	push(n, !0);
 	let i = prop(n, "cluster", 7), a = prop(n, "expanded", 7, !1), o = prop(n, "editing", 15, !1), s = prop(n, "editable", 3, !1), c = prop(n, "dti_transformed", 15, !1), l = prop(n, "thumbnail", 3, !1), u = prop(n, "selected", 3, !1), d = /* @__PURE__ */ state(!1), f = /* @__PURE__ */ state(void 0), p = /* @__PURE__ */ state(void 0), m = getEditorState(), h = getNameProvider(), g = {
@@ -9905,7 +9905,7 @@ function ClusterElement(e, n) {
 			var s = child(o);
 			Icon(s, { icon: "mdi:check-bold" }), reset(o), reset(n), template_effect(() => a.defaultValue = i().name), event("submit", n, y), append(e, n);
 		}, u = (e) => {
-			var n = root_5$3(), a = first_child(n), s = child(a, !0);
+			var n = root_5$4(), a = first_child(n), s = child(a, !0);
 			reset(a);
 			var c = sibling(a, 2), l = (e) => {
 				var n = root_6$3();
@@ -10205,7 +10205,7 @@ function ClusterAskModale(e, n) {
 	}), append(e, _), pop();
 }
 delegate(["click"]);
-var root_4$4 = /* @__PURE__ */ from_html("<!> <!>", 1), root_5$2 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><label class=\"label\">Actions on selection:</label> <!></div>"), root_2$8 = /* @__PURE__ */ from_html("<div class=\"toolbar-item cl-select-tools\"><label class=\"label\"> </label> <div class=\"field\"><!></div></div> <!>", 1), root_1$13 = /* @__PURE__ */ from_html("<div class=\"toolbar-content cl-editor-tools\"><!> <div class=\"toolbar-item toolbar-btn\"><!></div> <div class=\"toolbar-item toolbar-btn\"><!></div></div>"), root$15 = /* @__PURE__ */ from_html("<div><div class=\"toolbar cl-editor-toolbar\"><div class=\"toolbar-content\"><h2> </h2> <div class=\"toolbar-item\"><label class=\"label\">Sort by:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Size</option><option>ID</option><option>Name</option></select></div></div></div> <div class=\"toolbar-item\"><label class=\"label\">Display:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Grid</option><option>Rows</option></select></div></div></div> <!></div></div> <div><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div> <!></div> <!>", 1);
+var root_4$4 = /* @__PURE__ */ from_html("<!> <!>", 1), root_5$3 = /* @__PURE__ */ from_html("<div class=\"toolbar-item toolbar-btn\"><label class=\"label\">Actions on selection:</label> <!></div>"), root_2$8 = /* @__PURE__ */ from_html("<div class=\"toolbar-item cl-select-tools\"><label class=\"label\"> </label> <div class=\"field\"><!></div></div> <!>", 1), root_1$13 = /* @__PURE__ */ from_html("<div class=\"toolbar-content cl-editor-tools\"><!> <div class=\"toolbar-item toolbar-btn\"><!></div> <div class=\"toolbar-item toolbar-btn\"><!></div></div>"), root$15 = /* @__PURE__ */ from_html("<div><div class=\"toolbar cl-editor-toolbar\"><div class=\"toolbar-content\"><h2> </h2> <div class=\"toolbar-item\"><label class=\"label\">Sort by:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Size</option><option>ID</option><option>Name</option></select></div></div></div> <div class=\"toolbar-item\"><label class=\"label\">Display:</label> <div class=\"field is-narrow\"><div class=\"select\"><select><option>Grid</option><option>Rows</option></select></div></div></div> <!></div></div> <div><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div> <!></div> <!>", 1);
 function ClusterApp(e, n) {
 	push(n, !0);
 	let i = prop(n, "formfield", 7), a = proxy(new ClusterEditorState(n.clustering_data, n.base_url));
@@ -10268,7 +10268,7 @@ function ClusterApp(e, n) {
 				a.image_selection.size == 0 ? e(u) : e(d, !1);
 			}), reset(c), reset(i);
 			var f = sibling(i, 2), p = (e) => {
-				var n = root_5$2(), i = sibling(child(n), 2);
+				var n = root_5$3(), i = sibling(child(n), 2);
 				IconBtn(i, {
 					onclick: () => {
 						a.ask_cluster("selection_move", a.editingCluster);
@@ -10682,7 +10682,7 @@ function ClusteringTool(e, n) {
 		hidden: !n.visible
 	})]), append(e, d), pop();
 }
-var root_5$1 = /* @__PURE__ */ from_html("<div>...</div>"), root_3$4 = /* @__PURE__ */ from_html("<!> <!>", 1), root_1$10 = /* @__PURE__ */ from_html("<!> <!> <!>", 1);
+var root_5$2 = /* @__PURE__ */ from_html("<div>...</div>"), root_3$4 = /* @__PURE__ */ from_html("<!> <!>", 1), root_1$10 = /* @__PURE__ */ from_html("<!> <!> <!>", 1);
 function Pagination_1(e, n) {
 	push(n, !0);
 	let i = prop(n, "page", 15);
@@ -10717,7 +10717,7 @@ function Pagination_1(e, n) {
 					get$2(n).type === "page" && e(c);
 				});
 				var l = sibling(s, 2), u = (e) => {
-					var n = root_5$1();
+					var n = root_5$2();
 					append(e, n);
 				};
 				if_block(l, (e) => {
@@ -14452,7 +14452,7 @@ function resizeImage(e, n = 2048, i) {
 	} else a.width = s, a.height = c, o.drawImage(e, 0, 0, a.width, a.height);
 	return a.toBlob(i, "image/jpeg", .85);
 }
-var root_1$3 = /* @__PURE__ */ from_html("<span class=\"mr-2\">Reuse existing dataset</span> <!>", 1), root_4$2 = /* @__PURE__ */ from_html("<option> </option>"), root_2$2 = /* @__PURE__ */ from_html("<div class=\"select\"><select><option>Use dataset from</option><!></select></div>"), root_6 = /* @__PURE__ */ from_html("<div class=\"notification dropper is-info is-overlay\">Drop files here</div>"), root_8 = /* @__PURE__ */ from_html("<div class=\"column is-3\"><!></div> <div class=\"column is-3\"><!></div> <div class=\"column is-3\"><!></div> <div class=\"column is-3\"><!></div>", 1), root_14 = /* @__PURE__ */ from_html("<li class=\"column is-3 is-flex\"><div class=\"image-generic-outer-wrapper\" style=\"opacity: 1;\"><div class=\"image-generic-inner-wrapper\"><div class=\"image-generic-title\"><!> <span class=\"title-identification\"><span class=\"tag is-light is-bold mb-3\"> </span> <span class=\"is-size-7\"> </span></span></div> <div class=\"image-generic-content mb-1\"><img/></div></div></div></li>"), on_change = (e, n) => n(Array.from(e.target.files ?? [])), root_13 = /* @__PURE__ */ from_html("<ul class=\"columns is-mobile is-multiline list-invisible\"></ul> <div class=\"file has-name is-fullwidth\" id=\"id_pdf_file-wrapper\"><label class=\"file-label\"><span class=\"file-cta\"><span class=\"file-icon\"><span class=\"iconify\" data-icon=\"mdi:upload\"></span></span> <span class=\"file-label\">Select files...</span></span> <span class=\"file-name\"> </span> <input type=\"file\" accept=\"image/*\" class=\"file-input\" style=\"display: none;\" multiple/></label></div>", 1), root_15 = /* @__PURE__ */ from_html("<div class=\"file has-name is-fullwidth\" id=\"id_zip_file-wrapper\"><label class=\"file-label\"><span class=\"file-cta\"><span class=\"file-icon\"><span class=\"iconify\" data-icon=\"mdi:upload\"></span></span> <span class=\"file-label\">Select a file...</span></span> <span class=\"file-name\"> </span></label></div>"), root_17 = /* @__PURE__ */ from_html("<div class=\"file has-name is-fullwidth\" id=\"id_pdf_file-wrapper\"><label class=\"file-label\"><span class=\"file-cta\"><span class=\"file-icon\"><span class=\"iconify\" data-icon=\"mdi:upload\"></span></span> <span class=\"file-label\">Select a file...</span></span> <span class=\"file-name\"> </span></label></div>"), root_7 = /* @__PURE__ */ from_html("<!> <!> <!> <!> <!>", 1), root_5 = /* @__PURE__ */ from_html("<div class=\"has-background-light\"><div class=\"top-notification notification py-3 px-4\"><span class=\"iconify\" data-icon=\"mdi:info-outline\"></span> You can drag and drop files\n                here</div> <!> <!></div>"), root$1 = /* @__PURE__ */ from_html("<div class=\"dataset-compose-form is-relative\"><div class=\"dataset-reuse-toggle\"><!></div> <!></div>");
+var root_1$3 = /* @__PURE__ */ from_html("<span class=\"mr-2\">Reuse existing dataset</span> <!>", 1), root_4$2 = /* @__PURE__ */ from_html("<option> </option>"), root_2$2 = /* @__PURE__ */ from_html("<div class=\"select\"><select><option>Use dataset from</option><!></select></div>"), root_6 = /* @__PURE__ */ from_html("<div class=\"notification dropper is-info is-overlay\">Drop files here</div>"), root_8 = /* @__PURE__ */ from_html("<div class=\"column is-3\"><!></div> <div class=\"column is-3\"><!></div> <div class=\"column is-3\"><!></div> <div class=\"column is-3\"><!></div>", 1), root_14 = /* @__PURE__ */ from_html("<li class=\"column is-3 is-flex\"><div class=\"image-generic-outer-wrapper\" style=\"opacity: 1;\"><div class=\"image-generic-inner-wrapper\"><div class=\"image-generic-title\"><!> <span class=\"title-identification\"><span class=\"tag is-light is-bold mb-3\"> </span> <span class=\"is-size-7\"> </span></span></div> <div class=\"image-generic-content mb-1\"><img/></div></div></div></li>"), on_change = (e, n) => n(Array.from(e.target.files ?? [])), root_13 = /* @__PURE__ */ from_html("<ul class=\"columns is-mobile is-multiline list-invisible\"></ul> <div class=\"file has-name is-fullwidth\" id=\"id_pdf_file-wrapper\"><label class=\"file-label\"><span class=\"file-cta\"><span class=\"file-icon\"><span class=\"iconify\" data-icon=\"mdi:upload\"></span></span> <span class=\"file-label\">Select files...</span></span> <span class=\"file-name\"> </span> <input type=\"file\" accept=\"image/*\" class=\"file-input\" style=\"display: none;\" multiple/></label></div>", 1), root_15 = /* @__PURE__ */ from_html("<div class=\"file has-name is-fullwidth\" id=\"id_zip_file-wrapper\"><label class=\"file-label\"><span class=\"file-cta\"><span class=\"file-icon\"><span class=\"iconify\" data-icon=\"mdi:upload\"></span></span> <span class=\"file-label\">Select a file...</span></span> <span class=\"file-name\"> </span></label></div>"), root_17 = /* @__PURE__ */ from_html("<div class=\"file has-name is-fullwidth\" id=\"id_pdf_file-wrapper\"><label class=\"file-label\"><span class=\"file-cta\"><span class=\"file-icon\"><span class=\"iconify\" data-icon=\"mdi:upload\"></span></span> <span class=\"file-label\">Select a file...</span></span> <span class=\"file-name\"> </span></label></div>"), root_7 = /* @__PURE__ */ from_html("<!> <!> <!> <!> <!>", 1), root_5$1 = /* @__PURE__ */ from_html("<div class=\"has-background-light\"><div class=\"top-notification notification py-3 px-4\"><span class=\"iconify\" data-icon=\"mdi:info-outline\"></span> You can drag and drop files\n                here</div> <!> <!></div>"), root$1 = /* @__PURE__ */ from_html("<div class=\"dataset-compose-form is-relative\"><div class=\"dataset-reuse-toggle\"><!></div> <!></div>");
 function DatasetComposeForm(e, n) {
 	let i = props_id();
 	push(n, !0);
@@ -14472,10 +14472,17 @@ function DatasetComposeForm(e, n) {
 	function C(e) {
 		console.log(e), e.forEach((e) => {
 			preprocessImage(e, 2048, (n) => {
-				n && (b.file(e.name, n), set(y, [...get$2(y), {
-					name: e.name,
-					blob: n
-				}], !0));
+				if (n) {
+					let i = get$2(y).map((e) => e.name), a = e.name;
+					if (i.includes(a)) {
+						let n = e.name.split(".").pop() || "", o = e.name.slice(0, -n.length - 1), s = 1;
+						for (; i.includes(a);) a = `${o}+${s}.${n}`, s++;
+					}
+					b.file(a, n), set(y, [...get$2(y), {
+						name: a,
+						blob: n
+					}], !0);
+				}
 			});
 		}), set(x, "images");
 	}
@@ -14536,7 +14543,7 @@ function DatasetComposeForm(e, n) {
 			}), append(e, i);
 		}), reset(i), reset(n), bind_select_value(i, () => get$2(h), (e) => set(h, e)), append(e, n);
 	}, N = (e) => {
-		var n = root_5(), a = sibling(child(n), 2), o = (e) => {
+		var n = root_5$1(), a = sibling(child(n), 2), o = (e) => {
 			var n = root_6();
 			append(e, n);
 		};
@@ -14842,24 +14849,24 @@ function IndexSelect(e, n) {
 		});
 	}), append(e, s), pop();
 }
-var root_2 = /* @__PURE__ */ from_html("<!> <span><b>Detect and crop</b> watermarks inside the images</span>", 1), root_3$1 = /* @__PURE__ */ from_html("<!> <span>Watermarks are already cropped, use <b>full images</b></span>", 1), root_1$1 = /* @__PURE__ */ from_html("<!> <!>", 1);
+var root_2 = /* @__PURE__ */ from_html("<!> <span><b>Detect and crop</b> watermarks inside the full pages</span>", 1), root_3$1 = /* @__PURE__ */ from_html("<!> <span>Watermarks are already cropped, use <b>full images</b></span>", 1), root_5 = /* @__PURE__ */ from_html("<!> <span>Images are <b>black sketches on white background</b>, use <b>full images</b></span>", 1), root_1$1 = /* @__PURE__ */ from_html("<!> <!> <!>", 1);
 function NeedRegionsToggle(e, n) {
 	push(n, !0);
-	let i = prop(n, "value", 15), a = prop(n, "field", 7), o = /* @__PURE__ */ state(proxy(i() ? "true" : "false"));
-	function s(e) {
-		set(o, e, !0), i(get$2(o) == "true"), a().checked = i();
+	let i = prop(n, "value", 15, !0), a = prop(n, "field", 7), o = prop(n, "are_sketches_field", 7), s = /* @__PURE__ */ state(proxy(i() ? "true" : "false"));
+	function c(e) {
+		set(s, e, !0), i(get$2(s) == "true"), a().checked = i(), o() && (o().checked = get$2(s) == "sketches");
 	}
 	onMount(() => {
-		set(o, a().checked ? "true" : "false", !0), i(get$2(o) == "true");
+		set(s, o()?.checked ? "sketches" : a().checked ? "true" : "false", !0), i(get$2(s) == "true");
 	});
-	var c = comment(), l = first_child(c);
-	component(l, () => Toggle_group, (e, n) => {
+	var l = comment(), u = first_child(l);
+	component(u, () => Toggle_group, (e, n) => {
 		n(e, {
 			get value() {
-				return get$2(o);
+				return get$2(s);
 			},
 			type: "single",
-			onValueChange: s,
+			onValueChange: c,
 			class: "columns toggle-analysis-type",
 			children: (e, n) => {
 				var i = root_1$1(), a = first_child(i);
@@ -14874,8 +14881,8 @@ function NeedRegionsToggle(e, n) {
 						$$slots: { default: !0 }
 					});
 				});
-				var o = sibling(a, 2);
-				component(o, () => Toggle_group_item, (e, n) => {
+				var s = sibling(a, 2);
+				component(s, () => Toggle_group_item, (e, n) => {
 					n(e, {
 						value: "false",
 						class: "column is-3 has-text-centered",
@@ -14885,16 +14892,33 @@ function NeedRegionsToggle(e, n) {
 						},
 						$$slots: { default: !0 }
 					});
+				});
+				var c = sibling(s, 2), l = (e) => {
+					var n = comment(), i = first_child(n);
+					component(i, () => Toggle_group_item, (e, n) => {
+						n(e, {
+							value: "sketches",
+							class: "column is-3 has-text-centered",
+							children: (e, n) => {
+								var i = root_5(), a = first_child(i);
+								Icon(a, { icon: "lucide:flower" }), next(2), append(e, i);
+							},
+							$$slots: { default: !0 }
+						});
+					}), append(e, n);
+				};
+				if_block(c, (e) => {
+					o() && e(l);
 				}), append(e, i);
 			},
 			$$slots: { default: !0 }
 		});
-	}), append(e, c), pop();
+	}), append(e, l), pop();
 }
-var root_1 = /* @__PURE__ */ from_html("<div class=\"notification is-danger is-light py-3 px-4 mt-5 mb-2\"><p class=\"error\">Please fill in all the fields.</p> <!></div>"), root_3 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\">What index do you want to query?</h4> <!>", 1), root_4 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\"><!></h4> <div class=\"box has-background-light\"><!></div> <h4 class=\"mt-6 mb-5\">Are those image cropped and centered?</h4> <!> <div class=\"mb-4\"></div>", 1), root = /* @__PURE__ */ from_html("<!> <h4 class=\"mb-5\">What do you want to do?</h4> <!> <!> <!>", 1);
+var root_1 = /* @__PURE__ */ from_html("<div class=\"notification is-danger is-light py-3 px-4 mt-5 mb-2\"><p class=\"error\">Please fill in all the fields.</p> <!></div>"), root_3 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\">What index do you want to query?</h4> <!>", 1), root_4 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\"><!></h4> <div class=\"box has-background-light\"><!></div> <h4 class=\"mt-6 mb-5\">What kind of images is it?</h4> <!>", 1), root = /* @__PURE__ */ from_html("<!> <h4 class=\"mb-5\">What do you want to do?</h4> <!> <!> <!> <div class=\"mb-4\"></div>", 1);
 function WatermarksForm(e, n) {
 	push(n, !0);
-	let i = n.originalForm.querySelector("#id_name"), a = n.originalForm.querySelector("#id_analysis_type"), o = /* @__PURE__ */ state(proxy(a.value)), s = Array.from(n.originalForm.querySelectorAll("[name=query_target_index]")).map((e) => e.parentElement), c = /* @__PURE__ */ state(""), l = n.originalForm.querySelector(".dataset-form"), u = n.originalForm.querySelector("#id_need_regions"), d = /* @__PURE__ */ state(proxy(u.checked)), f = n.originalForm.querySelectorAll(".errorlist"), p = a.form.querySelector("input[type=submit]"), m = /* @__PURE__ */ state(!1);
+	let i = n.originalForm.querySelector("#id_name"), a = n.originalForm.querySelector("#id_analysis_type"), o = /* @__PURE__ */ state(proxy(a.value)), s = Array.from(n.originalForm.querySelectorAll("[name=query_target_index]")).map((e) => e.parentElement), c = /* @__PURE__ */ state(""), l = n.originalForm.querySelector(".dataset-form"), u = n.originalForm.querySelector("#id_need_regions"), d = n.originalForm.querySelector("#id_are_sketches"), f = n.originalForm.querySelectorAll(".errorlist"), p = a.form.querySelector("input[type=submit]"), m = /* @__PURE__ */ state(!1);
 	user_effect(() => {
 		get$2(o) === "query" ? i.value = "Query on " + s.find((e) => e.querySelector("input").value === get$2(c))?.querySelector(".index-title")?.textContent.trim() : i.value = get$2(o).charAt(0).toUpperCase() + get$2(o).slice(1);
 	}), user_effect(() => {
@@ -14963,21 +14987,22 @@ function WatermarksForm(e, n) {
 			}
 		}), reset(f);
 		var h = sibling(f, 4);
-		NeedRegionsToggle(h, {
-			get field() {
-				return u;
-			},
-			get value() {
-				return get$2(d);
-			},
-			set value(e) {
-				set(d, e, !0);
-			}
-		}), next(2), append(e, n);
+		{
+			let e = /* @__PURE__ */ user_derived(() => get$2(o) === "indexing" ? d : void 0);
+			NeedRegionsToggle(h, {
+				get field() {
+					return u;
+				},
+				get are_sketches_field() {
+					return get$2(e);
+				}
+			});
+		}
+		append(e, n);
 	};
 	if_block(x, (e) => {
 		get$2(o) && (get$2(o) !== "query" || get$2(c) != "") && e(S);
-	}), append(e, h), pop();
+	}), next(2), append(e, h), pop();
 }
 function initWatermarksForm(e) {
 	let n = document.createElement("div");

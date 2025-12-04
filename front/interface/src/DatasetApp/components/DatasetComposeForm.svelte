@@ -79,8 +79,21 @@
         files.forEach((file) => {
             preprocessImage(file, 2048, (blob) => {
                 if (blob) {
-                    image_zipper.file(file.name, blob);
-                    image_files = [...image_files, { name: file.name, blob: blob }];
+                    // make file name unique
+                    const prev_names = image_files.map(f => f.name);
+                    let filename = file.name;
+                    if (prev_names.includes(filename)) {
+                        // Generate a unique name
+                        const ext = file.name.split('.').pop() || '';
+                        const name = file.name.slice(0, -ext.length - 1);
+                        let counter = 1;
+                        while (prev_names.includes(filename)) {
+                            filename = `${name}+${counter}.${ext}`;
+                            counter++;
+                        }
+                    }
+                    image_zipper.file(filename, blob);
+                    image_files = [...image_files, { name: filename, blob: blob }];
                 }
             });
         });
