@@ -23,6 +23,7 @@ interface TNameProvider {
     getImageTitle: (image: TImageInfo, ellipsis?: boolean) => string;
     getImageDescription: (image?: TImageInfo) => string;
     getImageMetadata: (image?: TImageInfo) => Record<string, any>;
+    getImageLink: (image: TImageInfo) => string | undefined;
     fetchIIIFNames: (documents: TDocument[]) => Promise<any>;
     fetchMetadataNames: (metadata_url: string) => Promise<void>;
 }
@@ -104,6 +105,18 @@ export default class NameProvider implements TNameProvider {
             ...this.resolveField(image.document.uid, "metadata") || {}
         };
         return metadata;
+    }
+
+    getImageLink(image: TImageInfo) {
+        if (image.link) return image.link;
+        const resolved = this.resolveField(this.resolveKey(image), "url");
+        if (resolved) return resolved;
+        // CUDL IIIF specific hook
+        if (image.document?.name.startsWith("cudllibcamacuk")) {
+            const url = image.document.src.replace("/iiif/", "/view/");
+            return `${url}/${image.metadata?.page}`;
+        }
+        return undefined;
     }
 
     /**
@@ -236,6 +249,7 @@ const no_name_provider: TNameProvider = {
     getImageTitle: (image: TImageInfo) => image.name || image.id,
     getImageDescription: (image?: TImageInfo) => image?.document?.name || image?.document?.uid || "",
     getImageMetadata: (image?: TImageInfo) => {return {}},
+    getImageLink: (image?: TImageInfo) => undefined,
     fetchIIIFNames: async (documents: TDocument[]) => {},
     fetchMetadataNames: async (metadata_url: string) => {},
 }

@@ -13,6 +13,7 @@
     let { image, isTitle = false, prefix="", filenameDisplay=true }: Props = $props();
     let tag = $derived(isTitle ? "h4" : "span");
     let name_provider = getNameProvider();
+    let url = $derived(name_provider.getImageLink(image));
 </script>
 
 <svelte:element class="title-identification" class:mt-2={isTitle} this={tag} title={name_provider.getImageTitle(image)}>
@@ -27,4 +28,7 @@
 </svelte:element>
 {#if isTitle}
     <p>{name_provider.getImageDescription(image) || image.document?.name || image.subtitle || ""}</p>
+{#if url}
+    <p><a href={url} target="_blank">See in context</a></p>
+{/if}
 {/if}

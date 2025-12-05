@@ -21,15 +21,11 @@
     import { Dialog } from "bits-ui";
     import IconBtn from "./IconBtn.svelte";
     import ImageInfos from "./ImageInfos.svelte";
-    import { guessImageLink } from "../utils";
 
     let magnifying = $derived(getMagnifyingContext());
     let { image, comparison, transpositions } = $derived(magnifying);
 
     let transf = $derived<TMatchTransposition[]>(transpositions || []);
-
-    let imlink = $derived(image && guessImageLink(image));
-    let cplink = $derived(comparison && guessImageLink(comparison));
 
     function getOpen() {
         return image !== undefined;
@@ -69,9 +65,6 @@
                         </div>
                         <div class="magnifying-info">
                             <ImageInfos image={comparison} isTitle={true} prefix={"Query"}/>
-                            {#if cplink}
-                                <p><a href={cplink} target="_blank">See in context</a></p>
-                            {/if}
                         </div>
                     </div>
                 {/if}
@@ -89,9 +82,6 @@
                             <IconBtn icon="mdi:rotate-right" onclick={() => manualTransform(90, false)} />
                             <IconBtn icon="mdi:flip-horizontal" onclick={() => manualTransform(0, true)} />
                         </p>
-                        {#if imlink}
-                            <p><a href={imlink} target="_blank">See in context</a></p>
-                        {/if}
                     </div>
                 </div>
             </div>
