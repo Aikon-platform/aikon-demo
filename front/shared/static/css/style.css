@@ -3146,10 +3146,7 @@ table th {
   height: var(--bulma-control-height);
   justify-content: flex-start;
   line-height: var(--bulma-control-line-height);
-  padding-bottom: var(--bulma-control-padding-vertical);
-  padding-left: var(--bulma-control-padding-horizontal);
-  padding-right: var(--bulma-control-padding-horizontal);
-  padding-top: var(--bulma-control-padding-vertical);
+  padding: var(--bulma-control-padding-vertical) var(--bulma-control-padding-horizontal);
   position: relative;
   transition-duration: var(--bulma-duration);
   transition-property: background-color, border-color, box-shadow, color;
