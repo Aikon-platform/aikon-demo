@@ -2,7 +2,7 @@
 {% load shared_tags %}
 
 {% block form_content %}
-    {% include "demowebsite/dataset_baseform.html" with excluded_fields=available_algorithms.keys %}
+    {% include "demowebsite/dataset_baseform.html" with excluded_fields=available_algorithms.keys|add_to_list:"metadata" %}
 
     {# Similarity algorithm fields #}
     {% for algo, desc in available_algorithms.items %}
