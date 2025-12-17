@@ -7493,7 +7493,7 @@ function Dialog_close(e, n) {
 		n.child ? e(p) : e(m, !1);
 	}), append(e, d), pop();
 }
-var root_6$5 = /* @__PURE__ */ from_html("<!> <!>", 1), root_8$5 = /* @__PURE__ */ from_html("<!> <div><!></div>", 1);
+var root_6$4 = /* @__PURE__ */ from_html("<!> <!>", 1), root_8$5 = /* @__PURE__ */ from_html("<!> <div><!></div>", 1);
 function Dialog_content(e, n) {
 	let i = props_id();
 	push(n, !0);
@@ -7553,7 +7553,7 @@ function Dialog_content(e, n) {
 										},
 										children: (e, i) => {
 											var o = comment(), s = first_child(o), c = (e) => {
-												var i = root_6$5(), o = first_child(i), s = (e) => {
+												var i = root_6$4(), o = first_child(i), s = (e) => {
 													Scroll_lock(e, {
 														get preventScroll() {
 															return p();
@@ -8956,7 +8956,7 @@ function Tooltip(e, n) {
 		$$slots: { default: !0 }
 	}), pop();
 }
-var root_4$9 = /* @__PURE__ */ from_html("<div><div><!></div></div>"), root_9$1 = /* @__PURE__ */ from_html("<div><div><!></div></div>");
+var root_4$10 = /* @__PURE__ */ from_html("<div><div><!></div></div>"), root_9$1 = /* @__PURE__ */ from_html("<div><div><!></div></div>");
 function Tooltip_content(e, n) {
 	let i = props_id();
 	push(n, !0);
@@ -9026,7 +9026,7 @@ function Tooltip_content(e, n) {
 					}
 					append(e, i);
 				}, d = (e) => {
-					var i = root_4$9();
+					var i = root_4$10();
 					attribute_effect(i, () => ({ ...o() }));
 					var a = child(i);
 					attribute_effect(a, () => ({ ...get$2(s) }));
@@ -9232,6 +9232,12 @@ var NameProvider = class {
 			...this.resolveField(e.document.uid, "metadata") || {}
 		}), n;
 	}
+	getImageLink(e) {
+		if (e.link) return e.link;
+		let n = this.resolveField(this.resolveKey(e), "url");
+		if (n) return n;
+		if (e.document?.name.startsWith("cudllibcamacuk")) return `${e.document.src.replace("/iiif/", "/view/")}/${e.metadata?.page}`;
+	}
 	fetchIIIFNames(e) {
 		return new Promise(async (n, i) => {
 			for (let n of e) {
@@ -9283,6 +9289,7 @@ var NameProvider = class {
 	getImageTitle: (e) => e.name || e.id,
 	getImageDescription: (e) => e?.document?.name || e?.document?.uid || "",
 	getImageMetadata: (e) => ({}),
+	getImageLink: (e) => void 0,
 	fetchIIIFNames: async (e) => {},
 	fetchMetadataNames: async (e) => {}
 };
@@ -9497,19 +9504,15 @@ function ClusterCSVExporter(e, n) {
 		filename: "cluster.csv"
 	}), pop();
 }
-function guessImageLink(e) {
-	if (e.link) return e.link;
-	if (e.metadata?.page && e.document?.name.startsWith("cudllibcamacuk")) return `${e.document.src.replace("/iiif/", "/view/")}/${e.metadata.page}`;
-}
 function ellipsis(e, n) {
 	return n < 0 || e.length <= n ? e : n < 12 ? e.slice(0, n) + "..." : e.slice(0, Math.max(5, n - 12)) + "..." + e.slice(-Math.min(9, n - 5));
 }
-var root_2$12 = /* @__PURE__ */ from_html("<br/> <span> </span>", 1), root_1$16 = /* @__PURE__ */ from_html("<span class=\"tag is-light is-bold mb-3\"> </span> <!>", 1), root_3$11 = /* @__PURE__ */ from_html("<p> </p>"), root$18 = /* @__PURE__ */ from_html("<!> <!>", 1);
+var root_2$12 = /* @__PURE__ */ from_html("<br/> <span> </span>", 1), root_1$16 = /* @__PURE__ */ from_html("<span class=\"tag is-light is-bold mb-3\"> </span> <!>", 1), root_4$9 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_3$11 = /* @__PURE__ */ from_html("<p> </p> <!>", 1), root$18 = /* @__PURE__ */ from_html("<!> <!>", 1);
 function ImageInfos(e, n) {
 	push(n, !0);
-	let i = prop(n, "isTitle", 3, !1), a = prop(n, "prefix", 3, ""), o = prop(n, "filenameDisplay", 3, !0), s = /* @__PURE__ */ user_derived(() => i() ? "h4" : "span"), c = getNameProvider();
-	var l = root$18(), u = first_child(l);
-	element(u, () => get$2(s), !1, (e, s) => {
+	let i = prop(n, "isTitle", 3, !1), a = prop(n, "prefix", 3, ""), o = prop(n, "filenameDisplay", 3, !0), s = /* @__PURE__ */ user_derived(() => i() ? "h4" : "span"), c = getNameProvider(), l = /* @__PURE__ */ user_derived(() => c.getImageLink(n.image));
+	var u = root$18(), d = first_child(u);
+	element(d, () => get$2(s), !1, (e, s) => {
 		attribute_effect(e, (e, n) => ({
 			class: "title-identification",
 			title: e,
@@ -9526,13 +9529,20 @@ function ImageInfos(e, n) {
 		}), template_effect(() => set_text(d, `${(a() || "") ?? ""}
         Image #${n.image.num ?? ""}`)), append(s, l);
 	});
-	var d = sibling(u, 2), f = (e) => {
-		var i = root_3$11(), a = child(i, !0);
-		reset(i), template_effect((e) => set_text(a, e), [() => c.getImageDescription(n.image) || n.image.document?.name || n.image.subtitle || ""]), append(e, i);
+	var f = sibling(d, 2), p = (e) => {
+		var i = root_3$11(), a = first_child(i), o = child(a, !0);
+		reset(a);
+		var s = sibling(a, 2), u = (e) => {
+			var n = root_4$9(), i = child(n);
+			reset(n), template_effect(() => set_attribute(i, "href", get$2(l))), append(e, n);
+		};
+		if_block(s, (e) => {
+			get$2(l) && e(u);
+		}), template_effect((e) => set_text(o, e), [() => c.getImageDescription(n.image) || n.image.document?.name || n.image.subtitle || ""]), append(e, i);
 	};
-	if_block(d, (e) => {
-		i() && e(f);
-	}), append(e, l), pop();
+	if_block(f, (e) => {
+		i() && e(p);
+	}), append(e, u), pop();
 }
 function getMagnifyingContext() {
 	return getContext("magnify");
@@ -9540,33 +9550,33 @@ function getMagnifyingContext() {
 function setMagnifyingContext(e) {
 	setContext("magnify", e);
 }
-var on_click$6 = (e) => e.stopPropagation(), root_6$4 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_5$6 = /* @__PURE__ */ from_html("<div class=\"magnifying-item\"><div class=\"display-image\"><img class=\"display-img\"/></div> <div class=\"magnifying-info\"><!> <!></div></div>"), on_click_1$2 = (e) => e.stopPropagation(), root_7$6 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_4$8 = /* @__PURE__ */ from_html("<div class=\"magnifying-content\"><!>  <div class=\"magnifying-item\"><div class=\"display-image\"><img/></div> <div class=\"magnifying-info\"><!> <p class=\"actions my-2\"><!> <!> <!></p> <!></div></div></div>"), root_3$10 = /* @__PURE__ */ from_html("<div><!> <!> <!></div>");
+var on_click$6 = (e) => e.stopPropagation(), root_5$6 = /* @__PURE__ */ from_html("<div class=\"magnifying-item\"><div class=\"display-image\"><img class=\"display-img\"/></div> <div class=\"magnifying-info\"><!></div></div>"), on_click_1$2 = (e) => e.stopPropagation(), root_4$8 = /* @__PURE__ */ from_html("<div class=\"magnifying-content\"><!>  <div class=\"magnifying-item\"><div class=\"display-image\"><img/></div> <div class=\"magnifying-info\"><!> <p class=\"actions my-2\"><!> <!> <!></p></div></div></div>"), root_3$10 = /* @__PURE__ */ from_html("<div><!> <!> <!></div>");
 function ImageMagnifier(e, n) {
 	push(n, !0);
-	let i = /* @__PURE__ */ user_derived(getMagnifyingContext), a = /* @__PURE__ */ user_derived(() => get$2(i).image), o = /* @__PURE__ */ user_derived(() => get$2(i).comparison), s = /* @__PURE__ */ user_derived(() => get$2(i).transpositions), c = /* @__PURE__ */ user_derived(() => get$2(s) || []), l = /* @__PURE__ */ user_derived(() => get$2(a) && guessImageLink(get$2(a))), u = /* @__PURE__ */ user_derived(() => get$2(o) && guessImageLink(get$2(o)));
-	function d() {
+	let i = /* @__PURE__ */ user_derived(getMagnifyingContext), a = /* @__PURE__ */ user_derived(() => get$2(i).image), o = /* @__PURE__ */ user_derived(() => get$2(i).comparison), s = /* @__PURE__ */ user_derived(() => get$2(i).transpositions), c = /* @__PURE__ */ user_derived(() => get$2(s) || []);
+	function l() {
 		return get$2(a) !== void 0;
 	}
-	function f(e) {
+	function u(e) {
 		e || (get$2(i).image = void 0);
 	}
-	function p(e, n) {
+	function d(e, n) {
 		let i = get$2(c).find((e) => e && e.startsWith("rot")), a = get$2(c).includes("hflip"), o = i ? parseInt(i.slice(3)) : 0, s = o;
 		n && o % 180 && (s += 180), s = (s + e + 360) % 360;
 		let l = [];
 		s && l.push(`rot${s}`), n !== a && l.push("hflip"), set(c, l);
 	}
-	var m = comment(), h = first_child(m), g = (e) => {
-		var n = comment(), i = first_child(n), s = d, m = f;
+	var f = comment(), p = first_child(f), m = (e) => {
+		var n = comment(), i = first_child(n), s = l, f = u;
 		component(i, () => Dialog, (e, n) => {
 			n(e, {
 				get open() {
 					return s();
 				},
 				set open(e) {
-					m(e);
+					f(e);
 				},
-				onOpenChange: f,
+				onOpenChange: u,
 				children: (e, n) => {
 					var i = comment(), s = first_child(i);
 					component(s, () => Portal, (e, n) => {
@@ -9574,22 +9584,22 @@ function ImageMagnifier(e, n) {
 							children: (e, n) => {
 								var i = root_3$10();
 								let s;
-								var m = child(i);
-								component(m, () => Dialog_overlay, (e, n) => {
+								var f = child(i);
+								component(f, () => Dialog_overlay, (e, n) => {
 									n(e, { class: "modal-background" });
 								});
-								var h = sibling(m, 2);
-								IconBtn(h, {
+								var p = sibling(f, 2);
+								IconBtn(p, {
 									icon: "mdi:close",
 									class: "dialog-close",
-									onclick: () => f(!1)
+									onclick: () => u(!1)
 								});
-								var g = sibling(h, 2);
-								component(g, () => Dialog_content, (e, n) => {
+								var m = sibling(p, 2);
+								component(m, () => Dialog_content, (e, n) => {
 									n(e, {
 										class: "magnifier modal-content",
 										children: (e, n) => {
-											var i = root_4$8(), s = child(i), d = (e) => {
+											var i = root_4$8(), s = child(i), l = (e) => {
 												var n = root_5$6();
 												n.__click = [on_click$6];
 												var i = child(n), a = child(i);
@@ -9601,59 +9611,45 @@ function ImageMagnifier(e, n) {
 													},
 													isTitle: !0,
 													prefix: "Query"
-												});
-												var l = sibling(c, 2), d = (e) => {
-													var n = root_6$4(), i = child(n);
-													reset(n), template_effect(() => set_attribute(i, "href", get$2(u))), append(e, n);
-												};
-												if_block(l, (e) => {
-													get$2(u) && e(d);
 												}), reset(s), reset(n), template_effect(() => {
 													set_attribute(a, "src", get$2(o).url), set_attribute(a, "alt", get$2(o).id);
 												}), append(e, n);
 											};
 											if_block(s, (e) => {
-												get$2(o) && e(d);
+												get$2(o) && e(l);
 											});
-											var f = sibling(s, 2);
-											f.__click = [on_click_1$2];
-											var m = child(f), h = child(m);
-											reset(m);
-											var g = sibling(m, 2), _ = child(g);
-											ImageInfos(_, {
+											var u = sibling(s, 2);
+											u.__click = [on_click_1$2];
+											var f = child(u), p = child(f);
+											reset(f);
+											var m = sibling(f, 2), h = child(m);
+											ImageInfos(h, {
 												get image() {
 													return get$2(a);
 												},
 												isTitle: !0
 											});
-											var v = sibling(_, 2), y = child(v);
-											IconBtn(y, {
+											var g = sibling(h, 2), _ = child(g);
+											IconBtn(_, {
 												icon: "mdi:rotate-left",
-												onclick: () => p(-90, !1)
+												onclick: () => d(-90, !1)
 											});
-											var b = sibling(y, 2);
-											IconBtn(b, {
+											var v = sibling(_, 2);
+											IconBtn(v, {
 												icon: "mdi:rotate-right",
-												onclick: () => p(90, !1)
+												onclick: () => d(90, !1)
 											});
-											var x = sibling(b, 2);
-											IconBtn(x, {
+											var y = sibling(v, 2);
+											IconBtn(y, {
 												icon: "mdi:flip-horizontal",
-												onclick: () => p(0, !0)
-											}), reset(v);
-											var S = sibling(v, 2), C = (e) => {
-												var n = root_7$6(), i = child(n);
-												reset(n), template_effect(() => set_attribute(i, "href", get$2(l))), append(e, n);
-											};
-											if_block(S, (e) => {
-												get$2(l) && e(C);
-											}), reset(g), reset(f), reset(i), template_effect((e) => {
-												set_attribute(h, "src", get$2(a).url), set_attribute(h, "alt", get$2(a).id), set_class(h, 1, e);
+												onclick: () => d(0, !0)
+											}), reset(g), reset(m), reset(u), reset(i), template_effect((e) => {
+												set_attribute(p, "src", get$2(a).url), set_attribute(p, "alt", get$2(a).id), set_class(p, 1, e);
 											}, [() => "display-img " + get$2(c).join(" ")]), append(e, i);
 										},
 										$$slots: { default: !0 }
 									});
-								}), reset(i), template_effect((e) => s = set_class(i, 1, "modal content", null, s, e), [() => ({ "is-active": d() })]), append(e, i);
+								}), reset(i), template_effect((e) => s = set_class(i, 1, "modal content", null, s, e), [() => ({ "is-active": l() })]), append(e, i);
 							},
 							$$slots: { default: !0 }
 						});
@@ -9663,9 +9659,9 @@ function ImageMagnifier(e, n) {
 			});
 		}), append(e, n);
 	};
-	if_block(h, (e) => {
-		get$2(a) && e(g);
-	}), append(e, m), pop();
+	if_block(p, (e) => {
+		get$2(a) && e(m);
+	}), append(e, f), pop();
 }
 delegate(["click"]);
 var on_click$5 = (e) => e.stopPropagation(), root_5$5 = /* @__PURE__ */ from_html("<a class=\"image-source\" target=\"_blank\" title=\"See in context\"><!></a>"), root_7$5 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-pin\" title=\"Pin as comparison\"><!></a>"), root_8$4 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-pin always-visible\" title=\"Pin as comparison\"><!></a>"), root_9 = /* @__PURE__ */ from_html("<a href=\"javascript:void(0)\" class=\"image-magnify\" title=\"Magnify\"><!></a>"), root_10$1 = /* @__PURE__ */ from_html("<a class=\"image-focus\" title=\"Show detail\"><!></a>"), root_4$7 = /* @__PURE__ */ from_html("<div class=\"display-tools\"><!> <!> <!> <!></div>"), root_11$1 = /* @__PURE__ */ from_html("<span class=\"similarity\"> </span>"), root_3$9 = /* @__PURE__ */ from_html("<div class=\"display-image\"><img/></div> <!> <!>", 1), root_12 = /* @__PURE__ */ from_html("<div class=\"display-image\"><img/></div> <!>", 1), root_2$11 = /* @__PURE__ */ from_html("<!> <!>", 1);
