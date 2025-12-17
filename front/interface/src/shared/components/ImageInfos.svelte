@@ -15,16 +15,16 @@
     let name_provider = getNameProvider();
 </script>
 
-<svelte:element class="title-identification" class:mt-2={isTitle} this={tag} title={name_provider.getImageName(image)}>
+<svelte:element class="title-identification" class:mt-2={isTitle} this={tag} title={name_provider.getImageTitle(image)}>
     <span class="tag is-light is-bold mb-3">
         {prefix || ""}
         Image #{image.num}
     </span>
     {#if filenameDisplay}
         <br/>
-        <span>{ellipsis(name_provider.getImageName(image), 16)}</span>
+        <span>{ellipsis(name_provider.getImageTitle(image), 32)}</span>
     {/if}
 </svelte:element>
 {#if isTitle}
-    <p>{name_provider.getSourceName(image.document) || image.document?.name || image.subtitle || ""}</p>
+    <p>{name_provider.getImageDescription(image) || image.document?.name || image.subtitle || ""}</p>
 {/if}

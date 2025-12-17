@@ -27,6 +27,7 @@ from search.models import Index, Query, Indexing
 
 WATERMARKS_REGION_NET = "fasterrcnn_watermark_extraction"
 WATERMARKS_FEAT_NET = "resnet18_watermarks"
+WATERMARKS_FEAT_NET_SKETCHES = "resnet18_watermarks_conv4"
 
 User = get_user_model()
 
@@ -136,15 +137,20 @@ class WatermarksPipeline(AbstractPipelineOnDataset("watermarks")):
         self.similarity_task.start_task()
 
     def start_indexing_task(self):
+        are_sketches = self.parameters["are_sketches"]
+
+        net = WATERMARKS_FEAT_NET_SKETCHES if are_sketches else WATERMARKS_FEAT_NET
+
         self.indexing_task = Indexing.objects.create(
             dataset=self.dataset,
             requested_by=self.requested_by,
             notify_email=False,
             watermarks_pipeline=self,
             parameters={
-                "feat_net": WATERMARKS_FEAT_NET,
+                "feat_net": net,
                 "algorithm": "cosine",
                 "transpositions": ["none", "hflip"],
+                "are_sketches": are_sketches,
             },
             crops=self.regions_task,
         )
@@ -160,8 +166,6 @@ class WatermarksPipeline(AbstractPipelineOnDataset("watermarks")):
             watermarks_pipeline=self,
             target_index=self.query_target_index,
             parameters={
-                "feat_net": WATERMARKS_FEAT_NET,
-                "algorithm": "cosine",
                 "transpositions": ["none", "rot90", "rot180", "rot270"],
             },
             crops=self.regions_task,

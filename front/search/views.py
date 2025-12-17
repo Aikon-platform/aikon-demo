@@ -21,7 +21,7 @@ class IndexingMixin:
 class IndexingStatusView(IndexingMixin.Status):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["editable"] = (self.object.index.owner == self.request.user) or self.request.user.is_superuser
+        context["editable"] = (hasattr(self.object, "index") and self.object.index.owner == self.request.user) or self.request.user.is_superuser
         return context
 
 

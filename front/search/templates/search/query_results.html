@@ -26,8 +26,10 @@
         <script type="text/javascript">
             document.addEventListener("DOMContentLoaded", () => {
                 DemoTools.initSearchResults(
-                    document.getElementById("matches"), "{{ object.target_index.index_url|escapejs }}",
-                    "{{ object.result_url|escapejs }}");
+                    document.getElementById("matches"), 
+                    "{{ object.target_index.index_url|escapejs }}",
+                    "{{ object.result_url|escapejs }}",
+                    "{{ object.target_index.dataset.cleaned_metadata_url|escapejs }}");
             });
         </script>
     </div>
