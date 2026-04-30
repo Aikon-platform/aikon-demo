@@ -23,7 +23,6 @@ copy_env_values() {
 }
 
 echo_title "SET UP ENVIRONMENT VARIABLES"
-#for env in "$API_DIR"/.env "$FRONT_DIR"/.env "$ROOT_DIR"/.env.dev "$API_DIR"/.env.dev; do
 for env in "$FRONT_DIR"/.env "$ROOT_DIR"/.env.dev; do
     color_echo yellow "\nCopying up $env..."
     cp "$env".template "$env"
