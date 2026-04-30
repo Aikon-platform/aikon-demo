@@ -1,0 +1,33 @@
+[project]
+name = "front"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "django==4.2.*",
+    "django-dramatiq>=0.15.0",
+    "django-environ>=0.13.0",
+    "dramatiq[redis]>=2.1.0",
+    "orjson>=3.11.8",
+    "pillow>=12.2.0",
+    "python-dotenv>=1.2.2",
+    "requests>=2.33.1",
+    "stream-unzip>=0.0.101",
+    "stream-zip>=0.0.84",
+]
+
+[dependency-groups]
+prod = [
+    "django==4.2.*",
+    "django-dramatiq>=0.15.0",
+    "django-environ>=0.13.0",
+    "dramatiq[redis]>=2.1.0",
+    "orjson>=3.11.8",
+    "pillow>=12.2.0",
+    "psycopg2-binary>=2.9.12",
+    "python-dotenv>=1.2.2",
+    "requests>=2.33.1",
+    "stream-unzip>=0.0.101",
+    "stream-zip>=0.0.84",
+]

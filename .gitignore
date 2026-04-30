@@ -73,6 +73,7 @@ supervisord.conf
 .*hash
 env/
 venv/
+.venv/
 ENV/
 env.bak/
 venv.bak/

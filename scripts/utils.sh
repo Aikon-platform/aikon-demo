@@ -127,3 +127,13 @@ update_env() {
         prev_line="$line"
     done
 }
+
+fresh_shell() {
+    # reset exported variables
+    if [ "$OS" = "Linux" ]; then
+        exec bash
+    else
+        exec zsh
+    fi
+}
+
