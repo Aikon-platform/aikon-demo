@@ -2,6 +2,8 @@
 [ ! -f .env.dev ] || export $(grep -v '^#' .env.dev | xargs)
 
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+FRONT_DIR="$ROOT_DIR"/front
+API_DIR="$ROOT_DIR"/api
 
 cleanup() {
     if [ -n "$front_dramatiq_pid" ]; then
@@ -31,15 +33,15 @@ cleanup() {
 trap cleanup SIGINT SIGTERM
 
 # Start API service
-cd $ROOT_DIR/api/ && bash run.sh &
+cd "$API_DIR" && bash run.sh &
 api_pid=$!
 
 # Start Django frontend server
-cd $ROOT_DIR/front/ && venv/bin/python manage.py runserver $FRONT_PORT &
+cd "$FRONT_DIR" && uv run --directory="$FRONT_DIR" manage.py runserver $FRONT_PORT &
 front_server_pid=$!
 
 # Start Dramatiq worker
-cd $ROOT_DIR/front/ && venv/bin/python manage.py rundramatiq -t 1 -p 1 &
+cd "$FRONT_DIR" && uv run --directory="$FRONT_DIR" manage.py rundramatiq -t 1 -p 1 &
 front_dramatiq_pid=$!
 
 echo "Services started. Press Ctrl+C to terminate all services."

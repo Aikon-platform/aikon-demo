@@ -28,10 +28,10 @@ run_script() {
 
 run_script "setup_submodule.sh" "Submodule initialization"
 run_script "setup_system_package.sh" "System packages installation"
-run_script "setup_venv.sh" "Virtual environment setup"
 run_script "setup_var_env.sh" "Environment variables configuration"
-# run_script "redis.sh" "Redis installation and setup"
+run_script "setup_venv.sh" "Virtual environment setup"
 run_script "setup_database.sh" "Database configuration"
+# run_script "redis.sh" "Redis installation and setup"
 # run_script "vite.sh" "Vite setup"
 
 # install the API
