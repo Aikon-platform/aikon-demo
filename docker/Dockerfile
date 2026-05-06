@@ -21,7 +21,7 @@ ENV PYTHONUNBUFFERED=1
 ENV UV_NO_DEV=1
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_CACHE_DIR=/home/${USER}/.uv_cache
-ENV UV_PROJECT_ENVIRONMENT=/home/${USER}/.venv
+ENV UV_PROJECT_ENVIRONMENT=/home/${USER}/app/.venv
 ENV UV_PYTHON_INSTALL_DIR=/opt/uv-python
 ENV N_PROCESS=50
 
@@ -44,7 +44,8 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsm6 \
     libxext6 \
-    libpq-dev \vim
+    libpq-dev \
+    vim \
     build-essential \
     poppler-utils \
     ghostscript \
@@ -59,15 +60,6 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 RUN useradd -u ${USERID} -m -d /home/${USER} ${USER}
 
 WORKDIR /home/${USER}
-
-# COPY --chown=${USER} ./front/requirements.txt ./front/requirements-prod.txt ./
-
-# Install python dependencies
-# RUN python3.10 -m venv venv && \
-#     /home/${USER}/venv/bin/pip install --upgrade pip && \
-#     /home/${USER}/venv/bin/pip install -r requirements-prod.txt
-
-# TODO update supervisord
 
 # Copy app files
 COPY --chown=${USER} front /home/${USER}/app
@@ -102,5 +94,4 @@ RUN chmod +x /home/${USER}/manage.sh
 # Launch app
 CMD /home/${USER}/manage.sh && \
     export LC_ALL=C.UTF-8 && export LANG=C.UTF-8 && \
-    # source venv/bin/activate && \
     supervisord -c /home/${USER}/supervisord.conf
