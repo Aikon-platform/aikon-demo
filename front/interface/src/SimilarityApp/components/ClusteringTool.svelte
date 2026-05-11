@@ -108,7 +108,7 @@
         {#if clustering}
             <p>Clustering in progress...</p>
         {/if}
-        <div class={"cl-cluster-list cl-display-grid"}>
+        <div class="cl-cluster-list cl-display-grid">
             {#each clusters as cluster (cluster.id)}
                 <ClusterPreviewBlock {cluster} {index} />
             {/each}

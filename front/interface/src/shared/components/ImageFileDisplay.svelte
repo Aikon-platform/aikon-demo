@@ -113,7 +113,7 @@
                 <img
                     src={image.url}
                     alt={image.id}
-                    class={["display-img", ...(transpositions || [])]}
+                    class={[ "display-img", ...(transpositions || []) ]}
                 />
             </div>
             <ImageInfos {image} isTitle={true} />

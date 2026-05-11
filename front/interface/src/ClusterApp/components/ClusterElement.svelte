@@ -138,7 +138,7 @@
                         </p>
                     {:else}
                         <p>
-                            <ClusterCSVExporter clusters={[cluster]} />
+                            <ClusterCSVExporter clusters={[ cluster ]} />
                             <!-- {btnExpand} TODO -->
                         </p>
                     {/if}

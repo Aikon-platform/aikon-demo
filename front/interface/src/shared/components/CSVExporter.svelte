@@ -39,7 +39,7 @@
         exporting = true;
         try {
             const csv = await exportDataCSV();
-            const blob = new Blob([csv], { type: "text/csv" });
+            const blob = new Blob([ csv ], { type: "text/csv" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;

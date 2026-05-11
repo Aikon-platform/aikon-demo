@@ -18,7 +18,7 @@
             if (url == "") {
                 value.splice(index, 1);
             } else {
-                value[index] = [url];
+                value[index] = [ url ];
             }
             field.value = JSON.stringify(value);
         }
@@ -28,7 +28,7 @@
         if (e.key == "Enter") {
             e.preventDefault();
             if ((e.currentTarget as HTMLInputElement).value != "") {
-                value.push([(e.currentTarget as HTMLInputElement).value.trim()]);
+                value.push([ (e.currentTarget as HTMLInputElement).value.trim() ]);
                 field.value = JSON.stringify(value);
             }
             (e.currentTarget as HTMLInputElement).value = "";
@@ -39,7 +39,7 @@
         let text = e.clipboardData?.getData("text/plain");
         let lines = text?.split(/\s+/);
         if (lines) {
-            value.push(...lines.map(line => [line.trim()]).filter(line => line[0] != ""));
+            value.push(...lines.map(line => [ line.trim() ]).filter(line => line[0] != ""));
             field.value = JSON.stringify(value);
         }
     }

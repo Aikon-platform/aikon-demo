@@ -15,7 +15,7 @@
     })));
 
     function onValueChange(newValue: string) {
-        options_detailed.forEach(({input}) => {
+        options_detailed.forEach(({ input }) => {
             if (input.value === newValue) {
                 input.checked = true;
             } else {
@@ -25,7 +25,7 @@
     }
 
     onMount(() => {
-        options_detailed.forEach(({input}) => {
+        options_detailed.forEach(({ input }) => {
             if (input.checked) {
                 value = input.value;
             }
@@ -34,7 +34,7 @@
 </script>
 
 <ToggleGroup.Root bind:value={value} type="single" {onValueChange} orientation="vertical" class="dataset-compose-form">
-    {#each options_detailed as {input, label}}
+    {#each options_detailed as { input, label }}
         <ToggleGroup.Item value={input.value} class="search-index-option">
             {@html label}
         </ToggleGroup.Item>

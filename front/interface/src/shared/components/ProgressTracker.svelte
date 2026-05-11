@@ -73,7 +73,7 @@
             </div>
         {/if}
         <pre>{job_status.status == "PENDING"
-                ? "Waiting for worker..."
-                : job_status.log?.infos?.join("\n")}</pre>
+            ? "Waiting for worker..."
+            : job_status.log?.infos?.join("\n")}</pre>
     {/if}
 </div>

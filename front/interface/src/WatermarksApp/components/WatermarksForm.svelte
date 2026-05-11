@@ -42,7 +42,7 @@
     $effect(() => {
         submit_button.disabled =
             analysis_type_value === ""
-            || ( analysis_type_value === "query" && index_value === "" )
+            || (analysis_type_value === "query" && index_value === "")
             || !dataset_ready;
     });
 </script>

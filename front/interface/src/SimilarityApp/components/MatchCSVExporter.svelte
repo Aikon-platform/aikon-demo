@@ -13,7 +13,7 @@
     async function* iterRows() {
         const metadata_fields = new Set<string>();
         const ematches = matches.matches.filter(m => !threshold || m.similarity >= threshold);
-        ematches.unshift({image: matches.query, similarity: 1, q_transposition: "none", m_transposition: "none"});
+        ematches.unshift({ image: matches.query, similarity: 1, q_transposition: "none", m_transposition: "none" });
 
         const all_metadata = ematches.map(match => name_provider.getImageMetadata(match.image));
 

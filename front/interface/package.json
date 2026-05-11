@@ -15,8 +15,11 @@
     "@eslint/js": "^9.39.4",
     "@eslint/json": "^0.14.0",
     "@stylistic/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
     "eslint": "^9.39.4",
-    "eslint-plugin-svelte": "^3.17.1"
+    "eslint-plugin-svelte": "^3.17.1",
+    "svelte-eslint-parser": "^1.6.1"
   },
   "pnpm": {
     "overrides": {
@@ -25,8 +28,8 @@
   },
   "dependencies": {
     "@iconify/svelte": "^5.0.2",
-    "@tsconfig/svelte": "^5.0.5",
     "@sveltejs/vite-plugin-svelte": "^6.2.0",
+    "@tsconfig/svelte": "^5.0.5",
     "bits-ui": "^2.11.1",
     "bulma": "^1.0.4",
     "jszip": "^3.10.1",

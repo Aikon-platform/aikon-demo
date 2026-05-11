@@ -22,25 +22,25 @@
     let { action_icon, action_label, action_title, action_cluster } = $derived(
         for_action == "cluster_merge"
             ? {
-                  action_icon: "mdi:merge",
-                  action_label: "Merge whole clusters",
-                  action_title: "Select target cluster to merge with:",
-                  action_cluster: {
-                      ...cluster!,
-                      name: "Selected cluster: " + cluster?.name,
-                  },
-              }
+                action_icon: "mdi:merge",
+                action_label: "Merge whole clusters",
+                action_title: "Select target cluster to merge with:",
+                action_cluster: {
+                    ...cluster!,
+                    name: "Selected cluster: " + cluster?.name,
+                },
+            }
             : {
-                  action_icon: "mdi:folder-move",
-                  action_label: "Move selected images to...",
-                  action_title: "Select target cluster to move images:",
-                  action_cluster: {
-                      id: -1,
-                      name: "Selected images",
-                      images: editor_state.content.clusters[exclude_cluster_id!]
-                          ?.images.filter((image) => editor_state.image_selection.has(image.id)) ?? [],
-                  },
-              }
+                action_icon: "mdi:folder-move",
+                action_label: "Move selected images to...",
+                action_title: "Select target cluster to move images:",
+                action_cluster: {
+                    id: -1,
+                    name: "Selected images",
+                    images: editor_state.content.clusters[exclude_cluster_id!]
+                        ?.images.filter((image) => editor_state.image_selection.has(image.id)) ?? [],
+                },
+            }
     );
 
     let proposed_clusters = $derived([

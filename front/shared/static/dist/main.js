@@ -11099,7 +11099,7 @@ function ClusterPreviewBlock(t, n) {
 		append(t, n);
 	}), reset(f), reset(d), reset(i), template_effect(() => set_text(u, `${n.cluster.id >= 0 ? `Cluster ${n.cluster.id}` : "Unclustered"} (${n.cluster.members.length ?? ""})`)), append(t, i), pop();
 }
-var root_3$5 = /* @__PURE__ */ from_html("<div class=\"toolbar-item\"><label class=\"label is-expanded\" for=\"clustering-threshold\">Clustering threshold:</label> <div class=\"field\"><div class=\"control\"><input type=\"range\"/></div> <div class=\"control\"><input type=\"number\" class=\"input\" id=\"clustering-threshold\"/></div></div></div>"), root_1$11 = /* @__PURE__ */ from_html("<div class=\"toolbar\"><div class=\"toolbar-content\"><!> <!> <div class=\"toolbar-item toolbar-btn\"><!></div></div></div>"), root_8$1 = /* @__PURE__ */ from_html("<p>Clustering in progress...</p>"), root_7$1 = /* @__PURE__ */ from_html("<!> <div><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div>", 1), root$12 = /* @__PURE__ */ from_html("<!> <div><!></div> <div class=\"mt-4\"></div>", 1);
+var root_3$5 = /* @__PURE__ */ from_html("<div class=\"toolbar-item\"><label class=\"label is-expanded\" for=\"clustering-threshold\">Clustering threshold:</label> <div class=\"field\"><div class=\"control\"><input type=\"range\"/></div> <div class=\"control\"><input type=\"number\" class=\"input\" id=\"clustering-threshold\"/></div></div></div>"), root_1$11 = /* @__PURE__ */ from_html("<div class=\"toolbar\"><div class=\"toolbar-content\"><!> <!> <div class=\"toolbar-item toolbar-btn\"><!></div></div></div>"), root_8$1 = /* @__PURE__ */ from_html("<p>Clustering in progress...</p>"), root_7$1 = /* @__PURE__ */ from_html("<!> <div class=\"cl-cluster-list cl-display-grid\"><!> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div> <div class=\"cl-cluster box cl-filler\"></div></div>", 1), root$12 = /* @__PURE__ */ from_html("<!> <div><!></div> <div class=\"mt-4\"></div>", 1);
 function ClusteringTool(t, n) {
 	push(n, !0);
 	let i = /* @__PURE__ */ state(!1), a = /* @__PURE__ */ user_derived(() => Math.min(...n.matches.map((t) => Math.min(...t.matches.map((t) => t.similarity))))), o = /* @__PURE__ */ user_derived(() => Math.max(...n.matches.map((t) => Math.max(...t.matches.map((t) => t.similarity))))), s = /* @__PURE__ */ state(get$2(a) + .8 * (get$2(o) - get$2(a))), c = graphFromSimilarityMatches(n.index, n.matches), l = /* @__PURE__ */ state(proxy([])), u = /* @__PURE__ */ state(null);
@@ -11172,9 +11172,7 @@ function ClusteringTool(t, n) {
 		if_block(a, (t) => {
 			get$2(u) && t(o);
 		});
-		var s = sibling(a, 2);
-		set_class(s, 1, "cl-cluster-list cl-display-grid");
-		var c = child(s);
+		var s = sibling(a, 2), c = child(s);
 		each(c, 17, () => get$2(l), (t) => t.id, (t, i) => {
 			ClusterPreviewBlock(t, {
 				get cluster() {
@@ -15427,11 +15425,7 @@ function NeedRegionsToggle(t, n) {
 var root_1 = /* @__PURE__ */ from_html("<div class=\"notification is-danger is-light py-3 px-4 mt-5 mb-2\"><p class=\"error\">Please fill in all the fields.</p> <!></div>"), root_3 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\">What index do you want to query?</h4> <!>", 1), root_4 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\"><!></h4> <div class=\"box has-background-light\"><!></div> <h4 class=\"mt-6 mb-5\">What kind of images is it?</h4> <!>", 1), root = /* @__PURE__ */ from_html("<!> <h4 class=\"mb-5\">What do you want to do?</h4> <!> <!> <!> <div class=\"mb-4\"></div>", 1);
 function WatermarksForm(t, n) {
 	push(n, !0);
-	let i = n.originalForm.querySelector("#id_name"), a = n.originalForm.querySelector("#id_analysis_type"), o = /* @__PURE__ */ state(proxy(a.value));
-	user_effect(() => console.log("analysis_type_value", get$2(o)));
-	let s = Array.from(n.originalForm.querySelectorAll("[name=query_target_index]")).map((t) => t.parentElement), c = /* @__PURE__ */ state("");
-	user_effect(() => console.log("index_value", get$2(c)));
-	let l = n.originalForm.querySelector(".dataset-form"), u = n.originalForm.querySelector("#id_need_regions"), d = n.originalForm.querySelector("#id_are_sketches"), f = n.originalForm.querySelectorAll(".errorlist"), p = a.form.querySelector("input[type=submit]"), m = /* @__PURE__ */ state(!1);
+	let i = n.originalForm.querySelector("#id_name"), a = n.originalForm.querySelector("#id_analysis_type"), o = /* @__PURE__ */ state(proxy(a.value)), s = Array.from(n.originalForm.querySelectorAll("[name=query_target_index]")).map((t) => t.parentElement), c = /* @__PURE__ */ state(""), l = n.originalForm.querySelector(".dataset-form"), u = n.originalForm.querySelector("#id_need_regions"), d = n.originalForm.querySelector("#id_are_sketches"), f = n.originalForm.querySelectorAll(".errorlist"), p = a.form.querySelector("input[type=submit]"), m = /* @__PURE__ */ state(!1);
 	user_effect(() => {
 		get$2(o) === "query" ? i.value = "Query on " + s.find((t) => t.querySelector("input").value === get$2(c))?.querySelector(".index-title")?.textContent.trim() : i.value = get$2(o).charAt(0).toUpperCase() + get$2(o).slice(1);
 	}), user_effect(() => {

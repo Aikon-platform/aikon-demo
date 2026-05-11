@@ -59,7 +59,7 @@
                     image_zipper.generateAsync({ type: "blob" }).then((blob) => {
                         const dataTransfer = new DataTransfer();
                         dataTransfer.items.add(
-                            new File([blob], "dataset.zip", { type: "application/zip" })
+                            new File([ blob ], "dataset.zip", { type: "application/zip" })
                         );
                         zip_field.files = dataTransfer.files;
                         parent_html_form.submit();
@@ -93,7 +93,7 @@
                         }
                     }
                     image_zipper.file(filename, blob);
-                    image_files = [...image_files, { name: filename, blob: blob }];
+                    image_files = [ ...image_files, { name: filename, blob: blob }];
                 }
             });
         });
