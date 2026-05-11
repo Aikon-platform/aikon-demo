@@ -8,14 +8,17 @@
         originalForm: HTMLElement;
     }
 
+    // django form
     let { originalForm }:Props = $props();
 
     let experiment_name_field = originalForm.querySelector("#id_name") as HTMLInputElement;
 
     let analysis_type_field = originalForm.querySelector("#id_analysis_type") as HTMLSelectElement;
+    // type of watermark query: ""|"query"|"indexing"|"similarity"
     let analysis_type_value = $state(analysis_type_field.value);
 
     let index_options = Array.from(originalForm.querySelectorAll("[name=query_target_index]")).map(option => option.parentElement as HTMLLabelElement);
+    // if analysis_type_field == "indexing"
     let index_value = $state("");
 
     let dataset_form = originalForm.querySelector(".dataset-form") as HTMLFormElement;
@@ -37,7 +40,10 @@
     });
 
     $effect(() => {
-        submit_button.disabled = analysis_type_value === "" || (analysis_type_value === "query" && index_value === "") || !dataset_ready;
+        submit_button.disabled =
+            analysis_type_value === ""
+            || ( analysis_type_value === "query" && index_value === "" )
+            || !dataset_ready;
     });
 </script>
 
