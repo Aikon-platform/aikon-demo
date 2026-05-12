@@ -14,14 +14,18 @@ export function enforceFieldValue (allowedValues:TPrimitive[], defaultValue:TPri
             : defaultValue;
 }
 
+export function enforcelFieldBooleanValue (defaultValue: boolean): Function {
+    return enforceFieldValue([true, false], defaultValue)
+}
+
 /**
  * validate the value for a parameter and update the search parameters, without reloading the page (otherwise, would trigger infinite loop)
  * about using widow.history, see: https://stackoverflow.com/a/70591485
  */
-export function updateUrlSearchParams(enforceValueFunc: Function, paramName: string, paramValue: string): string {
+export function updateUrlSearchParams(enforceValueFunc: Function, paramName: string, paramValue: any): any {
     paramValue = enforceValueFunc(paramValue);
     const url = new URL(window.location.href);
-    url.searchParams.set(paramName, paramValue);
+    url.searchParams.set(paramName, String(paramValue));
     window.history.pushState(null, '', url.toString());
     return paramValue
 }

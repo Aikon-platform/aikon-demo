@@ -7,6 +7,11 @@
     import NeedRegionsToggle from "./NeedRegionsToggle.svelte";
     import { enforceFieldValue, updateUrlSearchParams } from "../../shared/utils";
 
+    /**
+     * NOTE URL-bound parameters are:
+     * - "analysis_type"
+     */
+
     interface Props {
         originalForm: HTMLElement;
     }

@@ -85,6 +85,7 @@ front/data/
 api/media/
 api/data/
 api/runs/
+data/
 
 # mediafiles
 front/mediafiles/
