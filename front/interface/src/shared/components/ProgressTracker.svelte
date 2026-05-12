@@ -12,10 +12,10 @@
     interface Props {
         tracking_url: string;
     }
-    let { tracking_url }: Props = $props();
+    const { tracking_url }: Props = $props();
 
     let job_status = $state<ProgressStatus | null>(null);
-    let error = $derived(job_status?.log?.errors?.join("\n"));
+    const error = $derived(job_status?.log?.errors?.join("\n"));
     let poll_timeout: number;
 
     /**

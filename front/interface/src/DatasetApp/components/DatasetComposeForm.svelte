@@ -16,14 +16,14 @@
     let { form, ready = $bindable() }: Props = $props();
     const form_id = $props.id();
 
-    let dataset_reuse_field = form.querySelector("#id_reuse_dataset") as HTMLInputElement;
-    let dataset_reuse_target_field = form.querySelector("#id_dataset") as HTMLInputElement;
+    const dataset_reuse_field = form.querySelector("#id_reuse_dataset") as HTMLInputElement;
+    const dataset_reuse_target_field = form.querySelector("#id_dataset") as HTMLInputElement;
 
-    let switch_field = form.querySelector("#id_format") as HTMLInputElement;
-    let iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
-    let zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
-    let pdf_field = form.querySelector("#id_pdf_file") as HTMLInputElement;
-    let parent_html_form = zip_field.form!;
+    const switch_field = form.querySelector("#id_format") as HTMLInputElement;
+    const iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
+    const zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
+    const pdf_field = form.querySelector("#id_pdf_file") as HTMLInputElement;
+    const parent_html_form = zip_field.form!;
 
     let dataset_reuse_value = $state(dataset_reuse_field.checked);
     let dataset_reuse_target_value = $state(dataset_reuse_target_field.value);
@@ -31,7 +31,7 @@
     let zip_file_name = $state(EMPTY_FILE);
     let pdf_file_name = $state(EMPTY_FILE);
     let image_files: { name: string; blob: Blob }[] = $state([]);
-    let image_zipper = new JSZip();
+    const image_zipper = new JSZip();
 
     let tab = $state("zip");
     let dragover = $state(false);

@@ -1,34 +1,49 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
     import DatasetComposeForm from "../../DatasetApp/components/DatasetComposeForm.svelte";
     import AnalysisTypeSelect from "./AnalysisTypeSelect.svelte";
     import IndexSelect from "./IndexSelect.svelte";
     import NeedRegionsToggle from "./NeedRegionsToggle.svelte";
+    import { enforceFieldValue, updateUrlSearchParams } from "../../shared/utils";
 
     interface Props {
         originalForm: HTMLElement;
     }
 
+    const enforceAnalysisTypeFieldValue = enforceFieldValue([ "", "query", "indexing", "similarity" ], "");
+
     // django form
-    let { originalForm }:Props = $props();
+    const { originalForm }:Props = $props();
 
-    let experiment_name_field = originalForm.querySelector("#id_name") as HTMLInputElement;
+    const experiment_name_field = originalForm.querySelector("#id_name") as HTMLInputElement;
 
-    let analysis_type_field = originalForm.querySelector("#id_analysis_type") as HTMLSelectElement;
-    // type of watermark query: ""|"query"|"indexing"|"similarity"
+    const analysis_type_field = originalForm.querySelector("#id_analysis_type") as HTMLSelectElement;
     let analysis_type_value = $state(analysis_type_field.value);
+    $effect(() => {
+        updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
+    });
 
-    let index_options = Array.from(originalForm.querySelectorAll("[name=query_target_index]")).map(option => option.parentElement as HTMLLabelElement);
+    // on mount, read ll effects from URL search params and valdiate them
+    onMount(() => {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        if (urlSearchParams.get("analysis_type")) {
+            analysis_type_field.value = updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
+        }
+    })
+
+    const index_options = Array.from(originalForm.querySelectorAll("[name=query_target_index]")).map(option => option.parentElement as HTMLLabelElement);
     // if analysis_type_field == "indexing"
     let index_value = $state("");
 
-    let dataset_form = originalForm.querySelector(".dataset-form") as HTMLFormElement;
+    const dataset_form = originalForm.querySelector(".dataset-form") as HTMLFormElement;
 
-    let need_regions_field = originalForm.querySelector("#id_need_regions") as HTMLInputElement;
+    const need_regions_field = originalForm.querySelector("#id_need_regions") as HTMLInputElement;
 
-    let are_sketches_field = originalForm.querySelector("#id_are_sketches") as HTMLInputElement;
+    const are_sketches_field = originalForm.querySelector("#id_are_sketches") as HTMLInputElement;
 
-    let errors = originalForm.querySelectorAll(".errorlist");
-    let submit_button = analysis_type_field.form!.querySelector("input[type=submit]") as HTMLButtonElement;
+    const errors = originalForm.querySelectorAll(".errorlist");
+    const submit_button = analysis_type_field.form!.querySelector("input[type=submit]") as HTMLButtonElement;
     let dataset_ready = $state(false);
 
     $effect(() => {

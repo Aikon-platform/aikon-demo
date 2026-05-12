@@ -9,7 +9,7 @@
 
     let { options, value = $bindable() }:Props = $props();
 
-    let options_detailed = $derived(options.map(option => ({
+    const options_detailed = $derived(options.map(option => ({
         label: Array.from(option.childNodes).filter(node => (node as any).tagName !== "INPUT").map(node => (node as any).outerHTML || node.textContent).join(""),
         input: option.querySelector("input") as HTMLInputElement,
     })));

@@ -13,6 +13,9 @@ const baseRules = {
     "no-unused-vars": "off",
     "no-undef": "error",
     "quotes": "off",
+    "prefer-const": [ "error", {
+        "destructuring": "all",
+    }],
     "@stylistic/indent": [ "warn", 4 ],
     "space-in-parens": [ "error", "never" ],
     "array-bracket-spacing": [ "error", "always", { objectsInArrays: false, arraysInArrays: false }],

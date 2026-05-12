@@ -7,7 +7,7 @@
         matches: TSimilarityMatches;
         threshold?: number;
     }
-    let { matches, threshold }: Props = $props();
+    const { matches, threshold }: Props = $props();
     const name_provider = getNameProvider();
 
     async function* iterRows() {

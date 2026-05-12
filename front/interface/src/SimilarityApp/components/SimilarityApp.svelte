@@ -22,10 +22,10 @@
     // If clustering tool has been shown once, keep it hidden but active so parameters are still available
     let keep_clustering_tool = $state(mode == "cluster");
 
-    let magnifying = $state({});
+    const magnifying = $state({});
     setMagnifyingContext(magnifying);
 
-    let name_provider = new NameProvider();
+    const name_provider = new NameProvider();
     setNameProvider(name_provider);
     
     onMount(() => {

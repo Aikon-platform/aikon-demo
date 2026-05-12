@@ -12,14 +12,14 @@
         clusters: TClusterInfo[];
     }
 
-    let { for_action, exclude_cluster_id, clusters }: Props = $props();
+    const { for_action, exclude_cluster_id, clusters }: Props = $props();
 
     let selected: TClusterInfo | null = $state(null);
     let open = $state(true);
-    let editor_state = getEditorState();
+    const editor_state = getEditorState();
 
-    let cluster = $derived(editor_state.content.clusters[exclude_cluster_id!]);
-    let { action_icon, action_label, action_title, action_cluster } = $derived(
+    const cluster = $derived(editor_state.content.clusters[exclude_cluster_id!]);
+    const { action_icon, action_label, action_title, action_cluster } = $derived(
         for_action == "cluster_merge"
             ? {
                 action_icon: "mdi:merge",
@@ -43,7 +43,7 @@
             }
     );
 
-    let proposed_clusters = $derived([
+    const proposed_clusters = $derived([
         ...clusters.filter((c) => c.id != exclude_cluster_id!),
         ...(for_action == "selection_move" ? [{ id: -1, name: "New cluster", images: [] }] : []),
     ]);

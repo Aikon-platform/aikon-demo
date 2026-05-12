@@ -5,7 +5,7 @@
         iterRows: () => AsyncGenerator<(string | number)[]>;
         filename: string;
     }
-    let { iterRows, filename }: Props = $props();
+    const { iterRows, filename }: Props = $props();
 
     let exporting = $state(false);
     let error = $state<string | null>(null);

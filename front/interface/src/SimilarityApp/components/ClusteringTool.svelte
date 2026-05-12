@@ -17,19 +17,19 @@
         visible?: boolean;
         extra_toolbar_items?: Snippet;
     }
-    let { index, matches, visible, extra_toolbar_items }: Props = $props();
+    const { index, matches, visible, extra_toolbar_items }: Props = $props();
 
     let isFinal = $state(false);
-    let minThreshold = $derived(
+    const minThreshold = $derived(
         Math.min(...matches.map((match) => Math.min(...match.matches.map((m) => m.similarity))))
     );
-    let maxThreshold = $derived(
+    const maxThreshold = $derived(
         Math.max(...matches.map((match) => Math.max(...match.matches.map((m) => m.similarity))))
     );
     // svelte-ignore state_referenced_locally
     let threshold = $state(minThreshold + 0.8 * (maxThreshold - minThreshold));
 
-    let graph = graphFromSimilarityMatches(index, matches);
+    const graph = graphFromSimilarityMatches(index, matches);
     let clusters: TSimpleCluster[] = $state([]);
     let clustering: number | null = $state(null);
 

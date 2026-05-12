@@ -68,7 +68,7 @@
 	    editing = true;
 	}
 
-	let empty = $derived(!internalValue || internalValue.trim() == '');
+	const empty = $derived(!internalValue || internalValue.trim() == '');
 
 	$effect(() => {
 	    if (focus && input) {

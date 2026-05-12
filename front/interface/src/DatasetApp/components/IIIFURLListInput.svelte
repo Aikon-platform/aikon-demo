@@ -36,8 +36,8 @@
     }
 
     function onPaste(e: ClipboardEvent) {
-        let text = e.clipboardData?.getData("text/plain");
-        let lines = text?.split(/\s+/);
+        const text = e.clipboardData?.getData("text/plain");
+        const lines = text?.split(/\s+/);
         if (lines) {
             value.push(...lines.map(line => [ line.trim() ]).filter(line => line[0] != ""));
             field.value = JSON.stringify(value);

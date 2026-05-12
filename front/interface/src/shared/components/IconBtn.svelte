@@ -10,7 +10,7 @@
         disabled?: boolean;
         class?: ClassValue;
     }
-    let { icon, label, onclick, disabled, class: className }: Props = $props();
+    const { icon, label, onclick, disabled, class: className }: Props = $props();
 </script>
 
 <Button.Root class={[ className || "is-link is-light mr-2", "button", disabled ? "disabled" : "" ]} onclick={onclick} disabled={disabled}>

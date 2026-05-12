@@ -12,17 +12,17 @@
         query_result_url: string;
         metadata_url?: string;
     }
-    let { source_index_url, query_result_url, metadata_url }: Props = $props();
+    const { source_index_url, query_result_url, metadata_url }: Props = $props();
 
     let source_index: TSimilarityIndex = $state({ sources: [], images: [], transpositions: [] });
     let query_index: TSimilarityIndex = $state({ sources: [], images: [], transpositions: [] });
     let matches: TSimilarityMatches[] = $state([]);
     let loading = $state(true);
 
-    let magnifying = $state({});
+    const magnifying = $state({});
     setMagnifyingContext(magnifying);
 
-    let name_provider = new NameProvider();
+    const name_provider = new NameProvider();
     setNameProvider(name_provider);
     
     onMount(() => {

@@ -9,12 +9,12 @@ import IconBtn from "../../shared/components/IconBtn.svelte";
 
     let { url, onChange }: Props = $props();
 
-    let onBlur = () => {
+    const onBlur = () => {
         console.log(url);
         onChange(url);
     }
 
-    let valid = $derived(url.startsWith("http://") || url.startsWith("https://"));
+    const valid = $derived(url.startsWith("http://") || url.startsWith("https://"));
 </script>
 
 <div class="urllist-item mb-2" class:valid={valid}>

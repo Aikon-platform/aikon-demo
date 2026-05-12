@@ -22,8 +22,8 @@
     import IconBtn from "./IconBtn.svelte";
     import ImageInfos from "./ImageInfos.svelte";
 
-    let magnifying = $derived(getMagnifyingContext());
-    let { image, comparison, transpositions } = $derived(magnifying);
+    const magnifying = $derived(getMagnifyingContext());
+    const { image, comparison, transpositions } = $derived(magnifying);
 
     let transf = $derived<TMatchTransposition[]>(transpositions || []);
 

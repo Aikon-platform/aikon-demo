@@ -10062,6 +10062,14 @@ function ClusterCSVExporter(t, n) {
 function ellipsis(t, n) {
 	return n < 0 || t.length <= n ? t : n < 12 ? t.slice(0, n) + "..." : t.slice(0, Math.max(5, n - 12)) + "..." + t.slice(-Math.min(9, n - 5));
 }
+function enforceFieldValue(t, n = "") {
+	return (i) => t.includes(i) ? i : n;
+}
+function updateUrlSearchParams(t, n, i) {
+	i = t(i);
+	let a = new URL(window.location.href);
+	return a.searchParams.set(n, i), window.history.pushState(null, "", a.toString()), i;
+}
 var root_2$12 = /* @__PURE__ */ from_html("<br/> <span> </span>", 1), root_1$16 = /* @__PURE__ */ from_html("<span class=\"tag is-light is-bold mb-3\"> </span> <!>", 1), root_4$10 = /* @__PURE__ */ from_html("<p><a target=\"_blank\">See in context</a></p>"), root_3$11 = /* @__PURE__ */ from_html("<p> </p> <!>", 1), root$18 = /* @__PURE__ */ from_html("<!> <!>", 1);
 function ImageInfos(t, n) {
 	push(n, !0);
@@ -15425,53 +15433,64 @@ function NeedRegionsToggle(t, n) {
 var root_1 = /* @__PURE__ */ from_html("<div class=\"notification is-danger is-light py-3 px-4 mt-5 mb-2\"><p class=\"error\">Please fill in all the fields.</p> <!></div>"), root_3 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\">What index do you want to query?</h4> <!>", 1), root_4 = /* @__PURE__ */ from_html("<h4 class=\"mt-6 mb-5\"><!></h4> <div class=\"box has-background-light\"><!></div> <h4 class=\"mt-6 mb-5\">What kind of images is it?</h4> <!>", 1), root = /* @__PURE__ */ from_html("<!> <h4 class=\"mb-5\">What do you want to do?</h4> <!> <!> <!> <div class=\"mb-4\"></div>", 1);
 function WatermarksForm(t, n) {
 	push(n, !0);
-	let i = n.originalForm.querySelector("#id_name"), a = n.originalForm.querySelector("#id_analysis_type"), o = /* @__PURE__ */ state(proxy(a.value)), s = Array.from(n.originalForm.querySelectorAll("[name=query_target_index]")).map((t) => t.parentElement), c = /* @__PURE__ */ state(""), l = n.originalForm.querySelector(".dataset-form"), u = n.originalForm.querySelector("#id_need_regions"), d = n.originalForm.querySelector("#id_are_sketches"), f = n.originalForm.querySelectorAll(".errorlist"), p = a.form.querySelector("input[type=submit]"), m = /* @__PURE__ */ state(!1);
+	let i = enforceFieldValue([
+		"",
+		"query",
+		"indexing",
+		"similarity"
+	], ""), a = n.originalForm.querySelector("#id_name"), o = n.originalForm.querySelector("#id_analysis_type"), s = /* @__PURE__ */ state(proxy(o.value));
 	user_effect(() => {
-		get$2(o) === "query" ? i.value = "Query on " + s.find((t) => t.querySelector("input").value === get$2(c))?.querySelector(".index-title")?.textContent.trim() : i.value = get$2(o).charAt(0).toUpperCase() + get$2(o).slice(1);
-	}), user_effect(() => {
-		p.disabled = get$2(o) === "" || get$2(o) === "query" && get$2(c) === "" || !get$2(m);
+		updateUrlSearchParams(i, "analysis_type", get$2(s));
+	}), onMount(() => {
+		new URLSearchParams(window.location.search).get("analysis_type") && (o.value = updateUrlSearchParams(i, "analysis_type", get$2(s)));
 	});
-	var h = root(), g = first_child(h), _ = (t) => {
+	let c = Array.from(n.originalForm.querySelectorAll("[name=query_target_index]")).map((t) => t.parentElement), l = /* @__PURE__ */ state(""), u = n.originalForm.querySelector(".dataset-form"), d = n.originalForm.querySelector("#id_need_regions"), f = n.originalForm.querySelector("#id_are_sketches"), p = n.originalForm.querySelectorAll(".errorlist"), m = o.form.querySelector("input[type=submit]"), h = /* @__PURE__ */ state(!1);
+	user_effect(() => {
+		get$2(s) === "query" ? a.value = "Query on " + c.find((t) => t.querySelector("input").value === get$2(l))?.querySelector(".index-title")?.textContent.trim() : a.value = get$2(s).charAt(0).toUpperCase() + get$2(s).slice(1);
+	}), user_effect(() => {
+		m.disabled = get$2(s) === "" || get$2(s) === "query" && get$2(l) === "" || !get$2(h);
+	});
+	var g = root(), _ = first_child(g), v = (t) => {
 		var n = root_1(), i = sibling(child(n), 2);
-		each(i, 17, () => f, index$1, (t, n) => {
+		each(i, 17, () => p, index$1, (t, n) => {
 			var i = comment(), a = first_child(i);
 			html(a, () => get$2(n).outerHTML), append(t, i);
 		}), reset(n), append(t, n);
 	};
-	if_block(g, (t) => {
-		f.length > 0 && t(_);
+	if_block(_, (t) => {
+		p.length > 0 && t(v);
 	});
-	var v = sibling(g, 4);
-	AnalysisTypeSelect(v, {
+	var y = sibling(_, 4);
+	AnalysisTypeSelect(y, {
 		get field() {
-			return a;
+			return o;
 		},
 		get value() {
-			return get$2(o);
+			return get$2(s);
 		},
 		set value(t) {
-			set(o, t, !0);
+			set(s, t, !0);
 		}
 	});
-	var y = sibling(v, 2), b = (t) => {
+	var b = sibling(y, 2), x = (t) => {
 		var n = root_3(), i = sibling(first_child(n), 2);
 		IndexSelect(i, {
 			get options() {
-				return s;
+				return c;
 			},
 			get value() {
-				return get$2(c);
+				return get$2(l);
 			},
 			set value(t) {
-				set(c, t, !0);
+				set(l, t, !0);
 			}
 		}), append(t, n);
 	};
-	if_block(y, (t) => {
-		get$2(o) === "query" && t(b);
+	if_block(b, (t) => {
+		get$2(s) === "query" && t(x);
 	});
-	var x = sibling(y, 2), S = (t) => {
-		var n = root_4(), i = first_child(n), a = child(i), s = (t) => {
+	var S = sibling(b, 2), C = (t) => {
+		var n = root_4(), i = first_child(n), a = child(i), o = (t) => {
 			var n = text("What images do you want to use as a query?");
 			append(t, n);
 		}, c = (t) => {
@@ -15479,26 +15498,26 @@ function WatermarksForm(t, n) {
 			append(t, n);
 		};
 		if_block(a, (t) => {
-			get$2(o) === "query" ? t(s) : t(c, -1);
+			get$2(s) === "query" ? t(o) : t(c, -1);
 		}), reset(i);
-		var f = sibling(i, 2), p = child(f);
+		var l = sibling(i, 2), p = child(l);
 		DatasetComposeForm(p, {
 			get form() {
-				return l;
+				return u;
 			},
 			get ready() {
-				return get$2(m);
+				return get$2(h);
 			},
 			set ready(t) {
-				set(m, t, !0);
+				set(h, t, !0);
 			}
-		}), reset(f);
-		var h = sibling(f, 4);
+		}), reset(l);
+		var m = sibling(l, 4);
 		{
-			let t = /* @__PURE__ */ user_derived(() => get$2(o) === "indexing" ? d : void 0);
-			NeedRegionsToggle(h, {
+			let t = /* @__PURE__ */ user_derived(() => get$2(s) === "indexing" ? f : void 0);
+			NeedRegionsToggle(m, {
 				get field() {
-					return u;
+					return d;
 				},
 				get are_sketches_field() {
 					return get$2(t);
@@ -15507,9 +15526,9 @@ function WatermarksForm(t, n) {
 		}
 		append(t, n);
 	};
-	if_block(x, (t) => {
-		get$2(o) && (get$2(o) !== "query" || get$2(c) != "") && t(S);
-	}), next(2), append(t, h), pop();
+	if_block(S, (t) => {
+		get$2(s) && (get$2(s) !== "query" || get$2(l) != "") && t(C);
+	}), next(2), append(t, g), pop();
 }
 function initWatermarksForm(t) {
 	let n = document.createElement("div");

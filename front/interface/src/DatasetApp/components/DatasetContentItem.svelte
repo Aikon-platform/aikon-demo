@@ -9,11 +9,11 @@
         itemIndex: number;
     }
 
-    let { datasetContentsItem, datasetFormat, itemIndex }: Props = $props();
+    const { datasetContentsItem, datasetFormat, itemIndex }: Props = $props();
 
     const DEFAULT_DISPLAY_LENGTH = 4;
     let displayLength = $state(DEFAULT_DISPLAY_LENGTH);
-    let updateDisplayLength = () =>
+    const updateDisplayLength = () =>
         (displayLength =
             displayLength === DEFAULT_DISPLAY_LENGTH
                 ? datasetContentsItem.images.length

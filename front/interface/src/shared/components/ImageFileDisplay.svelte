@@ -16,7 +16,7 @@
         disable_all?: boolean;
     }
 
-    let {
+    const {
         image,
         similarity,
         transpositions,
@@ -27,8 +27,8 @@
         disable_all,
     }: Props = $props();
 
-    let magnifying = getMagnifyingContext();
-    let pinned = $derived(magnifying.comparison?.id === image.id);
+    const magnifying = getMagnifyingContext();
+    const pinned = $derived(magnifying.comparison?.id === image.id);
 
     function togglePinned() {
         magnifying.comparison = pinned ? undefined : image;

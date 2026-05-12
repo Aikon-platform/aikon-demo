@@ -17,18 +17,18 @@
         mode?: "cluster" | "browse";
         extra_toolbar_items?: Snippet;
     }
-    let { index, matches, mode, extra_toolbar_items }: Props = $props();
+    const { index, matches, mode, extra_toolbar_items }: Props = $props();
 
     let group_by_source = $state(false);
     let filter_by_source = $state<TDocument | null>(null);
-    let matches_filtered = $derived(filter_by_source ? matches.filter(match => match.query.document === filter_by_source) : matches);
+    const matches_filtered = $derived(filter_by_source ? matches.filter(match => match.query.document === filter_by_source) : matches);
 
     let actual_page = $state(1);
     const PAGINATE_BY = 30;
-    let total_pages = $derived(Math.ceil(matches.length / PAGINATE_BY));
+    const total_pages = $derived(Math.ceil(matches.length / PAGINATE_BY));
 
-    let minThreshold = $derived(Math.min(...matches.map(match => Math.min(...match.matches.map(m => m.similarity)))));
-    let maxThreshold = $derived(Math.max(...matches.map(match => Math.max(...match.matches.map(m => m.similarity)))));
+    const minThreshold = $derived(Math.min(...matches.map(match => Math.min(...match.matches.map(m => m.similarity)))));
+    const maxThreshold = $derived(Math.max(...matches.map(match => Math.max(...match.matches.map(m => m.similarity)))));
     // svelte-ignore state_referenced_locally
     let threshold = $state(minThreshold + 0.5 * (maxThreshold - minThreshold));
 
