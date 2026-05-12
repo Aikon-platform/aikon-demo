@@ -99,6 +99,7 @@ node_modules/
 .vscode/
 
 front/shared/static/dist/main.css.map
+front/shared/static/dist/*
 
 nginx_conf
 nginx_ssl

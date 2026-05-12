@@ -1,3 +1,5 @@
+import { type TPrimitive } from "./types";
+
 export function ellipsis(str: string, maxLen: number) {
     if (maxLen < 0 || str.length <= maxLen) return str;
     if (maxLen < 12) return str.slice(0, maxLen) + "...";
@@ -5,12 +7,11 @@ export function ellipsis(str: string, maxLen: number) {
 }
 
 /** abstract function generating validators: if `currentValue` is not in `allowedValues`, return `defaultValue` */
-export function enforceFieldValue (allowedValues:string[], defaultValue:string = ""): Function {
-    return (currentValue:string): string => {
-        return allowedValues.includes(currentValue)
+export function enforceFieldValue (allowedValues:TPrimitive[], defaultValue:TPrimitive = ""): Function {
+    return (currentValue:TPrimitive): TPrimitive =>
+        allowedValues.includes(currentValue)
             ? currentValue
             : defaultValue;
-    };
 }
 
 /**
