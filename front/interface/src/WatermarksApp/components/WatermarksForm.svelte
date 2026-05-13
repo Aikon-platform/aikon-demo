@@ -5,7 +5,7 @@
     import AnalysisTypeSelect from "./AnalysisTypeSelect.svelte";
     import IndexSelect from "./IndexSelect.svelte";
     import NeedRegionsToggle from "./NeedRegionsToggle.svelte";
-    import { enforceFieldValue, updateUrlSearchParams } from "../../shared/utils";
+    import { enforceValue, updateUrlSearchParams } from "../../shared/utils";
 
     /**
      * NOTE URL-bound parameters are:
@@ -16,7 +16,7 @@
         originalForm: HTMLElement;
     }
 
-    const enforceAnalysisTypeFieldValue = enforceFieldValue([ "", "query", "indexing", "similarity" ], "");
+    const enforceAnalysisTypeFieldValue = enforceValue([ "", "query", "indexing", "similarity" ], "");
 
     // django form
     const { originalForm }:Props = $props();
@@ -25,17 +25,6 @@
 
     const analysis_type_field = originalForm.querySelector("#id_analysis_type") as HTMLSelectElement;
     let analysis_type_value = $state(analysis_type_field.value);
-    $effect(() => {
-        updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
-    });
-
-    // on mount, read ll effects from URL search params and valdiate them
-    onMount(() => {
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        if (urlSearchParams.get("analysis_type")) {
-            analysis_type_field.value = updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
-        }
-    })
 
     const index_options = Array.from(originalForm.querySelectorAll("[name=query_target_index]")).map(option => option.parentElement as HTMLLabelElement);
     // if analysis_type_field == "indexing"
@@ -52,6 +41,10 @@
     let dataset_ready = $state(false);
 
     $effect(() => {
+        updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
+    });
+
+    $effect(() => {
         if (analysis_type_value === "query") {
             experiment_name_field.value = "Query on " + index_options.find(option => option.querySelector("input")!.value === index_value)?.querySelector(".index-title")?.textContent.trim();
         } else {
@@ -65,6 +58,14 @@
             || (analysis_type_value === "query" && index_value === "")
             || !dataset_ready;
     });
+
+    // on mount, read ll effects from URL search params and valdiate them
+    onMount(() => {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        if (urlSearchParams.get("analysis_type")) {
+            analysis_type_field.value = updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
+        }
+    })
 </script>
 
 {#if errors.length > 0}

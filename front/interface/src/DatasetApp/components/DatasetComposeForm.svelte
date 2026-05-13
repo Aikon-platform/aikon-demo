@@ -7,12 +7,13 @@
     import IIIFURLListInput from "./IIIFURLListInput.svelte";
     import { preprocessImage } from "../imageHelpers";
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import { enforceFieldValue, enforcelFieldBooleanValue, updateUrlSearchParams } from "../../shared/utils";
+    import { enforceValue, enforceBooleanValue, valueOrDefault, updateUrlSearchParams } from "../../shared/utils";
 
     /**
      * NOTE URL-bound parameters are:
-     * - "dataset_type": TDatasetValue
+     * - "dataset_type": TDatasetValue. has no effect if dataset_reuse=true
      * - "dataset_reuse": boolean
+     *
      */
 
     type TDatasetValue = "zip"|"iiif"|"pdf"|"images"|""
@@ -57,8 +58,8 @@
 
     let dragover = $state(false);
 
-    const enforceSwitchFieldValue = enforceFieldValue([ "zip", "iiif", "images", "pdf" ], defaultTab)
-    const enforceDatasetReuseValue = enforcelFieldBooleanValue(defaultDatasetReuse);
+    const enforceSwitchFieldValue = enforceValue([ "zip", "iiif", "images", "pdf" ], defaultTab)
+    const enforceDatasetReuseValue = enforceBooleanValue(defaultDatasetReuse);
 
     function addImages(files: File[]) {
         console.log(files);
@@ -117,22 +118,14 @@
         }
     }
 
-    /**
-     * when changing a tab, set `switch_field` and update the URL params.
-     * on mount, this is also used to set the initial tab.
-     */
-    function onTabChange(value: string/*, setTab: boolean = false*/) {
-        console.log("onTabChange", value);
+    function onTabChange(value: string) {
         updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value)
         switch_field.value = value == "images" ? "zip" : value;
-        // if (setTab) {
-        //     tab = value as TDatasetValue;
-        // }
     }
 
     function onDatasetReuseChange(value: boolean) {
-        console.log("onDatasetReuseChange", value);
         dataset_reuse_field.checked = value;
+        updateUrlSearchParams(enforceDatasetReuseValue, "dataset_reuse", value);
     }
 
     $effect(() => {
@@ -151,18 +144,15 @@
     onMount(() => {
         const urlSearchParams = new URLSearchParams(window.location.search);
         const urlDatasetType = urlSearchParams.get("dataset_type");
-        // if `dataset_type` is defined in the URL, use it to set `tab` and `switch_field.value`. otherwise, them using a default.
-        // onTabChange(urlDatasetType?.length ? urlDatasetType : defaultTab, true);
 
         // if `dataset_type` is defined in the URL, use it to set `tab`. otherwise, them using a default.
         // implicitly, `switch_field.value` is also updated.
         tab = urlDatasetType?.length
             ? updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", urlDatasetType) as TDatasetValue  // validate and update value if necessary
             : defaultTab;
-        // console.log("dataset type on mount. tab:", tab, "switch_field.value", switch_field.value);
 
+        // set dataset_reuse_value from URL, if possible.
         const urlDatasetReuse = urlSearchParams.get("dataset_reuse") === "true";
-        // TODO fix this to bind URL param dataset_reuse and with dataset_reuse_value.
         dataset_reuse_value = updateUrlSearchParams(enforceDatasetReuseValue, "dataset_reuse", urlDatasetReuse);
 
         zip_file_name = zip_field.files?.[0]?.name ?? EMPTY_FILE;
