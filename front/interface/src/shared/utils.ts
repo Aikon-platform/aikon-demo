@@ -6,12 +6,31 @@ export function ellipsis(str: string, maxLen: number) {
     return str.slice(0, Math.max(5, maxLen - 12)) + "..." + str.slice(-Math.min(9, maxLen - 5));
 }
 
+export function unquote(v: any): any {
+    if (typeof v === "string") {
+        console.log("unquote 1", v);
+        // v = v.replaceAll(/(^"|"$)/g, "");
+        v = v.replace(/^["']|["']$/g, "")
+        console.log("unquote 2", v);
+    }
+    return v
+}
+
+export const isObject = (o: any): boolean => o?.constructor === Object;
+
+export const isString = (s: any): boolean => (typeof s === "string" || s instanceof String)
+
+export const isArray = (a: any): boolean => Array.isArray(a)
+
 /** abstract function generating validators: if `currentValue` is not in `allowedValues`, return `defaultValue` */
 export function enforceValue (allowedValues:TPrimitive[], defaultValue:TPrimitive = ""): Function {
-    return (currentValue:TPrimitive): TPrimitive =>
-        allowedValues.includes(currentValue)
+    return (currentValue:TPrimitive): TPrimitive => {
+        currentValue = unquote(currentValue);
+
+        return allowedValues.includes(currentValue)
             ? currentValue
             : defaultValue;
+    }
 }
 
 export function enforceBooleanValue (defaultValue: boolean): Function {
@@ -40,12 +59,20 @@ export function valueOrDefault(defaultValue: any, resolver: ((value:any)=>boolea
  *
  * NOTE: value must be JSON-stringifiable
  */
-export function updateUrlSearchParams(validateValueFunc: ((x:any)=>any)|undefined, paramName: string, paramValue: any): any {
+export function updateUrlSearchParams(validateValueFunc: Function|undefined, paramName: string, paramValue: any): any {
+    // don't JSON-stringify strings: JSON-stringifying a string will add ""
+    // around it which will mess up url-to-form binding
+    paramValue =  isArray(paramValue) || isObject(paramValue)
+        ? JSON.stringify(paramValue)
+        : paramValue;
+
     if (validateValueFunc) {
         paramValue = validateValueFunc(paramValue);
     }
+
     const url = new URL(window.location.href);
-    url.searchParams.set(paramName, JSON.stringify(paramValue));
+    url.searchParams.set(paramName, paramValue);
     window.history.pushState(null, '', url.toString());
+
     return paramValue
 }
