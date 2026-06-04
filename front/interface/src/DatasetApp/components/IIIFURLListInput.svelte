@@ -72,6 +72,7 @@
                 value[index] = [ url ];
             }
             field.value = JSON.stringify(value);
+            updateUrlIiifData(value);
         }
     }
 
@@ -85,6 +86,7 @@
                 field.value = JSON.stringify(value);
             }
             (e.currentTarget as HTMLInputElement).value = "";
+            updateUrlIiifData(value);
         }
     }
 
