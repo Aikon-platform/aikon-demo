@@ -7,7 +7,7 @@
     import IIIFURLListInput from "./IIIFURLListInput.svelte";
     import { preprocessImage } from "../imageHelpers";
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import { enforceValue, enforceBooleanValue, unquote, updateUrlSearchParams } from "../../shared/utils";
+    import { enforceValue, enforceBooleanValue, unquote, updateUrlSearchParams, maybeBooleanToBoolean } from "../../shared/utils";
 
     /**
      * NOTE URL-bound parameters are:
@@ -154,7 +154,7 @@
         tab = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", rawTab) as TDatasetValue  // validate and update value if necessary
 
         // set dataset_reuse_value from URL, if possible.
-        const urlDatasetReuse = unquote(urlSearchParams.get("dataset_reuse")) === "true";
+        const urlDatasetReuse = maybeBooleanToBoolean(urlSearchParams.get("dataset_reuse"));
         dataset_reuse_value = updateUrlSearchParams(enforceDatasetReuseValue, "dataset_reuse", urlDatasetReuse);
 
         zip_file_name = zip_field.files?.[0]?.name ?? EMPTY_FILE;

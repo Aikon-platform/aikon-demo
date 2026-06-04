@@ -19,6 +19,14 @@ export const isString = (s: any): boolean => (typeof s === "string" || s instanc
 
 export const isArray = (a: any): boolean => Array.isArray(a)
 
+/**
+ * `s` may be a string, number or boolean. return `true` if it is a representation of a boolean, false otherwise.
+ */
+export const maybeBooleanToBoolean = (s: string|number|boolean|null): boolean => {
+    s = unquote(s);
+    return [true, "true", "1", 1].some(x => s === x);
+}
+
 /** abstract function generating validators: if `currentValue` is not in `allowedValues`, return `defaultValue` */
 export function enforceValue(allowedValues:TPrimitive[], defaultValue:TPrimitive = ""): Function {
     return (currentValue:TPrimitive): TPrimitive => {
