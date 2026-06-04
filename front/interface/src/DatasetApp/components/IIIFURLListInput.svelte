@@ -15,7 +15,7 @@
 
     let { field, value = $bindable([]) }: Props = $props();
 
-    const paramName = "iiif_data"
+    const paramName = "iiif_data";
 
     /**
      * `value` to "," separated string
@@ -55,11 +55,6 @@
         // 2. concat items here with `value`
         value = value.concat(urlIiifUris);
         // 3. update URL search params (=remove invalid url sanitized in 1.)
-        writeToUrlParam();
-    }
-
-    function writeToUrlParam() {
-        // string[][] => string[] => string: extract URLs and set them as a "," separated string
         updateUrlIiifData(value);
     }
 
@@ -90,6 +85,7 @@
         }
     }
 
+    // TODO fix URL binding here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // fired when data is pasted into the input
     function onPaste(e: ClipboardEvent) {
         const text = e.clipboardData?.getData("text/plain");
@@ -98,6 +94,7 @@
             value.push(...lines.map(line => [ line.trim() ]).filter(line => line[0] != ""));
             field.value = JSON.stringify(value);
         }
+        updateUrlIiifData(value);
     }
 
     onMount(() => {
