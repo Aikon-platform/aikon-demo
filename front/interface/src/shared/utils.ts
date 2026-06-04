@@ -20,6 +20,20 @@ export const isString = (s: any): boolean => (typeof s === "string" || s instanc
 export const isArray = (a: any): boolean => Array.isArray(a)
 
 /**
+ * a string is a valid URL, starting http(s)
+ * copied from: https://stackoverflow.com/a/43467144
+ */
+export const isValidHttpUrl = (s: string): boolean => {
+    let url;
+    try {
+        url = new URL(s);
+    } catch (_) {
+        return false;
+    }
+    return url.protocol === "http:" || url.protocol === "https:";
+}
+
+/**
  * `s` may be a string, number or boolean. return `true` if it is a representation of a boolean, false otherwise.
  */
 export const maybeBooleanToBoolean = (s: string|number|boolean|null): boolean => {

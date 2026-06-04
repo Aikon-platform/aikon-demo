@@ -1,7 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import IIIFURLItem from "./IIIFURLItem.svelte";
-    import { enforceValue, enforceBooleanValue, valueOrDefault, updateUrlSearchParams } from "../../shared/utils";
+    import { enforceValue, enforceBooleanValue, valueOrDefault, updateUrlSearchParams, isValidHttpUrl, isString } from "../../shared/utils";
+
+    /**
+     * NOTE URL-bound parameters are:
+     * - "iiif_data": string. comma-separated IIIF manifest URLs on which to run a task.
+     */
 
     interface Props {
         field: HTMLTextAreaElement;
@@ -10,15 +15,53 @@
 
     let { field, value = $bindable([]) }: Props = $props();
 
-    const updateUrlSearchParamsIiifData = (val: string[][]) => updateUrlSearchParams(
-        valueOrDefault([], (x) => Array.isArray(x) && x.length > 0),
-        "iiif_data",
-        val
-    )
+    const paramName = "iiif_data"
 
-    onMount(() => {
-        value = JSON.parse(field.value);
-    });
+    /**
+     * `value` to "," separated string
+     * [["url1"], ["url2"]] => "url1,url2"
+     */
+    const unstringifyIiifData = (s: string): string[][] =>
+        s.split(",")
+            .filter(isValidHttpUrl)
+            .map(x => [x]);
+
+    /**
+     * comma separated string to `value`
+     * "url1,url2" => [["url1"], ["url2"]]
+     */
+    const stringifyIiifData = (d: string[][]): string =>
+        d.filter(x => x.length)
+            .map(x => x[0])
+            .filter(x => isString(x) && isValidHttpUrl(x))
+            .join(",");
+
+    /** update URL param `iiif_data` with new URLs. */
+    const updateUrlIiifData = (iiifData: string[][]): Function => {
+        // stringify `iiifData` (extract urls, remove non-urls, join urls by ",")
+        const iiifDataStr = stringifyIiifData(iiifData);
+
+        return updateUrlSearchParams(
+            undefined,
+            paramName,
+            iiifDataStr
+        )
+    }
+
+    function readFromUrlParam() {
+        const sp = (new URL(window.location.href)).searchParams;
+        // 1. parse URLs in seach params
+        const urlIiifUris = unstringifyIiifData(sp.get(paramName) || "");
+        // 2. concat items here with `value`
+        value = value.concat(urlIiifUris);
+        // 3. update URL search params (=remove invalid url sanitized in 1.)
+        writeToUrlParam();
+    }
+
+    function writeToUrlParam() {
+        // string[][] => string[] => string: extract URLs and set them as a "," separated string
+        updateUrlIiifData(value);
+    }
 
     // fired when pre-saved items are deleted or modified
     function onChangeItem(index: number) {
@@ -45,6 +88,7 @@
         }
     }
 
+    // fired when data is pasted into the input
     function onPaste(e: ClipboardEvent) {
         const text = e.clipboardData?.getData("text/plain");
         const lines = text?.split(/\s+/);
@@ -53,6 +97,11 @@
             field.value = JSON.stringify(value);
         }
     }
+
+    onMount(() => {
+        value = JSON.parse(field.value);
+        readFromUrlParam();
+    });
 </script>
 
 <div>
