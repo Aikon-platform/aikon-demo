@@ -20,7 +20,7 @@ export const isString = (s: any): boolean => (typeof s === "string" || s instanc
 export const isArray = (a: any): boolean => Array.isArray(a)
 
 /** abstract function generating validators: if `currentValue` is not in `allowedValues`, return `defaultValue` */
-export function enforceValue (allowedValues:TPrimitive[], defaultValue:TPrimitive = ""): Function {
+export function enforceValue(allowedValues:TPrimitive[], defaultValue:TPrimitive = ""): Function {
     return (currentValue:TPrimitive): TPrimitive => {
         currentValue = unquote(currentValue);
 
@@ -30,7 +30,7 @@ export function enforceValue (allowedValues:TPrimitive[], defaultValue:TPrimitiv
     }
 }
 
-export function enforceBooleanValue (defaultValue: boolean): Function {
+export function enforceBooleanValue(defaultValue: boolean): Function {
     return enforceValue([true, false], defaultValue)
 }
 
