@@ -8,10 +8,7 @@ export function ellipsis(str: string, maxLen: number) {
 
 export function unquote(v: any): any {
     if (typeof v === "string") {
-        console.log("unquote 1", v);
-        // v = v.replaceAll(/(^"|"$)/g, "");
         v = v.replace(/^["']|["']$/g, "")
-        console.log("unquote 2", v);
     }
     return v
 }
@@ -60,6 +57,8 @@ export function valueOrDefault(defaultValue: any, resolver: ((value:any)=>boolea
  * NOTE: value must be JSON-stringifiable
  */
 export function updateUrlSearchParams(validateValueFunc: Function|undefined, paramName: string, paramValue: any): any {
+    // unquote so that url-to-form binding works with and without quoptes
+    paramValue = unquote(paramValue);
     // don't JSON-stringify strings: JSON-stringifying a string will add ""
     // around it which will mess up url-to-form binding
     paramValue =  isArray(paramValue) || isObject(paramValue)
@@ -73,6 +72,5 @@ export function updateUrlSearchParams(validateValueFunc: Function|undefined, par
     const url = new URL(window.location.href);
     url.searchParams.set(paramName, paramValue);
     window.history.pushState(null, '', url.toString());
-
     return paramValue
 }

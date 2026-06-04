@@ -6,6 +6,7 @@
     import IndexSelect from "./IndexSelect.svelte";
     import NeedRegionsToggle from "./NeedRegionsToggle.svelte";
     import { enforceValue, updateUrlSearchParams } from "../../shared/utils";
+    import { createModuleResolutionCache } from "typescript";
 
     /**
      * NOTE URL-bound parameters are:
@@ -26,6 +27,17 @@
     const analysis_type_field = originalForm.querySelector("#id_analysis_type") as HTMLSelectElement;
     let analysis_type_value = $state(analysis_type_field.value);
 
+    let mounted = $state(false);
+
+    // `analysis_type_field.value` and URLSearchParams.analysis_type can both set a value.
+    // to avoid conflict, we defer the effect until after onMount has run. which defines form values from the URLSearchParams  ``
+    $effect(() => {
+        if (mounted) {
+            analysis_type_field.value = analysis_type_value;
+            updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value);
+        }
+    });
+
     const index_options = Array.from(originalForm.querySelectorAll("[name=query_target_index]")).map(option => option.parentElement as HTMLLabelElement);
     // if analysis_type_field == "indexing"
     let index_value = $state("");
@@ -39,10 +51,6 @@
     const errors = originalForm.querySelectorAll(".errorlist");
     const submit_button = analysis_type_field.form!.querySelector("input[type=submit]") as HTMLButtonElement;
     let dataset_ready = $state(false);
-
-    $effect(() => {
-        updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
-    });
 
     $effect(() => {
         if (analysis_type_value === "query") {
@@ -59,12 +67,14 @@
             || !dataset_ready;
     });
 
-    // on mount, read ll effects from URL search params and valdiate them
+    // on mount, read `analysis_type` from URL search params and use it to set the form value.
     onMount(() => {
         const urlSearchParams = new URLSearchParams(window.location.search);
-        if (urlSearchParams.get("analysis_type")) {
-            analysis_type_field.value = updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value)
+        const searchParamAnalysisType = urlSearchParams.get("analysis_type");
+        if (searchParamAnalysisType) {
+            analysis_type_value = updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", searchParamAnalysisType)
         }
+        mounted = true;
     })
 </script>
 

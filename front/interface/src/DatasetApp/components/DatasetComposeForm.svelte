@@ -145,11 +145,13 @@
         const urlSearchParams = new URLSearchParams(window.location.search);
         const urlDatasetType = urlSearchParams.get("dataset_type");
 
-        // if `dataset_type` is defined in the URL, use it to set `tab`. otherwise, them using a default.
+        // if `dataset_type` is defined in the URL, use it to set `tab`. otherwise, tab is set using a default.
         // implicitly, `switch_field.value` is also updated.
-        tab = urlDatasetType?.length
-            ? updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", urlDatasetType) as TDatasetValue  // validate and update value if necessary
+        const rawTab = urlDatasetType?.length
+            ? urlDatasetType
             : defaultTab;
+        // validate tab, and if `urlDatasetType` and sync tab and URL param.
+        tab = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", rawTab) as TDatasetValue  // validate and update value if necessary
 
         // set dataset_reuse_value from URL, if possible.
         const urlDatasetReuse = urlSearchParams.get("dataset_reuse") === "true";
