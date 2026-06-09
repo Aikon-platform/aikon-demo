@@ -6,7 +6,6 @@
     import IndexSelect from "./IndexSelect.svelte";
     import NeedRegionsToggle from "./NeedRegionsToggle.svelte";
     import { enforceValue, updateUrlSearchParams } from "../../shared/utils";
-    import { createModuleResolutionCache } from "typescript";
 
     /**
      * NOTE URL-bound parameters are:
@@ -107,7 +106,7 @@
     <DatasetComposeForm form={dataset_form} bind:ready={dataset_ready} />
 </div>
 
-<h4 class="mt-6 mb-5">What kind of images is it?</h4>
+<h4 class="mt-6 mb-5">What kind of images are in the dataset?</h4>
 <NeedRegionsToggle field={need_regions_field} are_sketches_field={analysis_type_value === "indexing" ? are_sketches_field : undefined} />
 {/if}
 <div class="mb-4"></div>
