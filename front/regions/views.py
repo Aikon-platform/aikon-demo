@@ -54,12 +54,19 @@ class RegionsDownloadZip(View):
         try:
             region = Regions.objects.get(pk=pk)
             zip_content = region.zip_crops()
-            return FileResponse(
+            if zip_content is None:
+                raise Http404(f"Crops not found for regions {pk}")
+            response = FileResponse(
                 zip_content,
                 content_type="application/zip",
                 filename=f"crops_{region.pk}.zip",
                 as_attachment=True,
             )
+            # disable nginx buffering for this route. this avoids timeouts
+            # when sending a large amount of data, which can happen here
+            # since we zip images.
+            response['X-Accel-Buffering'] = 'no'
+            response['Cache-Control'] = 'no-cache'
 
         except Regions.DoesNotExist:
             pass
