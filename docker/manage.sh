@@ -2,14 +2,11 @@
 
 set -e
 
-manage="/home/aikondemo/venv/bin/python /home/aikondemo/app/manage.py"
-
-# wait 2sec for postgres to start
-sleep 2
+manage="uv run --directory=/home/aikondemo/app /home/aikondemo/app/manage.py"
 
 $manage collectstatic --noinput
 
-$manage makemigrations
+# $manage makemigrations
 $manage migrate
 
 # source /home/aikondemo/app/.env

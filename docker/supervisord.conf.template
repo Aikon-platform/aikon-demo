@@ -6,7 +6,7 @@ logfile_maxbytes=0
 pidfile=/tmp/supervisord.pid
 
 [program:dramatiq]
-command=uv run --directory=/home/aikondemo/app/ python /home/aikondemo/app/manage.py rundramatiq -p 1 -t 1
+command=/home/aikondemo/app/.venv/bin/python /home/aikondemo/app/manage.py rundramatiq -p 1 -t 1
 directory=/home/aikondemo/app
 user=aikondemo
 autostart=true
@@ -19,11 +19,10 @@ stopsignal=QUIT
 environment=PYTHONPATH="/home/aikondemo"
 
 [program:django]
-command=uv --directory=/home/aikondemo/app/ run gunicorn \
-    app.demowebsite.wsgi:application \
+command=/home/aikondemo/app/.venv/bin/gunicorn app.demowebsite.wsgi:application \
+    --bind 0.0.0.0:DJANGO_PORT \
     --workers 4 \
     --worker-class gevent \
-    --bind 0.0.0.0:DJANGO_PORT \
     --timeout 600
 directory=/home/aikondemo/app
 user=aikondemo
