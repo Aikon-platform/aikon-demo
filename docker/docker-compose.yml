@@ -20,6 +20,8 @@ services:
       - ../front/.env
     environment:
       <<: *proxy-settings
+    extra_hosts:
+        - "host.docker.internal:host-gateway" 
     ports:
       - "${DJANGO_PORT:-8000}:${DJANGO_PORT:-8000}"
     #extra_hosts:
