@@ -1,6 +1,6 @@
 import json
 from stat import S_IFREG
-from stream_zip import ZIP_32, stream_zip
+from stream_zip import ZIP_64, ZIP_32, stream_zip
 from typing import List, Tuple, Iterable, Generator, Union
 
 from pathlib import Path
@@ -26,12 +26,22 @@ def zip_on_the_fly(files: List[Tuple[str, TPath]]) -> Iterable[bytes]:
     def iter_files() -> Generator[
         Tuple[str, int, int, int, Generator[bytes, None, None]], None, None
     ]:
-        for name, path in files:
+        for i, (name, path) in enumerate(files):
+            # NOTE: we zip the 1st file with ZIP_32, the others with ZIP_64.
+            # on MacOS Safari, "Open after downloading", if the 1st file in the zip
+            # is a Zip64, only the 1st file is extracted and the rest are silently deleted
+            # ZIP_32 doesn't have this bug but can't be used on large archives:
+            # - max number of zipped files is 65_000
+            # - max archive size is 4GB
+            # - max size of a single file in the zip is 4GB
+            # see warnings on ZIP_64 here: https://stream-zip.docs.trade.gov.uk/api/methods/#the-64-methods
+            # NOTE: only possible pitfall: if the 1st file is >4GB, it can't be zipped with ZIP_32 => archive creation will fail.
+            zip_type = ZIP_32 if i==0 else ZIP_64
             if not os.path.exists(path):
                 print(f"File {path} does not exist")
                 continue
             dt = datetime.fromtimestamp(os.path.getmtime(path))
-            yield (name, dt, S_IFREG | 0o600, ZIP_32, contents(path))
+            yield (name, dt, S_IFREG | 0o600, zip_type, contents(path))
 
     return stream_zip(iter_files())
 
