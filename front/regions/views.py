@@ -67,6 +67,7 @@ class RegionsDownloadZip(View):
             # since we zip images.
             response['X-Accel-Buffering'] = 'no'
             response['Cache-Control'] = 'no-cache'
+            return response
 
         except Regions.DoesNotExist:
             pass
