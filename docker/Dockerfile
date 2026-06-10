@@ -4,7 +4,7 @@ FROM node:23 AS svelte_build
 WORKDIR /app
 COPY front .
 WORKDIR /app/interface/
-RUN npm install --omit=dev
+RUN npm install
 RUN npm run build
 
 # --------------------------------------------

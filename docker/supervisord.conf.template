@@ -19,11 +19,7 @@ stopsignal=QUIT
 environment=PYTHONPATH="/home/aikondemo"
 
 [program:django]
-command=/home/aikondemo/app/.venv/bin/gunicorn app.demowebsite.wsgi:application \
-    --bind 0.0.0.0:DJANGO_PORT \
-    --workers 4 \
-    --worker-class gevent \
-    --timeout 600
+command=/home/aikondemo/app/.venv/bin/gunicorn app.demowebsite.wsgi:application --bind 0.0.0.0:DJANGO_PORT --workers 4 --worker-class gevent --timeout 600
 directory=/home/aikondemo/app
 user=aikondemo
 autostart=true
