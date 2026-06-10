@@ -65,7 +65,7 @@ http {
 
         location /media/ {
             autoindex off;
-            # path to the mounted data folder inside the docker container.
+            # path to the mounted data folder inside the nginx docker container.
             alias /data/;
         }
 
