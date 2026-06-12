@@ -65,7 +65,8 @@ http {
 
         location /media/ {
             autoindex off;
-            alias /data/mediafiles/;
+            # path to the mounted data folder inside the nginx docker container.
+            alias /data/;
         }
 
         location /favicon.ico {

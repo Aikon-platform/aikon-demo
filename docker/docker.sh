@@ -35,8 +35,7 @@ build_containers() {
     bash "$DOCKER_DIR"/init.sh
     # create_network
     $dc build
-    # connect_api
-    # TODO collectstatic
+    # connect_api\
 }
 
 stop_containers() {

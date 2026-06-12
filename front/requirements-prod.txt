@@ -1,2 +1,4 @@
 psycopg2-binary
+gunicorn
+gevent
 -r ./requirements.txt

@@ -4,7 +4,7 @@ FROM node:23 AS svelte_build
 WORKDIR /app
 COPY front .
 WORKDIR /app/interface/
-RUN npm install --omit=dev
+RUN npm install
 RUN npm run build
 
 # --------------------------------------------
@@ -48,11 +48,12 @@ RUN apt-get update && apt-get install -y \
     vim \
     build-essential \
     poppler-utils \
-    ghostscript \
-    # TODO delete
-    python3.10 \
-    python3.10-venv \
-    python3-pip
+    ghostscript
+
+# install UV. https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+RUN useradd -u ${USERID} -m -d /home/${USER} ${USER}
 
 # install UV. https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
