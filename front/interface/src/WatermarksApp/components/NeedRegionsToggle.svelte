@@ -20,7 +20,6 @@
         );
 
     let { value = $bindable(true), field, are_sketches_field }: Props = $props();
-    are_sketches_field = are_sketches_field || undefined;
     let internal_value = $state(value ? "true" : "false");
 
     function onValueChange(newValue: string) {
