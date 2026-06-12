@@ -24,7 +24,7 @@
     const unstringifyIiifData = (s: string): string[][] =>
         s.split(",")
             .filter(isValidHttpUrl)
-            .map(x => [x]);
+            .map(x => [ x ]);
 
     /**
      * comma separated string to `value`
@@ -77,7 +77,7 @@
             e.preventDefault();
             if ((e.currentTarget as HTMLInputElement).value != "") {
                 // value.push([ (e.currentTarget as HTMLInputElement).value.trim() ]);
-                value = value.concat([ [(e.currentTarget as HTMLInputElement).value.trim()] ])
+                value = value.concat([[ (e.currentTarget as HTMLInputElement).value.trim() ]])
                 field.value = JSON.stringify(value);
             }
             (e.currentTarget as HTMLInputElement).value = "";

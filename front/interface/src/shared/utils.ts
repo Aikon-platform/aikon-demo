@@ -19,6 +19,8 @@ export const isString = (s: any): boolean => (typeof s === "string" || s instanc
 
 export const isArray = (a: any): boolean => Array.isArray(a)
 
+export const isBoolean = (b: any): boolean => typeof b === "boolean";
+
 /**
  * a string is a valid URL, starting http(s)
  * copied from: https://stackoverflow.com/a/43467144

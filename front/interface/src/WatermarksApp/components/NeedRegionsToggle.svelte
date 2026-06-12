@@ -2,6 +2,7 @@
     import Icon from "@iconify/svelte";
     import { ToggleGroup } from "bits-ui";
     import { onMount } from "svelte";
+    import { enforceValue, updateUrlSearchParams, isBoolean } from "../../shared/utils";
 
     interface Props {
         value?: boolean;
@@ -9,11 +10,22 @@
         are_sketches_field?: HTMLInputElement;
     }
 
+    const enforceNeedsRegionsValue = enforceValue([ "true", "false", "sketches" ], "true");
+    const urlParamName = "needs_regions";
+    const urlParamUpdateHook = (value: string) =>
+        updateUrlSearchParams(
+            enforceNeedsRegionsValue,
+            urlParamName,
+            isBoolean(value) ? value.toString() : value  // if it's bool, stringify it
+        );
+
     let { value = $bindable(true), field, are_sketches_field }: Props = $props();
+    are_sketches_field = are_sketches_field || undefined;
     let internal_value = $state(value ? "true" : "false");
 
     function onValueChange(newValue: string) {
         internal_value = newValue;
+        urlParamUpdateHook(internal_value);
         value = internal_value == "true";
         field.checked = value;
         if (are_sketches_field) {
@@ -22,7 +34,22 @@
     }
 
     onMount(() => {
-        internal_value = are_sketches_field?.checked ? "sketches" : field.checked ? "true" : "false";
+        const searchParams = new URL(window.location.href).searchParams;
+        const urlValue = searchParams.get(urlParamName) || "";
+
+        // urlValue is defined  => set form values from URL
+        if (urlValue) {
+            if (are_sketches_field) {
+                are_sketches_field.checked = urlValue==="sketches";
+            }
+            internal_value = urlParamUpdateHook(urlValue);
+        // no URL values => set default depending on passed props
+        } else {
+            internal_value = are_sketches_field?.checked
+                ? "sketches"
+                : field.checked ? "true" : "false";
+            urlParamUpdateHook(urlValue);
+        }
         value = internal_value == "true";
     });
 
