@@ -56,4 +56,10 @@ Note that for other dataset types (PDF, ZIP, images), values cannot be defined f
     - separate multiple URLs with a comma (`,`) and no spaces
     - avoid quotes as always
 
+### What kind of images are in the dataset ?
 
+Define type of images so that they can be processed correctly. 
+
+- Svelte component: `NeedRegionsToggle.svelte`
+- param name: `needs_regions`
+- param values: `true | false | sketches`
