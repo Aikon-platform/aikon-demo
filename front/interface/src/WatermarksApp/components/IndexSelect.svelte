@@ -60,7 +60,6 @@
                     value = input.value;
                 }
             })
-
         // otherwise, set form data from props
         } else {
             options_detailed.forEach(({ input }) => {
@@ -69,7 +68,6 @@
                 }
             });
         }
-
     });
 </script>
 
