@@ -10,6 +10,18 @@ from datetime import datetime
 TPath = Union[str, Path]
 
 
+def sanitize_for_regex(s: str) -> str:
+    """
+    sanitize user input `s` so that it can be safely passed to a regular expression
+    """
+    chars = ["[", "\\", "$", "^", "*", "+", "?", "(", ")", "[", "{", "|", "]"]
+    if not isinstance(s, str):
+        raise TypeError(f"expected s to be a string, got {type(s)}")
+    for c in chars:
+        s = s.replace(c, "")
+    return s
+
+
 def zip_on_the_fly(files: List[Tuple[str, TPath]]) -> Iterable[bytes]:
     """
     Zip files on the fly
