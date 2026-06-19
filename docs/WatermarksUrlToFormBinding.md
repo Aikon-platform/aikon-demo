@@ -72,7 +72,7 @@ Note that for other dataset types (PDF, ZIP, images), values cannot be defined f
     - separate multiple URLs with a comma (`,`) and no spaces
     - avoid quotes as always
 
-![form3](./includes/form2.png)
+![form3](./includes/form3.png)
 
 ---
 
