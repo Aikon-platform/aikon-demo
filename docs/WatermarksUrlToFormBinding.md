@@ -10,6 +10,14 @@ In the `Start a new Watermarks pipeline` ([URL](https://aikon-demo.enpc.fr/water
 
 ---
 
+## Examples
+
+```
+watermarks/start?analysis_type=query&iiif_data=&dataset_type=iiif&dataset_reuse=false&needs_regions=true&watermark_index=Briquet 16k
+```
+
+---
+
 ## What do you want to do ?
 
 Defines the type of Watermark task to run.
