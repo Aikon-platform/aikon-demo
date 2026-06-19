@@ -95,13 +95,7 @@
 {/if}
 
 {#if analysis_type_value && (analysis_type_value !== "query" || index_value != "")}
-<h4 class="mt-6 mb-5">
-    {#if analysis_type_value === "query"}
-    What images do you want to use as a query?
-    {:else}
-    What is your dataset?
-    {/if}
-</h4>
+<h4 class="mt-6 mb-5">What is your dataset?</h4>
 <div class="box has-background-light">
     <DatasetComposeForm form={dataset_form} bind:ready={dataset_ready} />
 </div>

@@ -20,6 +20,22 @@ Defines the type of Watermark task to run.
 
 This form determines which fields will be displayed next.
 
+![form1](./includes/form1.png)
+
+--- 
+
+## What index do you want to query
+
+Used in image queries (compare a dataset against existing watermark indexes).
+
+Allows to select the index to use in the query.
+
+- Svelte component: `IndexSelect.svelte`
+- param name: `watermark_index`
+- param value: the name of one of the existing watermark indexes (i.e., "Briquet 16k" in the picture below).
+
+![form2](./includes/form2.png)
+
 ---
 
 ## What is your dataset ?
@@ -56,10 +72,16 @@ Note that for other dataset types (PDF, ZIP, images), values cannot be defined f
     - separate multiple URLs with a comma (`,`) and no spaces
     - avoid quotes as always
 
-### What kind of images are in the dataset ?
+![form3](./includes/form2.png)
+
+---
+
+## What kind of images are in the dataset ?
 
 Define type of images so that they can be processed correctly. 
 
 - Svelte component: `NeedRegionsToggle.svelte`
 - param name: `needs_regions`
 - param values: `true | false | sketches`
+
+![form4](./includes/form4.png)
