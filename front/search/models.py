@@ -33,7 +33,7 @@ class Index(models.Model):
         Dataset, on_delete=models.CASCADE, related_name="search_index"
     )
 
-    name = models.CharField(max_length=511, blank=True, default="")
+    name = models.CharField(max_length=511, blank=True, default=None, unique=True)
     description = models.TextField(blank=True, default="")
 
     index_id = models.CharField(max_length=511, db_index=True)
