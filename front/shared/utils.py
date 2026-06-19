@@ -12,7 +12,7 @@ TPath = Union[str, Path]
 
 def sanitize_for_regex(s: str) -> str:
     """
-    sanitize user input `s` so that it can be safely passed to a regular expression
+    sanitize user inputted string `s` so that it can be safely passed to a regular expression
     """
     chars = ["[", "\\", "$", "^", "*", "+", "?", "(", ")", "[", "{", "|", "]"]
     if not isinstance(s, str):
