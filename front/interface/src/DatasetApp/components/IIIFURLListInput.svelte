@@ -36,6 +36,11 @@
             .filter(x => isString(x) && isValidHttpUrl(x))
             .join(",");
 
+    /** field.value is the data actually being read by the Django form => update it */
+    const updateFieldValue = (newValue: string[][]) => {
+        field.value = JSON.stringify(newValue);
+    }
+
     /** update URL param `iiif_data` with new URLs. */
     const updateUrlIiifData = (iiifData: string[][]): Function => {
         // stringify `iiifData` (extract urls, remove non-urls, join urls by ",")
@@ -46,15 +51,22 @@
             iiifDataStr
         )
     }
+    /** main hook to update value, field.value and the URL based on `newValue` */
+    const updateValue = (newValue: string[][]) => {
+        value = newValue;
+        updateFieldValue(value);
+        updateUrlIiifData(value);
+        console.log("updateValue : field.value", field.value);
+    }
 
     function readFromUrlParam() {
         const sp = (new URL(window.location.href)).searchParams;
         // 1. parse URLs in seach params
         const urlIiifUris = unstringifyIiifData(sp.get(paramName) || "");
         // 2. concat items here with `value`
-        value = value.concat(urlIiifUris);
-        // 3. update URL search params (=remove invalid url sanitized in 1.)
-        updateUrlIiifData(value);
+        const newValue = value.concat(urlIiifUris);
+        // 3. update state
+        updateValue(newValue);
     }
 
     // fired when pre-saved items are deleted or modified
@@ -68,9 +80,7 @@
                 // modify element by its index.
                 newValue[index] = [ url ];
             }
-            field.value = JSON.stringify(newValue);
-            updateUrlIiifData(newValue);
-            value = newValue;
+            updateValue(newValue);
         }
     }
 
@@ -80,13 +90,14 @@
             e.preventDefault();
             if ((e.currentTarget as HTMLInputElement).value != "") {
                 // value.push([ (e.currentTarget as HTMLInputElement).value.trim() ]);
-                value = value.concat([[ (e.currentTarget as HTMLInputElement).value.trim() ]])
-                field.value = JSON.stringify(value);
+                const newValue = value.concat([[ (e.currentTarget as HTMLInputElement).value.trim() ]])
+                updateValue(newValue);
             }
             (e.currentTarget as HTMLInputElement).value = "";
-            updateUrlIiifData(value);
         }
     }
+
+    // TODO deduplication with values from the URL on mount.
 
     // TODO fix URL binding here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // fired when data is pasted into the input
@@ -94,10 +105,10 @@
         const text = e.clipboardData?.getData("text/plain");
         const lines = text?.split(/\s+/);
         if (lines) {
-            value.push(...lines.map(line => [ line.trim() ]).filter(line => line[0] != ""));
-            field.value = JSON.stringify(value);
+            const newValue = [...value];
+            newValue.push(...lines.map(line => [ line.trim() ]).filter(line => line[0] != ""));
+            updateValue(newValue);
         }
-        updateUrlIiifData(value);
     }
 
     onMount(() => {
