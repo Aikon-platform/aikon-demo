@@ -40,7 +40,6 @@
     const updateUrlIiifData = (iiifData: string[][]): Function => {
         // stringify `iiifData` (extract urls, remove non-urls, join urls by ",")
         const iiifDataStr = stringifyIiifData(iiifData);
-
         return updateUrlSearchParams(
             undefined,
             paramName,
@@ -61,13 +60,17 @@
     // fired when pre-saved items are deleted or modified
     function onChangeItem(index: number) {
         return (url: string) => {
+            let newValue = [...value];
             if (url == "") {
-                value.splice(index, 1);
+                // delete element by its index
+                newValue.splice(index, 1);
             } else {
-                value[index] = [ url ];
+                // modify element by its index.
+                newValue[index] = [ url ];
             }
-            field.value = JSON.stringify(value);
-            updateUrlIiifData(value);
+            field.value = JSON.stringify(newValue);
+            updateUrlIiifData(newValue);
+            value = newValue;
         }
     }
 
