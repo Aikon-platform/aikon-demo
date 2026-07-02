@@ -10,7 +10,6 @@ import IconBtn from "../../shared/components/IconBtn.svelte";
     let { url, onChange }: Props = $props();
 
     const onBlur = () => {
-        console.log(url);
         onChange(url);
     }
 

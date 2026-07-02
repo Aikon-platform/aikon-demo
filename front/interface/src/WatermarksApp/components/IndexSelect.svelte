@@ -55,7 +55,7 @@
         if (urlIndexValue) {
             urlIndexValue = updateIndexSearchParam(urlIndexValue);
             options_detailed.forEach(({ input }) => {
-                if ( input.id === urlIndexValue ) {
+                if (input.id === urlIndexValue) {
                     input.checked = input.id === urlIndexValue;
                     value = input.value;
                 }

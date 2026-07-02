@@ -62,7 +62,6 @@
     const enforceDatasetReuseValue = enforceBooleanValue(defaultDatasetReuse);
 
     function addImages(files: File[]) {
-        console.log(files);
         files.forEach((file) => {
             preprocessImage(file, 2048, (blob) => {
                 if (blob) {
@@ -129,7 +128,6 @@
     }
 
     $effect(() => {
-        console.log("$effect dataset_reuse_target_value", dataset_reuse_target_value);
         dataset_reuse_target_field.value = dataset_reuse_target_value;
     });
 
@@ -152,6 +150,8 @@
             : defaultTab;
         // validate tab, and if `urlDatasetType` and sync tab and URL param.
         tab = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", rawTab) as TDatasetValue  // validate and update value if necessary
+        // synchronize switch_field (internal django value) with URL param
+        switch_field.value = tab;
 
         // set dataset_reuse_value from URL, if possible.
         const urlDatasetReuse = maybeBooleanToBoolean(urlSearchParams.get("dataset_reuse"));

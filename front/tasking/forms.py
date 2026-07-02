@@ -91,6 +91,7 @@ class AbstractTaskOnDatasetForm(AbstractTaskForm, AbstractDatasetForm):
 
             if data_format in MAP_FIELD_FORMAT:
                 field_name = MAP_FIELD_FORMAT[data_format]
+
                 if not self.cleaned_data.get(field_name):
                     self.add_error(field_name, "A file is required.")
                     return False

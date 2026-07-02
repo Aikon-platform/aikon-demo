@@ -17,28 +17,45 @@
 
     const paramName = "iiif_data";
 
+    /** deduplicate URL value for `iiif_data` */
+    const deduplicateUrlValue = (s: string): string => [ ...new Set(s.split(",")) ].join(",")
+
+    /** deduplate svelte's internal form data (`value`) */
+    const deduplicateInternalValue = (v: string[][]): string[][] => {
+        const dedupUriArr = [ ...new Set(
+            v
+                .filter(el => el.length)
+                .map(el => el[0])
+        ) ];
+        return dedupUriArr.map(el => ([ el ]));
+    }
+
     /**
-     * `value` to "," separated string
-     * [["url1"], ["url2"]] => "url1,url2"
+     * URL-to-Svelte serialization
+     * comma separated string to `value`
+     * "url1,url2" => [["url1"], ["url2"]]
      */
     const unstringifyIiifData = (s: string): string[][] =>
-        s.split(",")
+        deduplicateUrlValue(s)
+            .split(",")
             .filter(isValidHttpUrl)
             .map(x => [ x ]);
 
     /**
-     * comma separated string to `value`
-     * "url1,url2" => [["url1"], ["url2"]]
+     * Svelte-to-URL serialization
+     * `value` to "," separated string
+     * [["url1"], ["url2"]] => "url1,url2"
      */
     const stringifyIiifData = (d: string[][]): string =>
-        d.filter(x => x.length)
+        deduplicateInternalValue(d)
+            .filter(x => x.length)
             .map(x => x[0])
             .filter(x => isString(x) && isValidHttpUrl(x))
             .join(",");
 
     /** field.value is the data actually being read by the Django form => update it */
     const updateFieldValue = (newValue: string[][]) => {
-        field.value = JSON.stringify(newValue);
+        field.value = JSON.stringify(deduplicateInternalValue(newValue));
     }
 
     /** update URL param `iiif_data` with new URLs. */
@@ -51,12 +68,12 @@
             iiifDataStr
         )
     }
+
     /** main hook to update value, field.value and the URL based on `newValue` */
     const updateValue = (newValue: string[][]) => {
-        value = newValue;
+        value = deduplicateInternalValue(newValue);
         updateFieldValue(value);
         updateUrlIiifData(value);
-        console.log("updateValue : field.value", field.value);
     }
 
     function readFromUrlParam() {
@@ -72,7 +89,8 @@
     // fired when pre-saved items are deleted or modified
     function onChangeItem(index: number) {
         return (url: string) => {
-            let newValue = [...value];
+            // copy of `value` to avoid in-place modifs.
+            let newValue = [ ...value ];
             if (url == "") {
                 // delete element by its index
                 newValue.splice(index, 1);
@@ -89,15 +107,12 @@
         if (e.key == "Enter") {
             e.preventDefault();
             if ((e.currentTarget as HTMLInputElement).value != "") {
-                // value.push([ (e.currentTarget as HTMLInputElement).value.trim() ]);
-                const newValue = value.concat([[ (e.currentTarget as HTMLInputElement).value.trim() ]])
+                const newValue = [...value].concat([[ (e.currentTarget as HTMLInputElement).value.trim() ]]);
                 updateValue(newValue);
             }
             (e.currentTarget as HTMLInputElement).value = "";
         }
     }
-
-    // TODO deduplication with values from the URL on mount.
 
     // TODO fix URL binding here !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // fired when data is pasted into the input
@@ -105,7 +120,7 @@
         const text = e.clipboardData?.getData("text/plain");
         const lines = text?.split(/\s+/);
         if (lines) {
-            const newValue = [...value];
+            const newValue = [ ...value ];
             newValue.push(...lines.map(line => [ line.trim() ]).filter(line => line[0] != ""));
             updateValue(newValue);
         }
