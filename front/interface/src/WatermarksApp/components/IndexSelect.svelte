@@ -2,7 +2,6 @@
     import { ToggleGroup } from "bits-ui";
     import { onMount } from "svelte";
     import { enforceValue, updateUrlSearchParams } from "../../shared/utils";
-    import { isQuestionOrPlusOrMinusToken } from "typescript";
 
     /**
      * NOTE url-bound parameters are:
