@@ -16,33 +16,13 @@ elif [[ "$OS" == "Windows" ]]; then
     }
 fi
 
-if ! command -v python3 &> /dev/null; then
-    color_echo "red" "Python is not installed. Please install python3.10 python3.10-venv python3.10-dev"
-    exit 1
-fi
-if ! command -v python3.10 &> /dev/null; then
-    color_echo "red" "Python 3.10 is not installed. Please install python3.10 python3.10-venv python3.10-dev"
-    exit 1
-fi
-
-if [[ "$OS" == "Linux" ]]; then
-    : # Placeholder
-    # sudo apt install software-properties-common
-    # sudo add-apt-repository ppa:deadsnakes/ppa
-    # sudo apt-get update && sudo apt-get install -y python3.10 python3.10-venv python3.10-dev
-elif [[ "$OS" == "Mac" ]]; then
-    : # Placeholder
-    # brew install python@3.10
-elif [[ "$OS" == "Windows" ]]; then
-    : # Placeholder
-    # winget install -e --id Python.Python.3.10
-    # pip3 install virtualenv
-fi
-
 if [[ "$OS" == "Linux" ]]; then
     sudo apt-get update && sudo apt-get install -y redis-server curl
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 elif [[ "$OS" == "Mac" ]]; then
     brew install redis curl
+    curl -LsSf https://astral.sh/uv/install.sh | sh
 elif [[ "$OS" == "Windows" ]]; then
     winget install -e --id Redis.Redis cURL.cURL
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 fi

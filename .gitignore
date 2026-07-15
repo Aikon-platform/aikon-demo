@@ -73,6 +73,7 @@ supervisord.conf
 .*hash
 env/
 venv/
+.venv/
 ENV/
 env.bak/
 venv.bak/
@@ -84,6 +85,7 @@ front/data/
 api/media/
 api/data/
 api/runs/
+data/
 
 # mediafiles
 front/mediafiles/
@@ -98,6 +100,7 @@ node_modules/
 .vscode/
 
 front/shared/static/dist/main.css.map
+front/shared/static/dist/*
 
 nginx_conf
 nginx_ssl

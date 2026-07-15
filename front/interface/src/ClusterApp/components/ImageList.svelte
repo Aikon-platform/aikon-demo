@@ -22,7 +22,7 @@
         onexpand,
     }: Props = $props();
 
-    let editor_state = getEditorState();
+    const editor_state = getEditorState();
 
     function toggleSelection(image: TClusterImageInfo) {
         editor_state.select_images("toggle", image);

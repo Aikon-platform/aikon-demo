@@ -6,7 +6,7 @@
     interface Props {
         image: TImageInfo;
     }
-    let { image }: Props = $props();
+    const { image }: Props = $props();
     let mounted = $state(false);
 
     $effect(() => {

@@ -1,11 +1,22 @@
 <script lang="ts">
-    import { Tabs, Toggle } from "bits-ui";
-    import IIIFURLListInput from "./IIIFURLListInput.svelte";
     import { onMount } from "svelte";
+    import { Tabs, Toggle } from "bits-ui";
     import JSZip from "jszip";
+    import Icon from "@iconify/svelte";
+
+    import IIIFURLListInput from "./IIIFURLListInput.svelte";
     import { preprocessImage } from "../imageHelpers";
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import Icon from "@iconify/svelte";
+    import { enforceValue, enforceBooleanValue, unquote, updateUrlSearchParams, maybeBooleanToBoolean } from "../../shared/utils";
+
+    /**
+     * NOTE URL-bound parameters are:
+     * - "dataset_type": TDatasetValue. has no effect if dataset_reuse=true
+     * - "dataset_reuse": boolean
+     *
+     */
+
+    type TDatasetValue = "zip"|"iiif"|"pdf"|"images"|""
 
     const EMPTY_FILE = "No file selected";
 
@@ -16,66 +27,41 @@
     let { form, ready = $bindable() }: Props = $props();
     const form_id = $props.id();
 
-    let dataset_reuse_field = form.querySelector("#id_reuse_dataset") as HTMLInputElement;
-    let dataset_reuse_target_field = form.querySelector("#id_dataset") as HTMLInputElement;
+    const dataset_reuse_field = form.querySelector("#id_reuse_dataset") as HTMLInputElement;
+    const dataset_reuse_target_field = form.querySelector("#id_dataset") as HTMLInputElement;
 
-    let switch_field = form.querySelector("#id_format") as HTMLInputElement;
-    let iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
-    let zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
-    let pdf_field = form.querySelector("#id_pdf_file") as HTMLInputElement;
-    let parent_html_form = zip_field.form!;
+    // `switch_field` represents the internal state sent to Django
+    // `tab` represents the user-exposed / svelte side data
+    // the notable difference is that, if tab==="images", images are zipped in svelte-side
+    // `switch_field.value` is set to "zip" while `tab` is kept to "images", and a zip of
+    // images is sent to Django.
+    const switch_field = form.querySelector("#id_format") as HTMLInputElement;
+    const defaultTab = "pdf";
+    let tab: TDatasetValue = $state("");  // set in `onMount`
 
+    const iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
+    const zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
+    const pdf_field = form.querySelector("#id_pdf_file") as HTMLInputElement;
+    const parent_html_form = zip_field.form!;
+
+    // checkbox: reuse existing dataset.
     let dataset_reuse_value = $state(dataset_reuse_field.checked);
+    const defaultDatasetReuse = false;
+    // which dataset to reuse
     let dataset_reuse_target_value = $state(dataset_reuse_target_field.value);
+
     let iiif_value = $state<string[][]>([]);
     let zip_file_name = $state(EMPTY_FILE);
     let pdf_file_name = $state(EMPTY_FILE);
     let image_files: { name: string; blob: Blob }[] = $state([]);
-    let image_zipper = new JSZip();
+    const image_zipper = new JSZip();
 
-    let tab = $state("zip");
     let dragover = $state(false);
 
-    onMount(() => {
-        zip_file_name = zip_field.files?.[0]?.name ?? EMPTY_FILE;
-        zip_field.onchange = () => {
-            zip_file_name = zip_field.files?.[0]?.name ?? EMPTY_FILE;
-        };
-
-        pdf_file_name = pdf_field.files?.[0]?.name ?? EMPTY_FILE;
-        pdf_field.onchange = () => {
-            pdf_file_name = pdf_field.files?.[0]?.name ?? EMPTY_FILE;
-        };
-
-        tab = switch_field.value;
-
-        if (parent_html_form) {
-            parent_html_form.onsubmit = (event) => {
-                if (tab !== "zip") zip_field.files = null;
-                if (tab !== "pdf") pdf_field.files = null;
-
-                if (tab == "images") {
-                    event.preventDefault();
-                    image_zipper.generateAsync({ type: "blob" }).then((blob) => {
-                        const dataTransfer = new DataTransfer();
-                        dataTransfer.items.add(
-                            new File([blob], "dataset.zip", { type: "application/zip" })
-                        );
-                        zip_field.files = dataTransfer.files;
-                        parent_html_form.submit();
-                    });
-                }
-            };
-        }
-        return () => {
-            zip_field.onchange = null;
-            pdf_field.onchange = null;
-            parent_html_form.onsubmit = null;
-        };
-    });
+    const enforceSwitchFieldValue = enforceValue([ "zip", "iiif", "images", "pdf" ], defaultTab)
+    const enforceDatasetReuseValue = enforceBooleanValue(defaultDatasetReuse);
 
     function addImages(files: File[]) {
-        console.log(files);
         files.forEach((file) => {
             preprocessImage(file, 2048, (blob) => {
                 if (blob) {
@@ -93,7 +79,7 @@
                         }
                     }
                     image_zipper.file(filename, blob);
-                    image_files = [...image_files, { name: filename, blob: blob }];
+                    image_files = [ ...image_files, { name: filename, blob: blob }];
                 }
             });
         });
@@ -132,11 +118,13 @@
     }
 
     function onTabChange(value: string) {
+        updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value)
         switch_field.value = value == "images" ? "zip" : value;
     }
 
     function onDatasetReuseChange(value: boolean) {
         dataset_reuse_field.checked = value;
+        updateUrlSearchParams(enforceDatasetReuseValue, "dataset_reuse", value);
     }
 
     $effect(() => {
@@ -144,11 +132,64 @@
     });
 
     $effect(() => {
-        ready = dataset_reuse_value ? dataset_reuse_target_value != "" : 
+        ready = dataset_reuse_value ? dataset_reuse_target_value != "" :
             (tab == "images" && image_files.length > 0) ||
             (tab == "zip" && zip_file_name !== EMPTY_FILE) ||
             (tab == "iiif" && iiif_value.length > 0) ||
             (tab == "pdf" && pdf_file_name !== EMPTY_FILE);
+    });
+
+    onMount(() => {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const urlDatasetType = urlSearchParams.get("dataset_type");
+
+        // if `dataset_type` is defined in the URL, use it to set `tab`. otherwise, tab is set using a default.
+        // implicitly, `switch_field.value` is also updated.
+        const rawTab = urlDatasetType?.length
+            ? urlDatasetType
+            : defaultTab;
+        // validate tab, and if `urlDatasetType` and sync tab and URL param.
+        tab = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", rawTab) as TDatasetValue  // validate and update value if necessary
+        // synchronize switch_field (internal django value) with URL param
+        switch_field.value = tab;
+
+        // set dataset_reuse_value from URL, if possible.
+        const urlDatasetReuse = maybeBooleanToBoolean(urlSearchParams.get("dataset_reuse"));
+        dataset_reuse_value = updateUrlSearchParams(enforceDatasetReuseValue, "dataset_reuse", urlDatasetReuse);
+
+        zip_file_name = zip_field.files?.[0]?.name ?? EMPTY_FILE;
+        zip_field.onchange = () => {
+            zip_file_name = zip_field.files?.[0]?.name ?? EMPTY_FILE;
+        };
+
+        pdf_file_name = pdf_field.files?.[0]?.name ?? EMPTY_FILE;
+        pdf_field.onchange = () => {
+            pdf_file_name = pdf_field.files?.[0]?.name ?? EMPTY_FILE;
+        };
+
+        if (parent_html_form) {
+            parent_html_form.onsubmit = (event) => {
+                if (tab !== "zip") zip_field.files = null;
+                if (tab !== "pdf") pdf_field.files = null;
+
+                if (tab == "images") {
+                    event.preventDefault();
+                    image_zipper.generateAsync({ type: "blob" }).then((blob) => {
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(
+                            new File([ blob ], "dataset.zip", { type: "application/zip" })
+                        );
+                        zip_field.files = dataTransfer.files;
+                        parent_html_form.submit();
+                    });
+                }
+            };
+        }
+        return () => {
+            zip_field.onchange = null;
+            pdf_field.onchange = null;
+            parent_html_form.onsubmit = null;
+        };
     });
 </script>
 

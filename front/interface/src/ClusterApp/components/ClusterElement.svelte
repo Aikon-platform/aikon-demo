@@ -29,11 +29,11 @@
     let renaming = $state(false);
     let elRef = $state<HTMLDivElement>();
     let nameInput = $state<HTMLInputElement>();
-    let editor_state = getEditorState();
-    let name_provider = getNameProvider();
+    const editor_state = getEditorState();
+    const name_provider = getNameProvider();
 
     const N_SHOWN = { grid: 8, rows: 18 };
-    let n_shown = $derived(N_SHOWN[editor_state.viewer_display]);
+    const n_shown = $derived(N_SHOWN[editor_state.viewer_display]);
 
     let images:TClusterImageInfo[] = $state([]);
 
@@ -138,7 +138,7 @@
                         </p>
                     {:else}
                         <p>
-                            <ClusterCSVExporter clusters={[cluster]} />
+                            <ClusterCSVExporter clusters={[ cluster ]} />
                             <!-- {btnExpand} TODO -->
                         </p>
                     {/if}

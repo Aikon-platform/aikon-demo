@@ -1,17 +1,23 @@
-from django.db import models
-import orjson
 import traceback
 import uuid
 from pathlib import Path
 import requests
 from typing import Optional
+from uuid import uuid4
+import re
 
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+import orjson
 
+from shared.utils import sanitize_for_regex
 from regions.models import AbstractAPITaskOnCrops
 from datasets.models import Dataset
+
 
 User = get_user_model()
 
@@ -27,7 +33,7 @@ class Index(models.Model):
         Dataset, on_delete=models.CASCADE, related_name="search_index"
     )
 
-    name = models.CharField(max_length=511, blank=True, default="")
+    name = models.CharField(max_length=511, blank=True, default=None, unique=True)
     description = models.TextField(blank=True, default="")
 
     index_id = models.CharField(max_length=511, db_index=True)
@@ -57,6 +63,20 @@ class Index(models.Model):
     def index_url(self):
         return f"{settings.MEDIA_URL}search/index-{self.id}.json"
 
+    @classmethod
+    def available_indexes(cls, user: Optional[User]=None):
+        filt = Q(public=True)
+        if user:
+            filt = filt | Q(owner=user)
+        return cls.objects.filter(filt)
+
+    @classmethod
+    def get_index_names(cls, index_pk) -> list[str]:
+        # filter out pk: in the case of updates, the Index is aldready in the DB but
+        # we don't want to autoincrement its name => filter it out
+        index_names = cls.objects.filter(~Q(pk=index_pk)).values_list(("name"))
+        return [ n[0] for n in index_names]
+
     def set_index(self, index: dict):
         self.index_path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.index_path, "wb") as f:
@@ -68,12 +88,47 @@ class Index(models.Model):
         with open(self.index_path, "rb") as f:
             return orjson.loads(f.read())
 
-    @classmethod
-    def available_indexes(cls, user: Optional[User]=None):
-        filt = Q(public=True)
-        if user:
-            filt = filt | Q(owner=user)
-        return cls.objects.filter(filt)
+    def set_index_name(self) -> "Index":
+        """
+        ensure the index name is unique by auto-incrementing it, if necessary
+        """
+        index_name = self.name
+        existing_index_names = self.get_index_names(self.pk)
+
+        # the `name` is used in Watermarks forms to select an index
+        # by defining its name in the URL query string => if no name
+        # is given, define a default name.
+        if not index_name:
+            index_name = f"index-{uuid4()}"
+            self.name = index_name
+            return self
+
+        # index_name is new => all good
+        if index_name not in existing_index_names:
+            self.name = index_name
+            return self
+
+        # since name must be unique, if another index has the same name,
+        # autoincrement the index name. structure: {index_name}-{n}.
+        index_name = sanitize_for_regex(index_name)
+        rgx_autoincrement = re.compile(fr"^({index_name})-(\d+)$")
+        # keep only the incremented index names from `existing_index_names`
+        incremented = [
+            rgx_autoincrement.match(name)
+            for name in existing_index_names
+        ]
+        incremented = [ m for m in incremented if m is not None ]
+        # index_name is in the db, but no pre-existing autoincrement => just add 1.
+        if not len(incremented):
+            index_name = f"{index_name}-1"
+            self.name = index_name
+            return self
+        # index_name is in the db and has been autoincremented => re-autoincrement
+        n_all = [ int(m[2]) for m in incremented ]
+        n_max = max(n_all)
+        index_name = f"{index_name}-{n_max+1}"
+        self.name = index_name
+        return self
 
 
 class Indexing(AbstractAPITaskOnCrops("search/indexing")):
@@ -82,7 +137,7 @@ class Indexing(AbstractAPITaskOnCrops("search/indexing")):
             param = getattr(self, "parameters", {})
             feat_net = param.get("feat_net", None)
             return f"Search Indexing{f' ({feat_net})' if feat_net else ''}"
-        return self.name
+        return str(self.name)
 
     def save_output(self, output: dict):
         """
@@ -274,3 +329,15 @@ class Query(AbstractAPITaskOnCrops("search/query")):
             return
 
         return super().on_task_success(data)
+
+
+@receiver(pre_save, sender=Index)
+def set_name(sender, **kwargs):
+    """
+    before creating/updating an Index, ensure its name is unique
+    by auto-incrementing it if necessary
+    """
+    instance: Index = kwargs.get("instance")
+    instance = instance.set_index_name()
+    return instance
+

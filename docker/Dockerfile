@@ -55,6 +55,11 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 RUN useradd -u ${USERID} -m -d /home/${USER} ${USER}
 
+# install UV. https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+RUN useradd -u ${USERID} -m -d /home/${USER} ${USER}
+
 WORKDIR /home/${USER}
 
 # Copy app files

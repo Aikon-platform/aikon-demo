@@ -1,5 +1,7 @@
 // SOURCE TYPES
 
+export type TPrimitive = string | number | boolean;
+
 export interface TDocument {
     uid: string;
     src: string;
