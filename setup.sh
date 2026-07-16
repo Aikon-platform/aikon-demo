@@ -1,6 +1,5 @@
 #!/bin/env bash
 
-
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 API_DIR="$ROOT_DIR/api"
 echo $API_DIR;
@@ -40,6 +39,8 @@ if ! bash "$API_DIR"/setup.sh; then
     color_echo red "API setup encountered an error"
     exit 1
 fi
+
+source "$ROOT_DIR/front/.env";
 
 echo_title "🎉 FRONT & API ARE SET UP! 🎉"
 color_echo blue "\nYou can now run the app and API with: "

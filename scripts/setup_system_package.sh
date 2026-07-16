@@ -18,11 +18,11 @@ fi
 
 if [[ "$OS" == "Linux" ]]; then
     sudo apt-get update && sudo apt-get install -y redis-server curl
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    which uv > /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh;
 elif [[ "$OS" == "Mac" ]]; then
     brew install redis curl
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    which uv > /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh;
 elif [[ "$OS" == "Windows" ]]; then
     winget install -e --id Redis.Redis cURL.cURL
-    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+    powershell -ExecutionPolicy ByPass -c "if (-not (Get-Command uv -ErrorAction SilentlyContinue)) { irm https://astral.sh/uv/install.ps1 | iex } else { Write-Host 'uv is already installed' }"
 fi
