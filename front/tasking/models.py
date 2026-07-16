@@ -450,9 +450,14 @@ def AbstractAPITaskOnDataset(task_prefix: str):
         """
         Abstract model for tasks that are sent to the API
         """
+        # NOTE : in the API, the `regions` module is named `region_extraction` => set endpoint accordingly
+        if task_prefix == "regions":
+            api_task_prefix = "region_extraction"
+        else:
+            api_task_prefix = task_prefix
 
         api_tracking_id = models.UUIDField(null=True, editable=False)
-        api_endpoint_prefix = f"{API_URL}/{task_prefix}"
+        api_endpoint_prefix = f"{API_URL}/{api_task_prefix}"
 
         class Meta:
             abstract = True
