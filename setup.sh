@@ -30,6 +30,8 @@ run_script "setup_system_package.sh" "System packages installation"
 run_script "setup_var_env.sh" "Environment variables configuration"
 run_script "setup_venv.sh" "Virtual environment setup"
 run_script "setup_database.sh" "Database configuration"
+run_script "setup_svelte.sh" "Svelte installation and compilation"
+
 # run_script "redis.sh" "Redis installation and setup"
 # run_script "vite.sh" "Vite setup"
 

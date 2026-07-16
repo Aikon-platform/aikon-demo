@@ -19,7 +19,8 @@
     "@typescript-eslint/parser": "^8.59.3",
     "eslint": "^9.39.4",
     "eslint-plugin-svelte": "^3.17.1",
-    "svelte-eslint-parser": "^1.6.1"
+    "svelte-eslint-parser": "^1.6.1",
+    "vite": "^7.3.6"
   },
   "pnpm": {
     "overrides": {
@@ -38,7 +39,6 @@
     "sass": "^1.93.1",
     "svelte": "^5.39.4",
     "svelte-check": "^4.3.1",
-    "typescript": "~5.8.3",
-    "vite": "npm:rolldown-vite@7.1.12"
+    "typescript": "~5.8.3"
   }
 }
