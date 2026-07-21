@@ -12,9 +12,9 @@
         highlit?: boolean;
         threshold?: number;
     }
-    let { matches, group_by_source, highlit, threshold }: Props = $props();
-    let groups = $derived(
-        group_by_source ? matches.matches_by_document : matches.matches.map((m) => [m])
+    const { matches, group_by_source, highlit, threshold }: Props = $props();
+    const groups = $derived(
+        group_by_source ? matches.matches_by_document : matches.matches.map((m) => [ m ])
     );
     let showAll = $state(false);
     let scrollRef = $state<HTMLElement | null>(null);

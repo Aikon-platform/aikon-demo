@@ -2,7 +2,7 @@
     import CSVExporter from "../../shared/components/CSVExporter.svelte";
     import { getNameProvider } from "../../shared/naming.svelte";
     import type { TClusterInfo } from "../types";
-    let { clusters }: { clusters: TClusterInfo[] } = $props();
+    const { clusters }: { clusters: TClusterInfo[] } = $props();
     const name_provider = getNameProvider();
 
     async function* iterRows() {

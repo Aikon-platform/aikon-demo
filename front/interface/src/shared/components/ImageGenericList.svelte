@@ -9,7 +9,7 @@
     interface Props {
         image_array: TImageInfo[];
     }
-    let { image_array }: Props = $props();
+    const { image_array }: Props = $props();
 </script>
 
 <ul class="columns is-mobile is-multiline list-invisible">

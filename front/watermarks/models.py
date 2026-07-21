@@ -45,8 +45,8 @@ class WatermarksPipeline(AbstractPipelineOnDataset("watermarks")):
         ],
     )
     need_regions = models.BooleanField(
-        "Detect and crop watermarks", 
-        default=True, 
+        "Detect and crop watermarks",
+        default=True,
         blank=True,
         help_text="Disable if your images are already cropped",
     )
@@ -59,7 +59,7 @@ class WatermarksPipeline(AbstractPipelineOnDataset("watermarks")):
         related_name="+",
     )
 
-    # sub stasks
+    # sub tasks
 
     regions_task = models.ForeignKey(
         Regions,

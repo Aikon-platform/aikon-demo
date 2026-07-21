@@ -2,26 +2,26 @@
 	import { Popover } from 'bits-ui';
 
 	interface Props {
-		value?: string;
-		placeholder: string;
-		onblur?: () => void;
-		onenter?: () => void;
-		editing?: boolean;
-		focus?: boolean;
-		required?: boolean;
-		class?: string;
-		editable?: boolean;
+	    value?: string;
+	    placeholder: string;
+	    onblur?: () => void;
+	    onenter?: () => void;
+	    editing?: boolean;
+	    focus?: boolean;
+	    required?: boolean;
+	    class?: string;
+	    editable?: boolean;
 	}
 	let {
-		value = $bindable(),
-		placeholder,
-		onblur,
-		onenter,
-		editing: editing_init,
-		focus,
-		required = false,
-		class: inputClass,
-		editable = true,
+	    value = $bindable(),
+	    placeholder,
+	    onblur,
+	    onenter,
+	    editing: editing_init,
+	    focus,
+	    required = false,
+	    class: inputClass,
+	    editable = true,
 	}: Props = $props();
 
 	let editing = $state(editing_init || false);
@@ -29,62 +29,62 @@
 	let internalValue = $state(value);
 
 	$effect(() => {
-		internalValue = value;
+	    internalValue = value;
 	});
 
 	if (required) {
-		placeholder = '*' + placeholder;
+	    placeholder = '*' + placeholder;
 	}
 
 	function trimValue() {
-		value = (value || '').trim();
-		internalValue = (internalValue || '').trim();
+	    value = (value || '').trim();
+	    internalValue = (internalValue || '').trim();
 	}
 
 	function handleKeypress(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			editing = false;
-			if (onenter) {
-				onenter();
-			}
-		}
+	    if (event.key === 'Enter') {
+	        event.preventDefault();
+	        editing = false;
+	        if (onenter) {
+	            onenter();
+	        }
+	    }
 	}
 
 	function startEditing() {
-		editing = true;
+	    editing = true;
 	}
 
 	function onBlur() {
-		editing = false;
-		trimValue();
-		value = internalValue;
-		if (onblur) {
-			onblur();
-		}
+	    editing = false;
+	    trimValue();
+	    value = internalValue;
+	    if (onblur) {
+	        onblur();
+	    }
 	}
 
 	function onFocus() {
-		editing = true;
+	    editing = true;
 	}
 
-	let empty = $derived(!internalValue || internalValue.trim() == '');
+	const empty = $derived(!internalValue || internalValue.trim() == '');
 
 	$effect(() => {
-		if (focus && input) {
-			setTimeout(() => {
-				if (!input) return;
-				// select content
-				const selection = window.getSelection();
-				if (selection) {
-					const range = document.createRange();
-					range.setStart(input, 0);
-					range.collapse(true);
-					selection.removeAllRanges();
-					selection.addRange(range);
-				}
-			}, 100);
-		}
+	    if (focus && input) {
+	        setTimeout(() => {
+	            if (!input) return;
+	            // select content
+	            const selection = window.getSelection();
+	            if (selection) {
+	                const range = document.createRange();
+	                range.setStart(input, 0);
+	                range.collapse(true);
+	                selection.removeAllRanges();
+	                selection.addRange(range);
+	            }
+	        }, 100);
+	    }
 	});
 </script>
 

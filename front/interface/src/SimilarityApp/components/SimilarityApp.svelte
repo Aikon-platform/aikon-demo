@@ -16,25 +16,25 @@
     }
     let { source_index_url, sim_matrix_url, metadata_url, mode }: Props = $props();
 
-    let index:TSimilarityIndex = $state.raw({sources: [], images: [], transpositions: []});
+    let index:TSimilarityIndex = $state.raw({ sources: [], images: [], transpositions: [] });
     let matches:TSimilarityMatches[] = $state.raw([]);
     let loading = $state(true);
     // If clustering tool has been shown once, keep it hidden but active so parameters are still available
     let keep_clustering_tool = $state(mode == "cluster");
 
-    let magnifying = $state({});
+    const magnifying = $state({});
     setMagnifyingContext(magnifying);
 
-    let name_provider = new NameProvider();
+    const name_provider = new NameProvider();
     setNameProvider(name_provider);
     
     onMount(() => {
         Promise.all([
             fetch(source_index_url).then(response => response.json()),
             fetch(sim_matrix_url).then(response => response.json())
-        ]).then(([raw_index, raw_matches]) => {
+        ]).then(([ raw_index, raw_matches ]) => {
             const data = unserializeSimilarityMatrix(raw_matches, raw_index);
-            [ index, matches ] = [data.index, data.matches];
+            [ index, matches ] = [ data.index, data.matches ];
             name_provider.fetchIIIFNames(index.sources);
             loading = false;
         });

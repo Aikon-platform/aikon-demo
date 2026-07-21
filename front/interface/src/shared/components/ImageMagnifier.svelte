@@ -22,8 +22,8 @@
     import IconBtn from "./IconBtn.svelte";
     import ImageInfos from "./ImageInfos.svelte";
 
-    let magnifying = $derived(getMagnifyingContext());
-    let { image, comparison, transpositions } = $derived(magnifying);
+    const magnifying = $derived(getMagnifyingContext());
+    const { image, comparison, transpositions } = $derived(magnifying);
 
     let transf = $derived<TMatchTransposition[]>(transpositions || []);
 
@@ -36,8 +36,8 @@
 
     function manualTransform(deltaRot: 0 | 90 | -90, hflip: boolean) {
         const curRotStr = transf.find(t => t && t.startsWith("rot")),
-              prevHflip = transf.includes("hflip"),
-              curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
+            prevHflip = transf.includes("hflip"),
+            curRot = curRotStr ? parseInt(curRotStr.slice(3)) : 0;
         let newRot = curRot;
         if (hflip && curRot % 180) newRot += 180;
         newRot = (newRot + deltaRot + 360) % 360;
@@ -64,7 +64,7 @@
                             <img src={comparison.url} alt={comparison.id} class="display-img" />
                         </div>
                         <div class="magnifying-info">
-                            <ImageInfos image={comparison} isTitle={true} prefix={"Query"}/>
+                            <ImageInfos image={comparison} isTitle={true} prefix="Query"/>
                         </div>
                     </div>
                 {/if}
