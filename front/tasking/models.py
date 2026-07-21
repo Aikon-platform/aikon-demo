@@ -478,6 +478,8 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                     json=data,
                     files=self.get_task_files(),
                 )
+                print(f"$$$$$ START ENDPOINT FULL={self.api_endpoint_prefix}/{endpoint} / BASE={self.api_endpoint_prefix} / ENDPOINT={endpoint}")
+                print("$$$$$ DATA", data)
             except (ConnectionError, RequestException):
                 self.write_log("Connection error when starting task")
                 self.status = "ERROR"
