@@ -5,6 +5,12 @@ ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 FRONT_DIR="$ROOT_DIR"/front
 API_DIR="$ROOT_DIR"/api
 
+PYTHON=$(command -v python3 || command -v python)
+if [ -z "$PYTHON" ]; then
+  echo "Error: no Python interpreter found (looked for python3 and python)" >&2
+  exit 1
+fi
+
 cleanup() {
     if [ -n "$front_dramatiq_pid" ]; then
         echo "Stopping dramatiq..."
@@ -33,7 +39,7 @@ cleanup() {
 trap cleanup SIGINT SIGTERM
 
 # Start API service
-cd "$API_DIR" && bash run.sh &
+cd "$API_DIR" && "$PYTHON" run.py up &
 api_pid=$!
 
 # Start Django frontend server

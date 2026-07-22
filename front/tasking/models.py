@@ -121,7 +121,7 @@ def AbstractTask(task_prefix: str):
         @property
         def result_media_path(self) -> str:
             """
-            Path to the result folder, relative to MEDIA_ROOT
+            Path to the result folder, relative to DATA_DIR
             """
             return f"{self.task_media_path}/result"
 
@@ -130,14 +130,14 @@ def AbstractTask(task_prefix: str):
             """
             Full path to the result folder
             """
-            return Path(settings.MEDIA_ROOT) / self.task_media_path
+            return Path(settings.DATA_DIR) / self.task_media_path
 
         @property
         def result_full_path(self) -> Path:
             """
             Full path to the result folder
             """
-            return Path(settings.MEDIA_ROOT) / self.result_media_path
+            return Path(settings.DATA_DIR) / self.result_media_path
 
         @property
         def log_file_path(self) -> Path:
@@ -313,7 +313,7 @@ def AbstractTask(task_prefix: str):
             Returns a dict with the monitoring data
             """
             total_size = 0
-            for f in Path(settings.MEDIA_ROOT).glob("**/*"):
+            for f in Path(settings.DATA_DIR).glob("**/*"):
                 if f.is_file():
                     total_size += f.stat().st_size
             n_datasets = (
@@ -478,6 +478,8 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                     json=data,
                     files=self.get_task_files(),
                 )
+                print(f"$$$$$ START ENDPOINT FULL={self.api_endpoint_prefix}/{endpoint} / BASE={self.api_endpoint_prefix} / ENDPOINT={endpoint}")
+                print("$$$$$ DATA", data)
             except (ConnectionError, RequestException):
                 self.write_log("Connection error when starting task")
                 self.status = "ERROR"
