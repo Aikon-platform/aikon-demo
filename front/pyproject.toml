@@ -18,6 +18,9 @@ dependencies = [
 ]
 
 [dependency-groups]
+dev = [
+    "pre-commit>=2.19.0",
+]
 prod = [
     "gevent>=26.5.0",
     "gunicorn>=26.0.0",

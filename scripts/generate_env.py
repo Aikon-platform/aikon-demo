@@ -212,7 +212,7 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
     base = (
         f"https://{v['PROD_URL']}"
         if prod
-        else f"http://localhost:{v['NGINX_PORT'] if nginx else v['FRONT_PORT']}"
+        else f"http://localhost:{v['NGINX_PORT'] if nginx else v['DJANGO_PORT']}"
     )
 
     return {
@@ -231,12 +231,12 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
         "APP_URL_FROM_DOCKER": (
             base if prod
             else "http://web:8000" if in_docker
-            else f"http://host.docker.internal:{v['FRONT_PORT']}"
+            else f"http://host.docker.internal:{v['DJANGO_PORT']}"
         ),
         "APP_URL_FROM_API": (
             base if prod
             else "http://web:8000" if in_docker  # local: api container → web
-            else f"http://localhost:{v['FRONT_PORT']}"  # dev: api on host → localhost
+            else f"http://localhost:{v['DJANGO_PORT']}"  # dev: api on host → localhost
         ),
         "API_URL": v["PROD_API_URL"] if prod else f"http://{'api' if in_docker else 'localhost'}:{v['API_PORT']}",
     }

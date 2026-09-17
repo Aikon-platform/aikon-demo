@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "scripts"))  # import scripts module without an __init__
 import generate_env  # scripts/generate_env.py
 
-FRONT_APP = ROOT / "front/app"
+FRONT_APP = ROOT / "front"
 API_DIR = ROOT / "api" 
 SVELTE_DIR = FRONT_APP / "interface"
 DOCKER_DIR = ROOT / "docker"
@@ -137,6 +137,7 @@ def detect_firewall() -> None:
     MacOS is not concerned: firewall is disabled by default and Docker-to-Host
     queries are not blocked by its firewall (socketfilterfw)
     """
+    print("\nchecking for firewalls...")
     script_path = f"bash {ROOT / 'scripts' / 'check_firewall.sh'}"
     msg = lambda firewall: print(
         "\n"
