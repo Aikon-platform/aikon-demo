@@ -272,7 +272,6 @@ name = "front"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "black" },
     { name = "django" },
     { name = "django-dramatiq" },
     { name = "django-environ" },
@@ -288,6 +287,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "black" },
     { name = "pre-commit" },
 ]
 prod = [
@@ -297,7 +297,6 @@ prod = [
 
 [package.metadata]
 requires-dist = [
-    { name = "black", specifier = ">=26.5.1" },
     { name = "django", specifier = "==4.2.*" },
     { name = "django-dramatiq", specifier = ">=0.15.0" },
     { name = "django-environ", specifier = ">=0.13.0" },
@@ -312,7 +311,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pre-commit", specifier = ">=2.19.0" }]
+dev = [
+    { name = "black", specifier = ">=26.5.1" },
+    { name = "pre-commit", specifier = ">=2.19.0" },
+]
 prod = [
     { name = "gevent", specifier = ">=26.5.0" },
     { name = "gunicorn", specifier = ">=26.0.0" },

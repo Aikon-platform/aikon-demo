@@ -1,4 +1,9 @@
 """
+
+as a reminder:
+- if MODE="dev", front/ webapp and api both run on the host server, other services (DB) run in Dockers
+- if MODE="local"|"prod", all processes (api and front) run in Dockers
+
 adapted from https://github.com/Aikon-platform/aikon/blob/main/run.py
 """
 
@@ -21,16 +26,8 @@ WIN = os.name == "nt"
 
 # frontend processes in dev (to have the webapp running on localhost)
 DEV_PROCS = [
-    (
-        "django",
-        ["uv", "run", "manage.py", "runserver", "0.0.0.0:{DJANGO_PORT}"],
-        FRONT
-    ),
-    (
-        "dramatiq",
-        ["uv", "run", "manage.py", "rundramatiq", "-t", "1", "p", "1"],
-        FRONT
-    )
+    ("django", ["uv", "run", "manage.py", "runserver", "0.0.0.0:{DJANGO_PORT}"], FRONT),
+    ("dramatiq", ["uv", "run", "manage.py", "rundramatiq", "-t", "1", "p", "1"], FRONT),
 ]
 
 
@@ -96,67 +93,113 @@ def stop(name: str, proc: subprocess.Popen) -> None:
     print(f"stopped {name}")
 
 
-# define API processes to run
+# call api/run.py with a command ("up"|"down"). used if MODE!="dev" to start/stop the dockerized API
+def run_api(action: str) -> None:
+    if not (ROOT / "api/.env").exists() or ENV.get("MODE") == "dev":
+        return
+    subprocess.run([sys.executable, str(ROOT / "api/run.py"), action], cwd=ROOT / "api")
+
+
+# define API processes to run in dev mode
 def api_dev_procs() -> list:
     kill_stale("dramatiq app.main", "flask --app app.main")
     api_env = read_env(API / ".env")
     port = api_env.get("API_PORT", "5001")
     device = api_env.get("DEVICE_NB", "") or "0"
     return [
-        ("api-flask",
-         ["uv", "run", "flask", "--app", "app.main", "run", "--debug", "-p", port],
-         ROOT / "api", 
-         {"CUDA_VISIBLE_DEVICES": device}),
-        ("api-dramatiq",
-         ["uv", "run", "dramatiq", "app.main", "-t", "1", "-p", "1"],
-         ROOT / "api", 
-         {"CUDA_VISIBLE_DEVICES": device}),
+        (
+            "api-flask",
+            ["uv", "run", "flask", "--app", "app.main", "run", "--debug", "-p", port],
+            ROOT / "api",
+            {"CUDA_VISIBLE_DEVICES": device},
+        ),
+        (
+            "api-dramatiq",
+            ["uv", "run", "dramatiq", "app.main", "-t", "1", "-p", "1"],
+            ROOT / "api",
+            {"CUDA_VISIBLE_DEVICES": device},
+        ),
     ]
 
 
 # run loop for all processes running on host in dev mode (frontend + api)
 def run_dev() -> None:
     kill_stale("manage.py rundramatiq", "manage.py runserver")
-    procs_def = list(DEV_PROCS)
+    procs_def = [
+        (name, cmd, cwd, None) for name, cmd, cwd in procs_def
+    ]
     if (API / "run.py").exists():
         procs_def += api_dev_procs()
-    procs = { 
-        name: spawn(name, cmd, cwd, env=None) 
-        for name, cmd, cwd in procs_def
-    }
+    procs = {name: spawn(name, cmd, cwd, env) for name, cmd, cwd, env in procs_def}
     # run the app
     try:
-        # while True keeps monitoring the processes after starting them. otherwise, we would exit
+        # while True keeps monitoring the processes after starting them: 
+        # every 2 seconds, we poll for process status. without while True, we would exit
         while True:
-            ...
+            for name, p in procs.items():
+                if p.poll() not in (None, 0):
+                    print(f"\n'{name}' exited with code {p.returncode}, shutting down")
+                    raise KeyboardInterrupt
+            time.sleep(2)
     # processes stop (either by crash or user input) => the `pass` does nothing and flows to finally
     except KeyboardInterrupt:
         pass
     # graceful shutdown
     finally:
         print("\nstopping host processes (hit ctrl+C to also stop docker services)")
-        
-        # if ctrl+C is pressed during app shutdown (`signal.SIGINT` emitted => `on_sigint` called), 
+
+        # if ctrl+C is pressed during app shutdown (`signal.SIGINT` emitted => `on_sigint` called),
         # teardown is set to True => also stop docker processes.
         teardown = False
+
         def on_sigint(*_):
             nonlocal teardown
             teardown = True
+
         signal.signal(signal.SIGINT, on_sigint)
 
         # kill host processes
         for name, p in procs.items():
             stop(name, p)
 
-        # host processes are cleaned => change signal handing of SIGINT: 
+        # host processes are cleaned => change signal handing of SIGINT:
         # if `signal.SIGINT` is emitted, ignore it with `SIG_IGN`
-        # => stop listening to ctrl+C  
+        # => stop listening to ctrl+C
         signal.signal(signal.SIGINT, signal.SIG_IGN)
 
         # kill docker processes if necessary
         if teardown:
             compose("down")
         else:
-            print("docker services still running. run `python run.py down` to stop them")
-    return 
+            print(
+                "docker services still running. run `python run.py down` to stop them"
+            )
+    return
 
+
+if __name__ == "__main__":
+    action = sys.argv[1] if len(sys.argv) > 1 else "up"
+    ENV = read_env()
+    if not docker_ok():
+        sys.exit("docker daemon not reachable. start docker and retry")
+
+    if action == "down":
+        compose("down")
+        run_api("down")
+    elif action == "build":
+        compose("up", "-d", "--build")
+    elif action == "logs":
+        compose("logs -f")
+    elif action == "up":
+        compose("up", "-d", "--remove-orphans")
+        # TODO aren't API processes started both by run_api and run_dev if mode=="dev" ??
+        run_api("up")
+        if ENV["MODE"] == "dev":
+            run_dev()
+        else:
+            port = ENV.get("NGINX_PORT", "8080")
+            url = (
+                f"https://{ENV['PROD_URL']}" if ENV["MODE"] == "prod" else f"http://localhost:{port}"
+            )
+            print(f"→ {url} (stop with `python run.py down`)")
+                    

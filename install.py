@@ -19,13 +19,12 @@ import sys
 import platform
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "scripts"))  # import scripts module without an __init__
 import generate_env  # scripts/generate_env.py
 
 FRONT_APP = ROOT / "front"
-API_DIR = ROOT / "api" 
+API_DIR = ROOT / "api"
 SVELTE_DIR = FRONT_APP / "interface"
 DOCKER_DIR = ROOT / "docker"
 
@@ -37,8 +36,12 @@ UV_INSTALL = {
 
 
 # run a shell command
-def sh(cmd: list|str, cwd: Path = None, shell = False, capture_output = False, text = False) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, cwd=cwd, check=True, capture_output=capture_output, shell=shell, text=text)
+def sh(
+    cmd: list | str, cwd: Path = None, shell=False, capture_output=False, text=False
+) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        cmd, cwd=cwd, check=True, capture_output=capture_output, shell=shell, text=text
+    )
 
 
 # is a package installed on the host ?
@@ -57,21 +60,39 @@ def which(name: str) -> str:
 def check_docker() -> None:
     which("docker")
     if subprocess.run(["docker", "compose", "version"], capture_output=True).returncode:
-        sys.exit("docker compose v2 is required (https://docs.docker.com/compose/install/)")
+        sys.exit(
+            "docker compose v2 is required (https://docs.docker.com/compose/install/)"
+        )
     if subprocess.run(["docker", "info"], capture_output=True).returncode:
-        sys.exit("docker daemon not reachable — start it (Docker Desktop, `colima start`, `orbstack`, ...) and retry")
+        sys.exit(
+            "docker daemon not reachable — start it (Docker Desktop, `colima start`, `orbstack`, ...) and retry"
+        )
 
 
 def db_password_ok(v: dict) -> bool:
     return not subprocess.run(
-        ["docker", "compose", "exec", "-T",
-         "-e", f"PGPASSWORD={v['POSTGRES_PASSWORD']}", "db",
-         "psql", "-U", v["POSTGRES_USER"], "-d", v["POSTGRES_DB"], "-c", "\\q"],
-        cwd=DOCKER_DIR, capture_output=True,
+        [
+            "docker",
+            "compose",
+            "exec",
+            "-T",
+            "-e",
+            f"PGPASSWORD={v['POSTGRES_PASSWORD']}",
+            "db",
+            "psql",
+            "-U",
+            v["POSTGRES_USER"],
+            "-d",
+            v["POSTGRES_DB"],
+            "-c",
+            "\\q",
+        ],
+        cwd=DOCKER_DIR,
+        capture_output=True,
     ).returncode
 
 
-def ensure_docker _db_credentials(v: dict) -> None:
+def ensure_docker_db_credentials(v: dict) -> None:
     # Postgres bakes credentials into its volume on first init and ignores the
     # env afterwards; a regenerated password then fails to authenticate.
     if db_password_ok(v):
@@ -86,7 +107,7 @@ def ensure_docker _db_credentials(v: dict) -> None:
     sh(["docker", "compose", "up", "-d", "--build", "--wait"], cwd=DOCKER_DIR)
 
 
-# setup the app in dev for `--mode dev`: django frontend + svelte frontend + docker containers   
+# setup the app in dev for `--mode dev`: django frontend + svelte frontend + docker containers
 def setup_dev(v: dict) -> None:
     uv, npm = which("uv"), which("npm")
     sh([uv, "sync", "--group=dev"], cwd=FRONT_APP)
@@ -111,7 +132,7 @@ def setup_docker(v: dict) -> None:
     print(f"\n✅ app starting (migrations run inside the container) → {url}")
 
 
-# after setting up the front, install the API. 
+# after setting up the front, install the API.
 def setup_api(mode: str, use_defaults: bool) -> None:
     api_install = API_DIR / "install.py"
     if not api_install.exists():
@@ -156,7 +177,9 @@ def detect_firewall() -> None:
     if shutil.which("ufw") and "Status: active" in _sh("sudo ufw status").stdout:
         msg("ufw")
     # 2. fedora
-    elif shutil.which("firewall-cmd") and "running" in _sh("firewall-cmd --state").stdout:
+    elif (
+        shutil.which("firewall-cmd") and "running" in _sh("firewall-cmd --state").stdout
+    ):
         msg("firewalld")
 
 
@@ -164,8 +187,12 @@ def detect_firewall() -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=generate_env.MODES)
-    parser.add_argument("--defaults", action="store_true", help="never prompt, use defaults")
-    parser.add_argument("--no-api", action="store_true", help="install/build only the front")
+    parser.add_argument(
+        "--defaults", action="store_true", help="never prompt, use defaults"
+    )
+    parser.add_argument(
+        "--no-api", action="store_true", help="install/build only the front"
+    )
     args = parser.parse_args()
 
     check_docker()
