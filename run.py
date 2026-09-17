@@ -52,6 +52,11 @@ def kill_stale(*patterns: str) -> None:
     time.sleep(1)
 
 
+# check if docker runs
+def docker_ok() -> bool:
+    return not subprocess.run(["docker", "info"], capture_output=True).returncode
+
+
 # run the dockerized services
 def compose(*args) -> None:
     subprocess.run(["docker", "compose", *args], cwd=DOCKER_DIR, check=True)
@@ -126,7 +131,7 @@ def api_dev_procs() -> list:
 def run_dev() -> None:
     kill_stale("manage.py rundramatiq", "manage.py runserver")
     procs_def = [
-        (name, cmd, cwd, None) for name, cmd, cwd in procs_def
+        (name, cmd, cwd, None) for name, cmd, cwd in DEV_PROCS
     ]
     if (API / "run.py").exists():
         procs_def += api_dev_procs()
