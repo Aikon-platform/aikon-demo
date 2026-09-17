@@ -177,3 +177,4 @@ if __name__ == "__main__":
         setup_api(mode, args.defaults)
 
     detect_firewall()
+    print("✅ install done ! run app with 'python run.py'")

@@ -232,6 +232,7 @@ dependencies = [
     { name = "dramatiq", extra = ["redis"] },
     { name = "orjson" },
     { name = "pillow" },
+    { name = "psycopg2-binary" },
     { name = "python-dotenv" },
     { name = "requests" },
     { name = "stream-unzip" },
@@ -245,7 +246,6 @@ dev = [
 prod = [
     { name = "gevent" },
     { name = "gunicorn" },
-    { name = "psycopg2-binary" },
 ]
 
 [package.metadata]
@@ -256,6 +256,7 @@ requires-dist = [
     { name = "dramatiq", extras = ["redis"], specifier = ">=2.1.0" },
     { name = "orjson", specifier = ">=3.11.9" },
     { name = "pillow", specifier = ">=12.2.0" },
+    { name = "psycopg2-binary", specifier = ">=2.9.12" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "requests", specifier = ">=2.34.2" },
     { name = "stream-unzip", specifier = ">=0.0.101" },
@@ -267,7 +268,6 @@ dev = [{ name = "pre-commit", specifier = ">=2.19.0" }]
 prod = [
     { name = "gevent", specifier = ">=26.5.0" },
     { name = "gunicorn", specifier = ">=26.0.0" },
-    { name = "psycopg2-binary", specifier = ">=2.9.12" },
 ]
 
 [[package]]
