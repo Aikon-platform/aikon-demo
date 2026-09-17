@@ -14,7 +14,8 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "requests>=2.34.2",
     "stream-unzip>=0.0.101",
-    "stream-zip>=0.0.84",
+    "stream-zip>=0.0.84",    
+    "psycopg2-binary>=2.9.12",
 ]
 
 [dependency-groups]
@@ -24,5 +25,4 @@ dev = [
 prod = [
     "gevent>=26.5.0",
     "gunicorn>=26.0.0",
-    "psycopg2-binary>=2.9.12",
 ]

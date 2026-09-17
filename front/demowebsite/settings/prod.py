@@ -9,17 +9,6 @@ SECRET_KEY = ENV("SECRET_KEY")
 ADMIN_EMAIL = ENV("ADMIN_EMAIL")
 ADMINS = [(ENV("POSTGRES_USER"), ADMIN_EMAIL)]
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": ENV.str("POSTGRES_DB", default="demowebsite"),
-        "USER": ENV.str("POSTGRES_USER", default="demowebsite"),
-        "PASSWORD": ENV.str("POSTGRES_PASSWORD"),
-        "HOST": ENV.str("DB_HOST", default="db"),
-        "PORT": ENV.str("DB_PORT", default="5432"),
-    }
-}
-
 API_URL = ENV("PROD_API_URL")
 BASE_URL = ENV("PROD_URL", default="")
 DOMAIN_NAME = urlparse(BASE_URL).netloc

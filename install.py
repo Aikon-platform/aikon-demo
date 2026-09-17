@@ -2,7 +2,7 @@
 """
 AIKON-demo installer.
 
-    python setup.py [--mode local|dev|prod] [--defaults]
+    python setup.py [--mode local|dev|prod] [--defaults] [--no-api]
 
 local = fully dockerized local setup, everything in Docker, zero prompt, app running at the end
 dev   = services in Docker, frontend, API and Svelte installed on the host, then `python run.py`
