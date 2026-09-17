@@ -114,7 +114,7 @@ def setup_dev(v: dict) -> None:
     sh([npm, "install"], cwd=SVELTE_DIR)
     sh([npm, "run", "build"], cwd=SVELTE_DIR)
     sh(["docker", "compose", "up", "-d", "--build", "--wait"], cwd=DOCKER_DIR)
-    ensure_db_credentials(v)
+    ensure_docker_db_credentials(v)
     sh([uv, "run", "manage.py", "migrate"], cwd=FRONT_APP)
     sh([uv, "run", "manage.py", "create_superuser_check"], cwd=FRONT_APP)
     print("\n✅ dev setup complete. Start everything with:  python run.py")
@@ -123,7 +123,7 @@ def setup_dev(v: dict) -> None:
 # setup the ap for `--mode prod|local`: fully dockerized setups
 def setup_docker(v: dict) -> None:
     sh(["docker", "compose", "up", "-d", "--build", "--wait"], cwd=DOCKER_DIR)
-    ensure_db_credentials(v)
+    ensure_docker_db_credentials(v)
     url = (
         f"https://{v['PROD_URL']}"
         if v["MODE"] == "prod"

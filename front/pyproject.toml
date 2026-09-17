@@ -22,6 +22,7 @@ dependencies = [
 dev = [
     "pre-commit>=2.19.0",
     "black>=26.5.1",
+    "pylint"
 ]
 prod = [
     "gevent>=26.5.0",
