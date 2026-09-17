@@ -21,7 +21,7 @@ User = get_user_model()
 def AbstractPipelineOnDataset(prefix):
     class Pipeline(AbstractTaskOnDataset(prefix)):
         pipeline = None
-        task_names: List[str] # static version
+        task_names: List[str]  # static version
 
         class Meta:
             abstract = True

@@ -5,21 +5,31 @@ from django.core.management.base import BaseCommand
 from django.core.management import CommandError
 from django.contrib.auth import get_user_model
 
+
 class Command(BaseCommand):
-    help = "Create the superuser if they don't aldready exist, and update their password"
+    help = (
+        "Create the superuser if they don't aldready exist, and update their password"
+    )
 
     def add_arguments(self, parser):
         pass
 
     def handle(self, *args, **options):
-        env_vars = ["POSTGRES_DB", "POSTGRES_USER", "POSTGRES_PASSWORD", "EMAIL_HOST_USER"]
+        env_vars = [
+            "POSTGRES_DB",
+            "POSTGRES_USER",
+            "POSTGRES_PASSWORD",
+            "EMAIL_HOST_USER",
+        ]
         env_dict = {}
         for vname in env_vars:
             env_dict[vname] = os.environ.get(vname)
 
         if any(v is None for v in env_dict.items()):
             self.stdout.write(
-                self.style.ERROR(f"⛔️ To create the super user, the following environment variables must be set: {env_vars}")
+                self.style.ERROR(
+                    f"⛔️ To create the super user, the following environment variables must be set: {env_vars}"
+                )
             )
             return
 
@@ -53,7 +63,7 @@ class Command(BaseCommand):
                 User.objects.create_superuser(
                     username=env_dict["POSTGRES_USER"],
                     email=env_dict["EMAIL_HOST_USER"],
-                    password=env_dict["POSTGRES_PASSWORD"]
+                    password=env_dict["POSTGRES_PASSWORD"],
                 )
                 self.stdout.write(
                     self.style.SUCCESS(
@@ -61,6 +71,4 @@ class Command(BaseCommand):
                     )
                 )
         except Exception as e:
-            self.stdout.write(
-                self.style.ERROR(f"⛔️ Error creating superuser: {e}")
-            )
+            self.stdout.write(self.style.ERROR(f"⛔️ Error creating superuser: {e}"))

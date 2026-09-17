@@ -35,9 +35,9 @@ def zip_on_the_fly(files: List[Tuple[str, TPath]]) -> Iterable[bytes]:
             while chunk := f.read(65536):
                 yield chunk
 
-    def iter_files() -> Generator[
-        Tuple[str, int, int, int, Generator[bytes, None, None]], None, None
-    ]:
+    def iter_files() -> (
+        Generator[Tuple[str, int, int, int, Generator[bytes, None, None]], None, None]
+    ):
         for i, (name, path) in enumerate(files):
             # NOTE: we zip the 1st file with ZIP_32, the others with ZIP_64.
             # on MacOS Safari, "Open after downloading", if the 1st file in the zip
@@ -48,7 +48,7 @@ def zip_on_the_fly(files: List[Tuple[str, TPath]]) -> Iterable[bytes]:
             # - max size of a single file in the zip is 4GB
             # see warnings on ZIP_64 here: https://stream-zip.docs.trade.gov.uk/api/methods/#the-64-methods
             # NOTE: only possible pitfall: if the 1st file is >4GB, it can't be zipped with ZIP_32 => archive creation will fail.
-            zip_type = ZIP_32 if i==0 else ZIP_64
+            zip_type = ZIP_32 if i == 0 else ZIP_64
             if not os.path.exists(path):
                 print(f"File {path} does not exist")
                 continue

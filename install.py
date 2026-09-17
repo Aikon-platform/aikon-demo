@@ -71,7 +71,7 @@ def db_password_ok(v: dict) -> bool:
     ).returncode
 
 
-def ensure_db_credentials(v: dict) -> None:
+def ensure_docker _db_credentials(v: dict) -> None:
     # Postgres bakes credentials into its volume on first init and ignores the
     # env afterwards; a regenerated password then fails to authenticate.
     if db_password_ok(v):

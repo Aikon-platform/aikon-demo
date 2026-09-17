@@ -9,4 +9,6 @@ if mode in ("dev", "local"):
 elif mode == "prod":
     from .prod import *
 else:
-    raise ValueError(f"MODE environment variable must be either 'dev', 'prod' or 'local'. got: '{mode}'")
+    raise ValueError(
+        f"MODE environment variable must be either 'dev', 'prod' or 'local'. got: '{mode}'"
+    )

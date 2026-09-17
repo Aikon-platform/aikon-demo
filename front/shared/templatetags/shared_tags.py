@@ -104,6 +104,7 @@ def can_admin_accounts(user):
 def can_monitor(user, app_name):
     return user.has_perm(f"{app_name}.monitor_{app_name}")
 
+
 @register.filter
 def has_visible_fields(form, excluded_fields):
     """
@@ -118,6 +119,7 @@ def has_visible_fields(form, excluded_fields):
         if not any(field.name.startswith(f) for f in excluded_fields):
             return True
     return False
+
 
 # @register.filter("dump")
 # def dump(value):

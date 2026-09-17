@@ -166,18 +166,18 @@ def AbstractTask(task_prefix: str):
             delta = (
                 self.finished_on - self.requested_on
                 if self.finished_on and self.requested_on
-                else datetime.now(timezone.utc) - self.requested_on
-                if not self.is_finished and not self.finished_on
-                else None
+                else (
+                    datetime.now(timezone.utc) - self.requested_on
+                    if not self.is_finished and not self.finished_on
+                    else None
+                )
             )
             if delta is None:
                 return delta
             eval: TypeDurationEval = (
                 "short"
                 if delta < timedelta(minutes=30)
-                else "mid"
-                if delta < timedelta(minutes=120)
-                else "long"
+                else "mid" if delta < timedelta(minutes=120) else "long"
             )
             return {"delta": delta, "eval": eval}
 
@@ -450,6 +450,7 @@ def AbstractAPITaskOnDataset(task_prefix: str):
         """
         Abstract model for tasks that are sent to the API
         """
+
         # NOTE : in the API, the `regions` module is named `region_extraction` => set endpoint accordingly
         if task_prefix == "regions":
             api_task_prefix = "region_extraction"
@@ -478,7 +479,9 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                     json=data,
                     files=self.get_task_files(),
                 )
-                print(f"$$$$$ START ENDPOINT FULL={self.api_endpoint_prefix}/{endpoint} / BASE={self.api_endpoint_prefix} / ENDPOINT={endpoint}")
+                print(
+                    f"$$$$$ START ENDPOINT FULL={self.api_endpoint_prefix}/{endpoint} / BASE={self.api_endpoint_prefix} / ENDPOINT={endpoint}"
+                )
                 print("$$$$$ DATA", data)
             except (ConnectionError, RequestException):
                 self.write_log("Connection error when starting task")
