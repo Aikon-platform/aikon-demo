@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alignment demo</title>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <nav
+      class="navbar"
+      role="navigation"
+      aria-label="main navigation"
+      data-theme="dark"
+    >
+      <div class="navbar-brand ml-3">
+        <a class="navbar-item" href=""> </a>
+
+        <a
+          role="button"
+          class="navbar-burger"
+          aria-label="menu"
+          data-target="navbar-content"
+        >
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="navbar-content" class="navbar-menu">
+        <div class="navbar-start"></div>
+
+        <div class="navbar-end mr-3">
+          <div class="navbar-item"></div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="wrapper container" style="min-height: 80vh; max-width: 90vw">
+      <div class="content">
+        <div class="centerwrap">
+          <h1>Alignment demo</h1>
+        </div>
+        <div class="centerwrap details-wrapper detailed">
+          <div class="widen">
+            <div id="aligner" class="aligner-viewer"></div>
+          </div>
+
+          <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", () => {
+              DemoTools.initAlignmentApp(document.getElementById("aligner"));
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer mt-6 pb-5 pt-5" data-theme="light">
+      <div class="columns is-centered" style="padding: 0 20vw"></div>
+
+      <div class="columns is-centered">
+        <div class="column is-8 has-text-centered">
+          <hr class="mt-2" />
+          <strong>AIKON Demo</strong> is a project hosted at École des Ponts
+          ParisTech | Imagine Lab
+          <br />
+        </div>
+      </div>
+    </footer>
+
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+  </body>
+</html>
