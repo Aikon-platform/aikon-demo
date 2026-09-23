@@ -190,13 +190,7 @@ export function isProperWarp(
 
 // Keypoint-based estimation
 
-export type TransformModel = "similarity" | "affine" | "homography";
-
-export const MIN_POINTS: Record<TransformModel, number> = {
-  similarity: 2,
-  affine: 3,
-  homography: 4,
-};
+export type TransformModel = "scale" | "scale+rotate" | "affine" | "homography";
 
 // Relative eigenvalue below which a least-squares system is considered singular
 const RANK_EPS = 1e-10;
@@ -284,7 +278,11 @@ function gram(rows: number[][]): number[][] {
   return m;
 }
 
-function fitSimilarity(src: Point[], dst: Point[]): TransformMatrix | null {
+function fitRotation(
+  src: Point[],
+  dst: Point[],
+  isotropic?: boolean,
+): TransformMatrix | null {
   // Points are centered: only rotation and scale remain, as a + ib
   let re = 0;
   let im = 0;
@@ -296,10 +294,64 @@ function fitSimilarity(src: Point[], dst: Point[]): TransformMatrix | null {
     im += p.x * q.y - p.y * q.x;
     den += p.x * p.x + p.y * p.y;
   }
-  const a = re / den;
-  const b = im / den;
-  if (Math.hypot(a, b) < 1e-6) return null;
-  return { ...identityMatrix(), a, b, c: -b, d: a };
+  if (den < 1e-12) return null;
+
+  if (isotropic) {
+    const a = re / den;
+    const b = im / den;
+    if (Math.hypot(a, b) < 1e-6) return null;
+    return { ...identityMatrix(), a, b, c: -b, d: a };
+  }
+
+  // Anisotropic: rotation + independent x/y scale (no shear). For a fixed
+  // angle the optimal sx, sy are a linear least squares solution, and for
+  // fixed sx, sy the optimal angle is the usual rotation-only fit (as
+  // above) between the scaled src points and dst; alternating the two
+  // exact steps converges to the joint least-squares solution.
+  const sxxDen = src.reduce((s, p) => s + p.x * p.x, 0);
+  const syyDen = src.reduce((s, p) => s + p.y * p.y, 0);
+  if (sxxDen < 1e-12 || syyDen < 1e-12) return null;
+
+  let theta = Math.atan2(im, re);
+  let sx = 1;
+  let sy = 1;
+  for (let iter = 0; iter < 20; iter++) {
+    const cos = Math.cos(theta);
+    const sin = Math.sin(theta);
+    let sxNum = 0;
+    let syNum = 0;
+    for (let k = 0; k < src.length; k++) {
+      const p = src[k];
+      const q = dst[k];
+      sxNum += cos * p.x * q.x + sin * p.x * q.y;
+      syNum += -sin * p.y * q.x + cos * p.y * q.y;
+    }
+    sx = sxNum / sxxDen;
+    sy = syNum / syyDen;
+
+    let rotRe = 0;
+    let rotIm = 0;
+    for (let k = 0; k < src.length; k++) {
+      const p = src[k];
+      const q = dst[k];
+      const px = sx * p.x;
+      const py = sy * p.y;
+      rotRe += px * q.x + py * q.y;
+      rotIm += px * q.y - py * q.x;
+    }
+    theta = Math.atan2(rotIm, rotRe);
+  }
+
+  if (Math.hypot(sx, sy) < 1e-6) return null;
+  const cos = Math.cos(theta);
+  const sin = Math.sin(theta);
+  return {
+    ...identityMatrix(),
+    a: sx * cos,
+    b: sx * sin,
+    c: -sy * sin,
+    d: sy * cos,
+  };
 }
 
 function fitAffine(src: Point[], dst: Point[]): TransformMatrix | null {
@@ -343,14 +395,49 @@ function fitHomography(src: Point[], dst: Point[]): TransformMatrix | null {
   return { a, b, c, d, e, f, g, h, i };
 }
 
+
+// Fit non-uniform scaling (anisotropic)
+function fitScale(src: Point[], dst: Point[], isotropic?: boolean): TransformMatrix | null {
+  // We want to find sx, sy such that dst[k] ≈ [sx, 0, 0; 0, sy, 0; 0, 0, 1] * src[k]
+  // This is equivalent to: q.x ≈ sx * p.x and q.y ≈ sy * p.y
+  // We solve for sx and sy using least squares (independent equations)
+  let sxNum = 0;
+  let sxDen = 0;
+  let syNum = 0;
+  let syDen = 0;
+  
+  for (let k = 0; k < src.length; k++) {
+    const p = src[k];
+    const q = dst[k];
+    sxNum += p.x * q.x;
+    sxDen += p.x * p.x;
+    syNum += p.y * q.y;
+    syDen += p.y * p.y;
+  }
+  
+  if (isotropic) {
+    sxDen += syDen;
+    sxNum += syNum;
+    const scale = sxDen > 1e-12 ? sxNum / sxDen : 0;
+    if (Math.abs(scale) < 1e-6) return null;
+    return { ...identityMatrix(), a: scale, d: scale };
+  }
+
+  const sx = sxDen > 1e-12 ? sxNum / sxDen : 1;
+  const sy = syDen > 1e-12 ? syNum / syDen : 1;
+  if (Math.abs(sx) < 1e-6 || Math.abs(sy) < 1e-6) return null;
+  return { ...identityMatrix(), a: sx, d: sy };
+}
+
 // Least squares transform of the given model mapping src[k] onto dst[k],
 // or null if the points are too few or in a degenerate configuration
 export function estimateTransform(
   model: TransformModel,
   src: Point[],
   dst: Point[],
+  keepAspectRatio?: boolean,
 ): TransformMatrix | null {
-  if (src.length !== dst.length || src.length < MIN_POINTS[model]) {
+  if (src.length !== dst.length || src.length < 2) {
     return null;
   }
   const normSrc = normalization(src);
@@ -360,11 +447,18 @@ export function estimateTransform(
 
   const s = src.map((p) => applyTransform(normSrc, p.x, p.y));
   const d = dst.map((p) => applyTransform(normDst, p.x, p.y));
-  const fit = {
-    similarity: fitSimilarity,
-    affine: fitAffine,
-    homography: fitHomography,
-  }[model](s, d);
+  
+  // Fit the appropriate model
+  let fit;
+  if (model === "scale") {
+    fit = fitScale(s, d, (keepAspectRatio || src.length == 2));
+  } else if (model === "scale+rotate" || src.length < 3) {
+    fit = fitRotation(s, d, (keepAspectRatio || src.length == 2));
+  } else if (model === "affine" || src.length < 4) {
+    fit = fitAffine(s, d);
+  } else {
+    fit = fitHomography(s, d);
+  }
   if (!fit) return null;
 
   const m = multiplyMatrix(invNormDst, multiplyMatrix(fit, normSrc));

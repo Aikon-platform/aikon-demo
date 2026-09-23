@@ -41,9 +41,6 @@
   let panStart = { x: 0, y: 0 };
   let panOrigin = { x: 0, y: 0 };
 
-  // Transform box handles move image corners independently (perspective)
-  let freeform = $state(false);
-
   const fitWarnings = $derived(
     alignmentState.images.flatMap((img) =>
       img.fitWarning ? [`${img.image.file_name}: ${img.fitWarning}`] : [],
@@ -235,18 +232,20 @@
 
   // Clear selection if the selected image is not visible or is the first layer
   $effect(() => {
-    if (selectedImage !== null && 
-        (alignmentState.images[selectedImage]?.visible === false || 
-         selectedImage === 0)) {
+    if (
+      selectedImage !== null &&
+      (alignmentState.images[selectedImage]?.visible === false ||
+        selectedImage === 0)
+    ) {
       alignmentState.selected = [];
     }
   });
 
   // Only show TransformBox if the selected image is visible and not the first layer
   const showTransformBox = $derived(
-    selectedImage !== null && 
-    selectedImage !== 0 &&
-    alignmentState.images[selectedImage]?.visible !== false
+    selectedImage !== null &&
+      selectedImage !== 0 &&
+      alignmentState.images[selectedImage]?.visible !== false,
   );
 </script>
 
@@ -275,7 +274,9 @@
           height={aligningImage.image.height}
           style="
             transform-origin: 0 0;
-            transform: {matrixToCss(multiplyMatrix(view, aligningImage.transform))};
+            transform: {matrixToCss(
+            multiplyMatrix(view, aligningImage.transform),
+          )};
             opacity: 0.7;
           "
         />
@@ -289,7 +290,8 @@
           {view}
           width={selected.image.width}
           height={selected.image.height}
-          {freeform}
+          transformModel={alignmentState.transformModel}
+          keepAspectRatio={alignmentState.keepAspectRatio}
           onChange={(m: TransformMatrix) => {
             selected.transform = m;
           }}
@@ -309,37 +311,63 @@
       <span class="fit-warning" title={fitWarnings.join("\n")}>
         <Icon icon="mdi:alert" />
         <span class="fit-warning-text">
-          {fitWarnings.length === 1 ? fitWarnings[0] : `${fitWarnings.length} fits rejected`}
+          {fitWarnings.length === 1
+            ? fitWarnings[0]
+            : `${fitWarnings.length} fits rejected`}
         </span>
       </span>
     {/if}
     <IconBtn
       icon="mdi:vector-link"
       label="Sync"
-      class={["is-small", alignmentState.syncWithKeypoints ? "is-link" : "is-ghost"]}
-      onclick={() => alignmentState.setSyncWithKeypoints(!alignmentState.syncWithKeypoints)}
+      class={[
+        "is-small",
+        alignmentState.syncWithKeypoints ? "is-link" : "is-ghost",
+      ]}
+      onclick={() =>
+        alignmentState.setSyncWithKeypoints(!alignmentState.syncWithKeypoints)}
     />
     <div class="select is-small">
       <select
         bind:value={alignmentState.transformModel}
         onchange={() => alignmentState.resync()}
-        title="Transformations allowed when fitting keypoints"
+        title="Transform model"
       >
-        <option value="similarity">Similarity</option>
+        <option value="scale">Scale</option>
+        <option value="scale+rotate">Scale + Rotate</option>
         <option value="affine">Affine</option>
         <option value="homography">Homography</option>
       </select>
     </div>
     <IconBtn
-      icon="mdi:perspective-more"
-      label="Freeform"
-      class={["is-small", freeform ? "is-link" : "is-ghost"]}
-      onclick={() => (freeform = !freeform)}
+      icon={alignmentState.keepAspectRatio ? "mdi:link-variant" : "mdi:link-variant-off"}
+      label="Isotropic"
+      class={[
+        "is-small",
+        alignmentState.keepAspectRatio ? "is-link" : "is-ghost",
+      ]}
+      onclick={() => {
+        alignmentState.keepAspectRatio = !alignmentState.keepAspectRatio;
+        alignmentState.resync();
+      }}
     />
-    <IconBtn icon="mdi:magnify-minus" class="is-ghost is-small" onclick={() => zoomButton(1 / 1.25)} />
+    <IconBtn
+      icon="mdi:magnify-minus"
+      class="is-ghost is-small"
+      onclick={() => zoomButton(1 / 1.25)}
+    />
     <span class="zoom-level">{Math.round(zoom * 100)}%</span>
-    <IconBtn icon="mdi:magnify-plus" class="is-ghost is-small" onclick={() => zoomButton(1.25)} />
-    <IconBtn icon="mdi:fit-to-page-outline" label="Reset" class="is-ghost is-small" onclick={resetView} />
+    <IconBtn
+      icon="mdi:magnify-plus"
+      class="is-ghost is-small"
+      onclick={() => zoomButton(1.25)}
+    />
+    <IconBtn
+      icon="mdi:fit-to-page-outline"
+      label="Reset"
+      class="is-ghost is-small"
+      onclick={resetView}
+    />
   </div>
 </div>
 

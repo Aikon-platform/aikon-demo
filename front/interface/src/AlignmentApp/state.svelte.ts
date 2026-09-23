@@ -3,7 +3,6 @@ import {
     estimateTransform,
     invertMatrix,
     isProperWarp,
-    MIN_POINTS,
     multiplyMatrix,
     type TransformMatrix,
     type TransformModel,
@@ -40,8 +39,9 @@ export class AlignmentState {
     /** Index of the keypoint currently hovered or dragged, in any image */
     activeKeypoint: number | null = $state(null);
     /** Fit each image's transform onto the first image from keypoints */
-    syncWithKeypoints = $state(false);
-    transformModel: TransformModel = $state("similarity");
+    syncWithKeypoints = $state(true);
+    transformModel: TransformModel = $state("scale");
+    keepAspectRatio = $state(true);
 
     /** Image `from` pixels -> image `to` pixels, through world space */
     warpMatrix(from: number, to: number): TransformMatrix | null {
@@ -125,12 +125,9 @@ export class AlignmentState {
             }
         });
 
-        const min = MIN_POINTS[this.transformModel];
-        if (src.length < min) {
-            this.setFitWarning(img, `${this.transformModel} needs ${min} enabled keypoints, got ${src.length}`);
-            return;
-        }
-        const relative = estimateTransform(this.transformModel, src, dst);
+        let model = this.transformModel;
+        
+        const relative = estimateTransform(model, src, dst, this.keepAspectRatio);
         if (!relative) {
             this.setFitWarning(img, "degenerate keypoints (coincident or collinear)");
             return;

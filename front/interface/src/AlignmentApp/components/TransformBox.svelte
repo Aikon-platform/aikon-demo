@@ -11,6 +11,7 @@
     translationMatrix,
     type Quad,
     type TransformMatrix,
+    type TransformModel,
   } from "../transform";
 
   interface Props {
@@ -23,10 +24,10 @@
     onChange: (m: TransformMatrix) => void;
     onDragStart?: () => void;
     onDragEnd?: () => void;
-    /** Handles move the image corners independently (perspective) */
-    freeform?: boolean;
-    /** Always keep aspect ratio when scaling (same as holding Shift) */
-    freezeAR?: boolean;
+    /** Transform model: scale, scale+rotate, affine, homography */
+    transformModel: TransformModel;
+    /** Always keep aspect ratio when scaling */
+    keepAspectRatio?: boolean;
   }
 
   let {
@@ -37,9 +38,13 @@
     onChange,
     onDragStart,
     onDragEnd,
-    freeform = false,
-    freezeAR = false,
+    transformModel,
+    keepAspectRatio = true,
   }: Props = $props();
+
+  // Derive freeform from transform model
+  // freeform is true for affine and homography (perspective)
+  const freeform = $derived(transformModel === "affine" || transformModel === "homography");
 
   type Point = { x: number; y: number };
 
@@ -194,7 +199,12 @@
 
     let sx = onX ? (local.x - ax) / dx : 1;
     let sy = onY ? (local.y - ay) / dy : 1;
-    if (e.shiftKey || freezeAR) {
+    
+    // Apply keepAspectRatio based on transform model
+    // For scale and scale+rotate modes, enforce aspect ratio if keepAspectRatio is true
+    const enforceAR = (transformModel === "scale" || transformModel === "scale+rotate") && keepAspectRatio;
+    
+    if (e.shiftKey || enforceAR) {
       // Corner: project pointer on the anchor -> handle diagonal
       const s =
         onX && onY
@@ -247,6 +257,8 @@
         );
         break;
       case "rotate": {
+        // Only allow rotation for scale+rotate, affine, and homography models
+        if (transformModel === "scale") break;
         const c = applyTransform(d.screen0, pivot.u * width, pivot.v * height);
         let angle =
           Math.atan2(p.y - c.y, p.x - c.x) -
@@ -284,13 +296,15 @@
     points={corners.map((p) => `${p.x},${p.y}`).join(" ")}
     onpointerdown={(e) => startDrag(e, { kind: "move" })}
   />
-  <line
-    class="rotate-stem"
-    x1={topMid.x}
-    y1={topMid.y}
-    x2={rotateHandle.x}
-    y2={rotateHandle.y}
-  />
+  {#if transformModel !== "scale"}
+    <line
+      class="rotate-stem"
+      x1={topMid.x}
+      y1={topMid.y}
+      x2={rotateHandle.x}
+      y2={rotateHandle.y}
+    />
+  {/if}
   {#each handles as h}
     <rect
       class="handle"
@@ -308,13 +322,15 @@
         )}
     />
   {/each}
-  <circle
-    class="handle rotate"
-    cx={rotateHandle.x}
-    cy={rotateHandle.y}
-    r={HANDLE_SIZE / 2 + 1}
-    onpointerdown={(e) => startDrag(e, { kind: "rotate" })}
-  />
+  {#if transformModel !== "scale"}
+    <circle
+      class="handle rotate"
+      cx={rotateHandle.x}
+      cy={rotateHandle.y}
+      r={HANDLE_SIZE / 2 + 1}
+      onpointerdown={(e) => startDrag(e, { kind: "rotate" })}
+    />
+  {/if}
   <g
     class="pivot"
     transform="translate({pivotScreen.x} {pivotScreen.y})"
