@@ -2,6 +2,7 @@
   import { AlignmentState } from "../state.svelte";
   import AlignCandidates from "./AlignCandidates.svelte";
   import AlignCanvas from "./AlignCanvas.svelte";
+  import AlignKeypoints from "./AlignKeypoints.svelte";
   import AlignLayers from "./AlignLayers.svelte";
   import IconBtn from "../../shared/components/IconBtn.svelte";
 
@@ -10,6 +11,7 @@
   // Open the candidates modal by default so the user picks images first;
   // it can be reopened at any time from the toolbar.
   let showCandidates = $state(true);
+  let showKeypoints = $state(true);
 </script>
 
 <div class="alignment-app-root">
@@ -20,6 +22,12 @@
       class="is-link is-light"
       onclick={() => (showCandidates = true)}
     />
+    <IconBtn
+      icon="mdi:vector-point"
+      label="Keypoints"
+      class={["is-link", showKeypoints ? "" : "is-light"]}
+      onclick={() => (showKeypoints = !showKeypoints)}
+    />
   </div>
 
   <div class="alignment-layout">
@@ -29,6 +37,11 @@
     <div class="alignment-main">
       <AlignCanvas {alignmentState} />
     </div>
+    {#if showKeypoints}
+      <div class="alignment-keypoints">
+        <AlignKeypoints {alignmentState} />
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -78,6 +91,15 @@
     flex: 1 1 auto;
     height: 100%;
     min-width: 0;
+  }
+
+  .alignment-keypoints {
+    flex: 0 0 40%;
+    min-width: 260px;
+    height: 100%;
+    overflow: hidden;
+    border-left: 1px solid var(--bulma-border, #dbdbdb);
+    background: var(--bulma-scheme-main, #fff);
   }
 
   :global(.aligner-viewer) {

@@ -12,6 +12,7 @@
   } from "../transform";
   import TransformBox from "./TransformBox.svelte";
   import IconBtn from "../../shared/components/IconBtn.svelte";
+  import Icon from "@iconify/svelte";
 
   interface Props {
     alignmentState: AlignmentState;
@@ -42,6 +43,12 @@
 
   // Transform box handles move image corners independently (perspective)
   let freeform = $state(false);
+
+  const fitWarnings = $derived(
+    alignmentState.images.flatMap((img) =>
+      img.fitWarning ? [`${img.image.file_name}: ${img.fitWarning}`] : [],
+    ),
+  );
 
   const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
 
@@ -298,6 +305,31 @@
   </div>
 
   <div class="align-canvas-controls">
+    {#if fitWarnings.length}
+      <span class="fit-warning" title={fitWarnings.join("\n")}>
+        <Icon icon="mdi:alert" />
+        <span class="fit-warning-text">
+          {fitWarnings.length === 1 ? fitWarnings[0] : `${fitWarnings.length} fits rejected`}
+        </span>
+      </span>
+    {/if}
+    <IconBtn
+      icon="mdi:vector-link"
+      label="Sync"
+      class={["is-small", alignmentState.syncWithKeypoints ? "is-link" : "is-ghost"]}
+      onclick={() => alignmentState.setSyncWithKeypoints(!alignmentState.syncWithKeypoints)}
+    />
+    <div class="select is-small">
+      <select
+        bind:value={alignmentState.transformModel}
+        onchange={() => alignmentState.resync()}
+        title="Transformations allowed when fitting keypoints"
+      >
+        <option value="similarity">Similarity</option>
+        <option value="affine">Affine</option>
+        <option value="homography">Homography</option>
+      </select>
+    </div>
     <IconBtn
       icon="mdi:perspective-more"
       label="Freeform"
@@ -348,6 +380,21 @@
     border-radius: var(--bulma-radius, 4px);
     padding: 0.25rem 0.5rem;
     color: #fff;
+  }
+
+  .fit-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    max-width: 20rem;
+    font-size: 0.75rem;
+    color: #ffd257;
+  }
+
+  .fit-warning-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .zoom-level {

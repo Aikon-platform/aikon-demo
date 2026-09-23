@@ -8,7 +8,7 @@
   import Icon from "@iconify/svelte";
   import EditableSpan from "../../shared/components/EditableSpan.svelte";
   import IconBtn from "../../shared/components/IconBtn.svelte";
-  import { identityMatrix } from "../transform.js";
+  import { applyTransform, identityMatrix } from "../transform.js";
   import { fly } from "svelte/transition";
 
   interface Props {
@@ -100,10 +100,17 @@
       image: rawImage,
       transform: identityMatrix(),
       visible: true,
+      // Reference keypoints, warped into this image (identity transform)
+      keypoints: alignmentState.images.length > 0
+        ? alignmentState.images[0].keypoints.map((p) =>
+            applyTransform(alignmentState.images[0].transform, p.x, p.y),
+          )
+        : [],
     };
 
     // Add to state
     alignmentState.images = [...alignmentState.images, aligningImage];
+    alignmentState.resync();
   }
 
   // Remove an image from the state
@@ -115,6 +122,7 @@
     }
     // Remove from state
     alignmentState.images = alignmentState.images.filter((_, i) => i !== index);
+    alignmentState.resync();
   }
 </script>
 

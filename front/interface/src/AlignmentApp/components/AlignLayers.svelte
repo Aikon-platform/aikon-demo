@@ -49,6 +49,8 @@
     const [removed] = images.splice(draggedIndex, 1);
     images.splice(targetIndex, 0, removed);
     alignmentState.images = images;
+    // The first layer is the keypoint fit reference
+    alignmentState.resync();
 
     // Update selection to match the new index
     const selectedIndices = alignmentState.selected.map((i) =>
