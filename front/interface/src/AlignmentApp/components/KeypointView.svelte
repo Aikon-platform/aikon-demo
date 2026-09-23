@@ -23,6 +23,7 @@
   const FIT_MARGIN = 0.95;
   const HIT_RADIUS = 8; // px, on screen
   const KEYPOINT_RADIUS = 5;
+  const TOP_MARGIN = 36;
 
   const aligningImage = $derived(alignmentState.images[imageIndex]);
   const width = $derived(aligningImage.image.width);
@@ -36,7 +37,7 @@
     const observer = new ResizeObserver(() => {
       const rect = container.getBoundingClientRect();
       containerWidth = rect.width;
-      containerHeight = rect.height;
+      containerHeight = rect.height - TOP_MARGIN;
     });
     observer.observe(container);
     return () => observer.disconnect();
@@ -53,7 +54,7 @@
     const fit = multiplyMatrix(
       translationMatrix(
         (containerWidth - s * width) / 2,
-        (containerHeight - s * height) / 2,
+        TOP_MARGIN + (containerHeight - s * height) / 2,
       ),
       scaleMatrix(s, s),
     );
@@ -163,6 +164,7 @@
       }
       drag = { kind: "keypoint", k };
       alignmentState.activeKeypoint = k;
+      e.preventDefault();
       clearHover();
     } else {
       return;

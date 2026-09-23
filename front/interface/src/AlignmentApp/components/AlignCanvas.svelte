@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { AlignmentState } from "../state.svelte";
+  import type { AligningImage, AlignmentState } from "../state.svelte";
   import {
     applyTransform,
     identityMatrix,
@@ -241,6 +241,20 @@
       selectedImage !== 0 &&
       alignmentState.images[selectedImage]?.visible !== false,
   );
+
+  function onTransformChange(selected: AligningImage, m: TransformMatrix) {
+    selected.transform = m;
+    if (!alignmentState.syncWithKeypoints) return;
+    
+    // Update keypoints for the selected image from reference
+    const ref = alignmentState.images[0];
+    if (ref && ref.keypoints.length > 0) {
+      selected.keypoints = ref.keypoints.map((p) =>
+        alignmentState.warpPoint(0, selectedImage!, p),
+      );
+      selected.fitWarning = null;
+    }
+  }
 </script>
 
 <svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
@@ -286,9 +300,7 @@
           height={selected.image.height}
           transformModel={alignmentState.transformModel}
           keepAspectRatio={alignmentState.keepAspectRatio}
-          onChange={(m: TransformMatrix) => {
-            selected.transform = m;
-          }}
+          onChange={(m: TransformMatrix) => onTransformChange(selected, m)}
           onDragStart={() => {
             frozenLayout = liveLayout;
           }}
@@ -387,7 +399,6 @@
     padding: 0.25rem 0.5rem;
     color: #fff;
   }
-
 
   .zoom-level {
     font-size: 0.75rem;
