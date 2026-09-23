@@ -127,6 +127,11 @@ export class AlignmentState {
 
         let model = this.transformModel;
         
+        if (src.length < 2) {
+            img.fitWarning = null;
+            return;
+        }
+
         const relative = estimateTransform(model, src, dst, this.keepAspectRatio);
         if (!relative) {
             this.setFitWarning(img, "degenerate keypoints (coincident or collinear)");

@@ -12,6 +12,40 @@
   // it can be reopened at any time from the toolbar.
   let showCandidates = $state(true);
   let showKeypoints = $state(true);
+
+  // Resizable panel state
+  let sidebarWidth = $state(260);
+  let keypointsWidth = $state(300);
+  let startX = $state(0);
+  let startWidth = $state(0);
+  let activeHandle = $state<'sidebar' | 'keypoints' | null>(null);
+
+  function startResize(handle: 'sidebar' | 'keypoints', e: MouseEvent) {
+    activeHandle = handle;
+    startX = e.clientX;
+    startWidth = handle === 'sidebar' ? sidebarWidth : keypointsWidth;
+    e.preventDefault();
+  }
+
+  function stopResize() {
+    activeHandle = null;
+  }
+
+  function handleResize(e: MouseEvent) {
+    if (!activeHandle) return;
+    const delta = e.clientX - startX;
+    if (activeHandle === 'sidebar') {
+      const newWidth = startWidth + delta;
+      if (newWidth >= 150 && newWidth <= 500) {
+        sidebarWidth = newWidth;
+      }
+    } else if (activeHandle === 'keypoints') {
+      const newWidth = startWidth - delta;
+      if (newWidth >= 200 && newWidth <= 700) {
+        keypointsWidth = newWidth;
+      }
+    }
+  }
 </script>
 
 <div class="alignment-app-root">
@@ -30,15 +64,17 @@
     />
   </div>
 
-  <div class="alignment-layout">
-    <div class="alignment-sidebar">
+  <div class="alignment-layout" on:mousemove={handleResize} on:mouseup={stopResize} on:mouseleave={stopResize}>
+    <div class="alignment-sidebar" style="width: {sidebarWidth}px; flex: 0 0 {sidebarWidth}px;">
       <AlignLayers {alignmentState} />
     </div>
+    <div class="resize-handle" on:mousedown={(e) => startResize('sidebar', e)} />
     <div class="alignment-main">
       <AlignCanvas {alignmentState} />
     </div>
     {#if showKeypoints}
-      <div class="alignment-keypoints">
+      <div class="resize-handle" on:mousedown={(e) => startResize('keypoints', e)} />
+      <div class="alignment-keypoints" style="width: {keypointsWidth}px; flex: 0 0 {keypointsWidth}px;">
         <AlignKeypoints {alignmentState} />
       </div>
     {/if}
@@ -78,28 +114,43 @@
   }
 
   .alignment-sidebar {
-    flex: 0 0 260px;
-    width: 260px;
-    min-width: 260px;
     height: 100%;
     overflow: hidden;
     border-right: 1px solid var(--bulma-border, #dbdbdb);
     background: var(--bulma-scheme-main, #fff);
+    min-width: 150px;
+    max-width: 500px;
   }
 
   .alignment-main {
     flex: 1 1 auto;
     height: 100%;
     min-width: 0;
+    overflow: hidden;
   }
 
   .alignment-keypoints {
-    flex: 0 0 40%;
-    min-width: 260px;
     height: 100%;
     overflow: hidden;
     border-left: 1px solid var(--bulma-border, #dbdbdb);
     background: var(--bulma-scheme-main, #fff);
+    min-width: 200px;
+    max-width: 70%;
+  }
+
+  .resize-handle {
+    width: 8px;
+    height: 100%;
+    background: var(--bulma-border, #dbdbdb);
+    cursor: col-resize;
+    flex: 0 0 8px;
+    transition: background-color 0.2s;
+    user-select: none;
+  }
+
+  .resize-handle:hover,
+  .resize-handle:active {
+    background: var(--bulma-primary, #00d1b2);
   }
 
   :global(.aligner-viewer) {

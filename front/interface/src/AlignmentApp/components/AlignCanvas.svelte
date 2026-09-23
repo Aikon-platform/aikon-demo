@@ -41,12 +41,6 @@
   let panStart = { x: 0, y: 0 };
   let panOrigin = { x: 0, y: 0 };
 
-  const fitWarnings = $derived(
-    alignmentState.images.flatMap((img) =>
-      img.fitWarning ? [`${img.image.file_name}: ${img.fitWarning}`] : [],
-    ),
-  );
-
   const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
 
   function zoomAt(clientX: number, clientY: number, factor: number) {
@@ -307,26 +301,22 @@
   </div>
 
   <div class="align-canvas-controls">
-    {#if fitWarnings.length}
-      <span class="fit-warning" title={fitWarnings.join("\n")}>
-        <Icon icon="mdi:alert" />
-        <span class="fit-warning-text">
-          {fitWarnings.length === 1
-            ? fitWarnings[0]
-            : `${fitWarnings.length} fits rejected`}
-        </span>
-      </span>
+    {#if alignmentState.transformModel.startsWith("scale")}
+      <IconBtn
+        icon={alignmentState.keepAspectRatio
+          ? "mdi:link-variant"
+          : "mdi:link-variant-off"}
+        label="Isotropic"
+        class={[
+          "is-small",
+          alignmentState.keepAspectRatio ? "is-link" : "is-ghost",
+        ]}
+        onclick={() => {
+          alignmentState.keepAspectRatio = !alignmentState.keepAspectRatio;
+          alignmentState.resync();
+        }}
+      />
     {/if}
-    <IconBtn
-      icon="mdi:vector-link"
-      label="Sync"
-      class={[
-        "is-small",
-        alignmentState.syncWithKeypoints ? "is-link" : "is-ghost",
-      ]}
-      onclick={() =>
-        alignmentState.setSyncWithKeypoints(!alignmentState.syncWithKeypoints)}
-    />
     <div class="select is-small">
       <select
         bind:value={alignmentState.transformModel}
@@ -339,18 +329,6 @@
         <option value="homography">Homography</option>
       </select>
     </div>
-    <IconBtn
-      icon={alignmentState.keepAspectRatio ? "mdi:link-variant" : "mdi:link-variant-off"}
-      label="Isotropic"
-      class={[
-        "is-small",
-        alignmentState.keepAspectRatio ? "is-link" : "is-ghost",
-      ]}
-      onclick={() => {
-        alignmentState.keepAspectRatio = !alignmentState.keepAspectRatio;
-        alignmentState.resync();
-      }}
-    />
     <IconBtn
       icon="mdi:magnify-minus"
       class="is-ghost is-small"
@@ -410,20 +388,6 @@
     color: #fff;
   }
 
-  .fit-warning {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    max-width: 20rem;
-    font-size: 0.75rem;
-    color: #ffd257;
-  }
-
-  .fit-warning-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 
   .zoom-level {
     font-size: 0.75rem;
