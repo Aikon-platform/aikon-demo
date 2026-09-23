@@ -4,17 +4,20 @@
     RawImage,
     AligningImage,
   } from "../state.svelte.ts";
+  import { Dialog } from "bits-ui";
+  import Icon from "@iconify/svelte";
   import EditableSpan from "../../shared/components/EditableSpan.svelte";
-  import { fly } from "svelte/transition";
   import IconBtn from "../../shared/components/IconBtn.svelte";
   import { identityMatrix } from "../transform.js";
+  import { fly } from "svelte/transition";
 
   interface Props {
     alignmentState: AlignmentState;
+    open: boolean;
     onClose: () => void;
   }
 
-  let { alignmentState, onClose }: Props = $props();
+  let { alignmentState, open = $bindable(), onClose }: Props = $props();
   const form_id = $props.id();
 
   // Track drag state for visual feedback
@@ -115,150 +118,206 @@
   }
 </script>
 
-<div
-  class="alignment-app drop-zone"
-  class:dragging={isDragging}
-  ondragenter={handleDragEnter}
-  ondragover={handleDragOver}
-  ondragleave={handleDragLeave}
-  ondrop={handleDrop}
-  role="region"
-  aria-label="Drag and drop image files here"
-  aria-dropeffect="copy"
-  transition:fly={{ y: -30, duration: 500 }}
->
-  <div class="file is-boxed">
-    <label for="{form_id}-img-input" class="file-label">
-      <span class="file-cta">
-        <span class="file-icon">
-          <span class="iconify" data-icon="mdi:upload"></span>
-        </span>
-        <span class="file-label">Select image files...</span>
-      </span>
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onchange={handleFileInput}
-        style="display: none;"
-        class="file-input"
-        id="{form_id}-img-input"
-      />
-    </label>
-  </div>
+<Dialog.Root bind:open>
+  <Dialog.Portal>
+    <div class="modal" class:is-active={open}>
+      <Dialog.Overlay class="modal-background" />
+      <Dialog.Content class="modal-card align-candidates-modal">
+        {#snippet child({ props })}
+          <div {...props}>
+            <div class="modal-card-head">
+              <Dialog.Title class="modal-card-title">Select images to align</Dialog.Title>
 
-  <IconBtn
-    icon="mdi:check"
-    onclick={onClose}
-    label="Start aligning"
-    class="is-link"
-    disabled={!alignmentState.images.length}
-  />
+              <IconBtn
+                icon="mdi:check"
+                onclick={onClose}
+                label="Start aligning"
+                class="is-link"
+                disabled={!alignmentState.images.length}
+              />
+            </div>
 
-  <div class="images-list">
-    {#each alignmentState.images as aligningImage, index (index)}
-      <div class="image-item">
-        <button
-          class="delete-button"
-          onclick={() => removeImage(index)}
-          title="Delete"
-        >
-          &times;
-        </button>
-        <img
-          src={aligningImage.image.data}
-          alt={aligningImage.image.file_name}
-          width={aligningImage.image.width}
-          height={aligningImage.image.height}
-        />
-        <EditableSpan
-          bind:value={aligningImage.image.file_name}
-          placeholder="Filename"
-          class="filename-span"
-        />
-        <span class="image-meta"
-          >({aligningImage.image.width}x{aligningImage.image.height})</span
-        >
-      </div>
-    {/each}
-  </div>
-</div>
+            <div class="modal-card-body">
+              <div
+                class="drop-zone box"
+                class:dragging={isDragging}
+                ondragenter={handleDragEnter}
+                ondragover={handleDragOver}
+                ondragleave={handleDragLeave}
+                ondrop={handleDrop}
+                role="region"
+                aria-label="Drag and drop image files here"
+                aria-dropeffect="copy"
+              >
+                <div class="align-candidates-upload columns">
+                <p class="column">Drag &amp; drop images here, or</p>
+                <div class="column file is-boxed is-small">
+                  <label for="{form_id}-img-input" class="file-label">
+                    <span class="file-cta">
+                      <span class="file-icon">
+                        <Icon icon="mdi:upload" />
+                      </span>
+                      <span class="file-label">Select image files...</span>
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onchange={handleFileInput}
+                      style="display: none;"
+                      class="file-input"
+                      id="{form_id}-img-input"
+                    />
+                  </label>
+                </div>
+                </div>
+
+              <div class="images-list">
+                {#each alignmentState.images as aligningImage, index (index)}
+                  <div class="image-card">
+                    <button
+                      class="delete is-small delete-button"
+                      onclick={() => removeImage(index)}
+                      title="Delete"
+                      aria-label="Delete"
+                    ></button>
+                    <div class="image-thumb">
+                      <img
+                        src={aligningImage.image.data}
+                        alt={aligningImage.image.file_name}
+                      />
+                    </div>
+                    <EditableSpan
+                      bind:value={aligningImage.image.file_name}
+                      placeholder="Filename"
+                      class="filename-span"
+                    />
+                    <span class="image-meta"
+                      >{aligningImage.image.width}×{aligningImage.image
+                        .height}</span
+                    >
+                  </div>
+                {/each}
+                {#if alignmentState.images.length === 0}
+                  <p class="has-text-grey no-images">No images added yet.</p>
+                {/if}
+              </div>
+              </div>
+            </div>
+
+            <div class="modal-card-foot align-candidates-foot">
+              <IconBtn
+                icon="mdi:check"
+                onclick={onClose}
+                label="Start aligning"
+                class="is-link"
+                disabled={!alignmentState.images.length}
+              />
+            </div>
+          </div>
+        {/snippet}
+      </Dialog.Content>
+    </div>
+  </Dialog.Portal>
+</Dialog.Root>
 
 <style>
-  .alignment-app {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  .align-candidates-modal {
+    width: min(1600px, 92vw);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .align-candidates-upload {
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+  }
+
+  .modal-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
   }
 
   .drop-zone {
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px dashed var(--bulma-border, #ccc);
     text-align: center;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    align-items: stretch;
   }
 
   .drop-zone.dragging {
-    border-color: #4caf50;
-    background-color: rgba(76, 175, 80, 0.1);
+    border-color: var(--bulma-primary, #4caf50);
+    background-color: var(--bulma-primary-light, rgba(76, 175, 80, 0.1));
   }
 
   .images-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
   }
 
-  .image-item {
+  .no-images {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .image-card {
     position: relative;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 4px;
+    border: 1px solid var(--bulma-border, #ddd);
+    border-radius: var(--bulma-radius, 4px);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
   }
 
-  .image-item img {
+  .image-thumb {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bulma-scheme-main-bis, #f5f5f5);
+    border-radius: var(--bulma-radius-small, 3px);
+    overflow: hidden;
+  }
+
+  .image-thumb img {
     max-width: 100%;
-    max-height: 150px;
+    max-height: 100%;
     object-fit: contain;
   }
 
-  .filename-span {
-    margin-top: 8px;
-    font-size: 12px;
+  :global(.filename-span) {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
     text-align: center;
     word-break: break-all;
-    display: block;
+    width: 100%;
   }
 
   .image-meta {
-    font-size: 12px;
-    text-align: center;
-    color: #666;
-    display: block;
-    margin-top: 4px;
+    font-size: 0.7rem;
+    color: var(--bulma-text-weak, #666);
   }
 
   .delete-button {
     position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(255, 255, 255, 0.8);
-    border: none;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #666;
+    top: 0.35rem;
+    right: 0.35rem;
   }
 
-  .delete-button:hover {
-    background: rgba(255, 255, 255, 1);
-    color: #333;
+  .align-candidates-foot {
+    justify-content: flex-end;
   }
 </style>

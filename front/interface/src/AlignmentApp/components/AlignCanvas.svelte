@@ -1,14 +1,17 @@
 <script lang="ts">
-  import { untrack } from "svelte";
   import type { AlignmentState } from "../state.svelte";
   import {
     applyTransform,
     identityMatrix,
     invertMatrix,
+    matrixToCss,
     multiplyMatrix,
+    scaleMatrix,
+    translationMatrix,
     type TransformMatrix,
   } from "../transform";
   import TransformBox from "./TransformBox.svelte";
+  import IconBtn from "../../shared/components/IconBtn.svelte";
 
   interface Props {
     alignmentState: AlignmentState;
@@ -26,17 +29,101 @@
   let containerWidth = $state(0);
   let containerHeight = $state(0);
 
+  // Canvas zoom/pan applied on top of the auto-fit layout, expressed
+  // as a "fit-space -> screen" transform: screen = zoom * fitPoint + pan
+  const MIN_ZOOM = 0.05;
+  const MAX_ZOOM = 20;
+  let zoom = $state(1);
+  let pan = $state({ x: 0, y: 0 });
+  let spaceHeld = $state(false);
+  let isPanning = $state(false);
+  let panStart = { x: 0, y: 0 };
+  let panOrigin = { x: 0, y: 0 };
+
+  const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
+
+  function zoomAt(clientX: number, clientY: number, factor: number) {
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const mx = clientX - rect.left;
+    const my = clientY - rect.top;
+    const newZoom = clampZoom(zoom * factor);
+    if (newZoom === zoom) return;
+
+    // Keep the fit-space point currently under the cursor fixed on screen
+    const fx = (mx - pan.x) / zoom;
+    const fy = (my - pan.y) / zoom;
+    pan = { x: mx - newZoom * fx, y: my - newZoom * fy };
+    zoom = newZoom;
+  }
+
+  function handleWheel(e: WheelEvent) {
+    e.preventDefault();
+    const factor = Math.exp(-e.deltaY * 0.001);
+    zoomAt(e.clientX, e.clientY, factor);
+  }
+
+  function resetView() {
+    zoom = 1;
+    pan = { x: 0, y: 0 };
+  }
+
+  function zoomButton(factor: number) {
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
+  }
+
+  function isPanTrigger(e: PointerEvent) {
+    return e.button === 1 || (e.button === 0 && spaceHeld);
+  }
+
+  function handlePointerDown(e: PointerEvent) {
+    if (!isPanTrigger(e)) return;
+    e.preventDefault();
+    isPanning = true;
+    panStart = { x: e.clientX, y: e.clientY };
+    panOrigin = { ...pan };
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+  }
+
+  function handlePointerMove(e: PointerEvent) {
+    if (!isPanning) return;
+    pan = {
+      x: panOrigin.x + (e.clientX - panStart.x),
+      y: panOrigin.y + (e.clientY - panStart.y),
+    };
+  }
+
+  function handlePointerUp(e: PointerEvent) {
+    if (!isPanning) return;
+    isPanning = false;
+    (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+  }
+
+  // Space key triggers hand tool
+  function handleKeyDown(e: KeyboardEvent) {
+    if (e.code === "Space" && !e.repeat) {
+      spaceHeld = true;
+    }
+  }
+
+  function handleKeyUp(e: KeyboardEvent) {
+    if (e.code === "Space") {
+      spaceHeld = false;
+    }
+  }
+
   // Compute relative transform for each image and centering offset
   function computeLayout() {
     const images = alignmentState.images;
     if (images.length === 0) {
-      return { transforms: [], centerX: 0, centerY: 0 };
+      return { transforms: [], centerX: 0, centerY: 0, view: identityMatrix() };
     }
 
     const firstMatrix = images[0].transform;
     const firstInverse = invertMatrix(firstMatrix);
     const inv = firstInverse || identityMatrix();
-    console.log(firstMatrix, inv);
 
     const relativeTransforms = images.map((img) =>
       multiplyMatrix(inv, img.transform),
@@ -73,7 +160,12 @@
 
     // If no visible images, return identity transforms and no offset
     if (!hasVisible) {
-      return { transforms: relativeTransforms, centerX: 0, centerY: 0 };
+      return {
+        transforms: relativeTransforms,
+        centerX: 0,
+        centerY: 0,
+        view: inv,
+      };
     }
 
     const width = maxX - minX;
@@ -81,17 +173,10 @@
     const centerX = containerWidth / 2 - (minX + width / 2);
     const centerY = containerHeight / 2 - (minY + height / 2);
 
-    return { transforms: relativeTransforms, centerX, centerY };
-  }
+    // World -> container pixels
+    const view = multiplyMatrix(translationMatrix(centerX, centerY), inv);
 
-  // Format matrix for CSS transform
-  function matrixToCss(m: TransformMatrix): string {
-    // Embed 3x3 projective matrix into 4x4 for CSS matrix3d
-    // [ a  c  0  e ]   Column-major: a,b,0,g, c,d,0,h, 0,0,1,0, e,f,0,i
-    // [ b  d  0  f ]
-    // [ 0  0  1  0 ]
-    // [ g  h  0  i ]
-    return `matrix3d(${m.a}, ${m.b}, 0, ${m.g}, ${m.c}, ${m.d}, 0, ${m.h}, 0, 0, 1, 0, ${m.e}, ${m.f}, 0, ${m.i})`;
+    return { transforms: relativeTransforms, centerX, centerY, view };
   }
 
   // Update container dimensions
@@ -123,57 +208,90 @@
   });
 
   // Compute layout reactively
-  const layout = $derived(computeLayout());
+  const liveLayout = $derived(computeLayout());
+  // Layout is frozen while a transform is being dragged, to avoid re-centering
+  let frozenLayout: ReturnType<typeof computeLayout> | null = $state(null);
+  const layout = $derived(frozenLayout ?? liveLayout);
 
-  let selectedImage:number|null = $state(null);
-  let initialTransform:TransformMatrix|null = $state(null);
-  let initialWidth:number|null = $state(null);
-  let initialHeight:number|null = $state(null);
-  $effect(() => {
-      const reactive = alignmentState.selected[0];
-      untrack(() => {
-          if (reactive == selectedImage) return;
-          selectedImage = reactive;
-          initialTransform = {...$state.snapshot(alignmentState.images[reactive].transform)};
-          initialWidth = alignmentState.images[reactive].image.width;
-          initialHeight = alignmentState.images[reactive].image.height;
-      })
-  })
-  $inspect(selectedImage, initialTransform, initialWidth, initialHeight);
+  // User zoom/pan, applied on top of the auto-fit "world -> container pixel" view
+  const zoomPan = $derived(
+    multiplyMatrix(translationMatrix(pan.x, pan.y), scaleMatrix(zoom, zoom)),
+  );
+  const view = $derived(multiplyMatrix(zoomPan, layout.view));
+
+  const selectedImage: number | null = $derived(
+    alignmentState.selected[0] ?? null,
+  );
 </script>
 
-<div bind:this={container} class="align-canvas">
-  {#each alignmentState.images as aligningImage, i}
-    {#if aligningImage.visible}
-      <img
-        src={aligningImage.image.data}
-        alt={aligningImage.image.file_name}
-        class="align-image"
-        width={aligningImage.image.width}
-        height={aligningImage.image.height}
-        style="
-          transform-origin: 0 0;
-          transform: translate({layout.centerX}px, {layout.centerY}px) {matrixToCss(
-          layout.transforms[i],
-        )};
-          opacity: 0.7;
-        "
-      />
+<svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
+
+<div class="align-canvas-wrap">
+  <div
+    bind:this={container}
+    class="align-canvas"
+    class:pannable={spaceHeld}
+    class:panning={isPanning}
+    onwheel={handleWheel}
+    onpointerdown={handlePointerDown}
+    onpointermove={handlePointerMove}
+    onpointerup={handlePointerUp}
+    onpointercancel={handlePointerUp}
+    role="application"
+  >
+    {#each alignmentState.images as aligningImage}
+      {#if aligningImage.visible}
+        <img
+          src={aligningImage.image.data}
+          alt={aligningImage.image.file_name}
+          class="align-image"
+          width={aligningImage.image.width}
+          height={aligningImage.image.height}
+          style="
+            transform-origin: 0 0;
+            transform: {matrixToCss(multiplyMatrix(view, aligningImage.transform))};
+            opacity: 0.7;
+          "
+        />
+      {/if}
+    {/each}
+    {#if selectedImage !== null && alignmentState.images[selectedImage]}
+      {@const selected = alignmentState.images[selectedImage]}
+      {#key selectedImage}
+        <TransformBox
+          transform={selected.transform}
+          {view}
+          width={selected.image.width}
+          height={selected.image.height}
+          onChange={(m: TransformMatrix) => {
+            selected.transform = m;
+          }}
+          onDragStart={() => {
+            frozenLayout = liveLayout;
+          }}
+          onDragEnd={() => {
+            frozenLayout = null;
+          }}
+        />
+      {/key}
     {/if}
-  {/each}
-  {#if selectedImage !== null}
-    <TransformBox 
-      initial={initialTransform!}
-      width={initialWidth!}
-      height={initialHeight!}
-      onChange={(m) => {
-        alignmentState.images[selectedImage!].transform = m;
-      }}
-    />
-  {/if}
+  </div>
+
+  <div class="align-canvas-controls">
+    <IconBtn icon="mdi:magnify-minus" class="is-ghost is-small" onclick={() => zoomButton(1 / 1.25)} />
+    <span class="zoom-level">{Math.round(zoom * 100)}%</span>
+    <IconBtn icon="mdi:magnify-plus" class="is-ghost is-small" onclick={() => zoomButton(1.25)} />
+    <IconBtn icon="mdi:fit-to-page-outline" label="Reset" class="is-ghost is-small" onclick={resetView} />
+  </div>
 </div>
 
 <style>
+  .align-canvas-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
   .align-canvas {
     width: 100%;
     height: 100%;
@@ -181,6 +299,36 @@
     background: #222;
     position: relative;
     overflow: hidden;
+    touch-action: none;
+    cursor: default;
+  }
+
+  .align-canvas.pannable {
+    cursor: grab;
+  }
+
+  .align-canvas.panning {
+    cursor: grabbing;
+  }
+
+  .align-canvas-controls {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(30, 30, 30, 0.75);
+    border-radius: var(--bulma-radius, 4px);
+    padding: 0.25rem 0.5rem;
+    color: #fff;
+  }
+
+  .zoom-level {
+    font-size: 0.75rem;
+    min-width: 3em;
+    text-align: center;
+    color: #fff;
   }
 
   .align-image {

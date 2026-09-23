@@ -1,596 +1,336 @@
 <script lang="ts">
-  import type { TransformMatrix } from "../transform";
-  import { applyTransform, multiplyMatrix } from "../transform";
+  import {
+    applyTransform,
+    aroundPoint,
+    invertMatrix,
+    multiplyMatrix,
+    rotationMatrix,
+    scaleMatrix,
+    translationMatrix,
+    type TransformMatrix,
+  } from "../transform";
 
   interface Props {
-    initial: TransformMatrix;
+    /** Image -> world transform being edited */
+    transform: TransformMatrix;
+    /** World -> screen (container pixels) transform */
+    view: TransformMatrix;
     width: number;
     height: number;
     onChange: (m: TransformMatrix) => void;
+    onDragStart?: () => void;
+    onDragEnd?: () => void;
+    /** Not implemented yet: independent corner (perspective) handles */
+    freeform?: boolean;
+    /** Always keep aspect ratio when scaling (same as holding Shift) */
+    freezeAR?: boolean;
   }
 
-  let { initial, onChange, width, height }: Props = $props();
+  let {
+    transform,
+    view,
+    width,
+    height,
+    onChange,
+    onDragStart,
+    onDragEnd,
+    freezeAR = false,
+  }: Props = $props();
 
-  // Internal matrix state
-  let internalMatrix = $state(structuredClone($state.snapshot(initial)));
+  type Point = { x: number; y: number };
 
-  $effect(() => {
-    internalMatrix = structuredClone($state.snapshot(initial));
-  });
+  // Handles as (u, v) fractions of the image size, clockwise from top-left
+  const HANDLES: [number, number][] = [
+    [0, 0],
+    [0.5, 0],
+    [1, 0],
+    [1, 0.5],
+    [1, 1],
+    [0.5, 1],
+    [0, 1],
+    [0, 0.5],
+  ];
+  const HANDLE_SIZE = 9;
+  const ROTATE_OFFSET = 28; // px, distance of the rotation handle above the box
+  const ROTATE_SNAP = Math.PI / 12; // 15°, with Shift
+  const MIN_SCALE = 1e-3;
+  const RESIZE_CURSORS = [
+    "ew-resize",
+    "nwse-resize",
+    "ns-resize",
+    "nesw-resize",
+  ];
 
-  // Pivot point in local coordinates
-  let pivot = $state({ x: 0, y: 0 });
+  // Pivot, as (u, v) fractions of the image size: it follows the image
+  let pivot = $state({ u: 0.5, v: 0.5 });
 
-  // Track which handle is being dragged
-  type HandleType =
-    | "nw"
-    | "ne"
-    | "sw"
-    | "se" // corners
-    | "n"
-    | "e"
-    | "s"
-    | "w" // edges
-    | "rotation"
-    | "pivot"
-    | null;
+  let svg: SVGSVGElement;
 
-  let activeHandle = $state<HandleType>(null);
-  let dragStart = $state({ x: 0, y: 0 });
-  let dragStartMatrix = $state<TransformMatrix | null>(null);
-  let dragStartPivot = $state<{ x: number; y: number } | null>(null);
+  // Image -> screen
+  const screen = $derived(multiplyMatrix(view, transform));
+  const toScreen = (u: number, v: number) =>
+    applyTransform(screen, u * width, v * height);
 
-  // Container reference
-  let container: HTMLDivElement;
-
-  // Half dimensions
-  const halfW = $derived(width / 2);
-  const halfH = $derived(height / 2);
-
-  // Check if matrix is affine (no projective components)
-  const isAffine = $derived(
-    internalMatrix.g === 0 && internalMatrix.h === 0 && internalMatrix.i === 1,
+  const corners = $derived([
+    toScreen(0, 0),
+    toScreen(1, 0),
+    toScreen(1, 1),
+    toScreen(0, 1),
+  ]);
+  const center = $derived(toScreen(0.5, 0.5));
+  const handles = $derived(
+    HANDLES.map(([u, v]) => {
+      const p = toScreen(u, v);
+      return { u, v, ...p, cursor: resizeCursor(p) };
+    }),
   );
-  $inspect("is affine", isAffine);
-
-  // Get container bounding rect
-  function getContainerRect() {
-    if (!container) return { x: 0, y: 0, width: 1, height: 1 };
-    const rect = container.getBoundingClientRect();
+  const topMid = $derived(toScreen(0.5, 0));
+  const rotateHandle = $derived.by(() => {
+    const dx = topMid.x - center.x;
+    const dy = topMid.y - center.y;
+    const len = Math.hypot(dx, dy);
+    const [nx, ny] = len > 1e-6 ? [dx / len, dy / len] : [0, -1];
     return {
-      x: rect.x,
-      y: rect.y,
-      width: Math.max(rect.width, 1),
-      height: Math.max(rect.height, 1),
+      x: topMid.x + nx * ROTATE_OFFSET,
+      y: topMid.y + ny * ROTATE_OFFSET,
     };
+  });
+  const pivotScreen = $derived(toScreen(pivot.u, pivot.v));
+
+  // Pick the resize cursor closest to the handle direction on screen
+  function resizeCursor(p: Point): string {
+    const angle = Math.atan2(p.y - center.y, p.x - center.x);
+    const octant = Math.round(angle / (Math.PI / 4));
+    return RESIZE_CURSORS[((octant % 4) + 4) % 4];
   }
 
-  // Convert local coordinates to screen coordinates using the matrix
-  // Returns null if matrix is projective (not supported for editing)
-  function localToScreen(
-    localX: number,
-    localY: number,
-  ): { x: number; y: number } | null {
-    if (!isAffine) return null;
+  type Operation =
+    | { kind: "move" }
+    | { kind: "rotate" }
+    | { kind: "pivot" }
+    | { kind: "scale"; u: number; v: number };
 
-    const rect = getContainerRect();
-    const transformed = applyTransform(internalMatrix, localX, localY);
+  interface Drag {
+    op: Operation;
+    start: Point;
+    transform0: TransformMatrix;
+    view0: TransformMatrix;
+    invView0: TransformMatrix;
+    screen0: TransformMatrix;
+    invScreen0: TransformMatrix;
+  }
 
-    // Transform to screen: center of container is (0,0) in local space
-    return {
-      x: rect.x + rect.width / 2 + transformed.x,
-      y: rect.y + rect.height / 2 + transformed.y,
+  let drag: Drag | null = null;
+
+  function pointer(e: PointerEvent): Point {
+    const rect = svg.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  function startDrag(e: PointerEvent, op: Operation) {
+    if (e.button !== 0) return;
+    const transform0 = $state.snapshot(transform);
+    const view0 = $state.snapshot(view);
+    const screen0 = multiplyMatrix(view0, transform0);
+    const invView0 = invertMatrix(view0);
+    const invScreen0 = invertMatrix(screen0);
+    if (!invView0 || !invScreen0) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    drag = {
+      op,
+      start: pointer(e),
+      transform0,
+      view0,
+      invView0,
+      screen0,
+      invScreen0,
     };
+    onDragStart?.();
   }
 
-  // Convert screen coordinates to local coordinates
-  function screenToLocal(
-    screenX: number,
-    screenY: number,
-  ): { x: number; y: number } | null {
-    if (!isAffine) return null;
-
-    const rect = getContainerRect();
-    // Convert to container-relative coordinates with (0,0) at center
-    const containerX = screenX - rect.x - rect.width / 2;
-    const containerY = screenY - rect.y - rect.height / 2;
-
-    // Invert the affine matrix
-    const { a, b, c, d, e, f } = internalMatrix;
-    const det = a * d - b * c;
-
-    if (Math.abs(det) < 1e-10) {
-      return { x: containerX, y: containerY };
-    }
-
-    const invDet = 1 / det;
-    const localX = (d * (containerX - e) - c * (containerY - f)) * invDet;
-    const localY = (-b * (containerX - e) + a * (containerY - f)) * invDet;
-
-    return { x: localX, y: localY };
-  }
-
-  // Get screen position of a local point (for handles)
-  function getHandleScreenPosition(
-    localX: number,
-    localY: number,
-  ): { x: number; y: number } | null {
-    return localToScreen(localX, localY);
-  }
-
-  // Handle size
-  const handleSize = 8;
-  const pivotSize = 10;
-
-  // Check if screen point is within a handle
-  function isInHandle(
-    screenX: number,
-    screenY: number,
-    handleLocalX: number,
-    handleLocalY: number,
-    size: number = handleSize,
-  ): boolean {
-    const handlePos = localToScreen(handleLocalX, handleLocalY);
-    if (!handlePos) return false;
-
-    const dx = screenX - handlePos.x;
-    const dy = screenY - handlePos.y;
-    return dx * dx + dy * dy <= size * size;
-  }
-
-  // Create affine scale matrix around origin
-  function createScaleMatrix(
-    scaleX: number,
-    scaleY: number,
-    originX: number,
-    originY: number,
-  ): TransformMatrix {
-    return {
-      a: scaleX,
-      b: 0,
-      c: 0,
-      d: scaleY,
-      e: originX * (1 - scaleX),
-      f: originY * (1 - scaleY),
-      g: 0,
-      h: 0,
-      i: 1,
-    };
-  }
-
-  // Create affine rotation matrix around origin
-  function createRotationMatrix(
-    angle: number,
-    originX: number,
-    originY: number,
-  ): TransformMatrix {
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    return {
-      a: cos,
-      b: -sin,
-      c: sin,
-      d: cos,
-      e: originX * (1 - cos) + originY * sin,
-      f: originY * (1 - cos) - originX * sin,
-      g: 0,
-      h: 0,
-      i: 1,
-    };
-  }
-
-  // Matrix to CSS transform (for the box display)
-  function matrixToCss(m: TransformMatrix): string {
-    // CSS matrix3d takes 16 values in column-major order
-    // Our 3x3 matrix [[a, c, e], [b, d, f], [g, h, i]]
-    // maps to 4x4 as:
-    // [ a   b   0   g ]
-    // [ c   d   0   h ]
-    // [ 0   0   1   0 ]
-    // [ e   f   0   i ]
-    // Column-major: a,b,0,g, c,d,0,h, 0,0,1,0, e,f,0,i
-    return `matrix3d(${m.a}, ${m.b}, 0, ${m.g}, ${m.c}, ${m.d}, 0, ${m.h}, 0, 0, 1, 0, ${m.e}, ${m.f}, 0, ${m.i})`;
-  }
-
-  // Start drag
-  function startDrag(handle: HandleType, clientX: number, clientY: number) {
-    activeHandle = handle;
-    dragStart = { x: clientX, y: clientY };
-    dragStartMatrix = structuredClone(internalMatrix);
-    dragStartPivot = { ...pivot };
-  }
-
-  // End drag
   function endDrag() {
-    activeHandle = null;
-    dragStartMatrix = null;
-    dragStartPivot = null;
+    if (!drag) return;
+    drag = null;
+    onDragEnd?.();
   }
 
-  // Handle pointer down
-  function onPointerDown(event: PointerEvent) {
-    if (event.button !== 0) return;
-    const { clientX, clientY } = event;
-
-    if (!isAffine) return; // No editing with projective transforms
-
-    // Check pivot first
-    if (isInHandle(clientX, clientY, pivot.x, pivot.y, pivotSize)) {
-      startDrag("pivot", clientX, clientY);
-      return;
-    }
-
-    // Check rotation handle
-    if (isInHandle(clientX, clientY, halfW + 30, -halfH - 30)) {
-      startDrag("rotation", clientX, clientY);
-      return;
-    }
-
-    // Check corner handles
-    const corners = [
-      { name: "nw" as const, x: -halfW, y: -halfH },
-      { name: "ne" as const, x: halfW, y: -halfH },
-      { name: "se" as const, x: halfW, y: halfH },
-      { name: "sw" as const, x: -halfW, y: halfH },
-    ];
-    for (const corner of corners) {
-      if (isInHandle(clientX, clientY, corner.x, corner.y)) {
-        startDrag(corner.name, clientX, clientY);
-        return;
-      }
-    }
-
-    // Check edge handles
-    const edges = [
-      { name: "n" as const, x: 0, y: -halfH },
-      { name: "e" as const, x: halfW, y: 0 },
-      { name: "s" as const, x: 0, y: halfH },
-      { name: "w" as const, x: -halfW, y: 0 },
-    ];
-    for (const edge of edges) {
-      if (isInHandle(clientX, clientY, edge.x, edge.y)) {
-        startDrag(edge.name, clientX, clientY);
-        return;
-      }
-    }
+  // Apply a screen-space transform on top of the initial one
+  function inScreen(d: Drag, m: TransformMatrix): TransformMatrix {
+    return multiplyMatrix(
+      d.invView0,
+      multiplyMatrix(m, multiplyMatrix(d.view0, d.transform0)),
+    );
   }
 
-  // Handle pointer move
-  function onPointerMove(event: PointerEvent) {
-    if (!activeHandle || !dragStartMatrix || !isAffine) return;
+  const clampScale = (s: number) =>
+    Math.abs(s) < MIN_SCALE ? (s < 0 ? -MIN_SCALE : MIN_SCALE) : s;
 
-    const { clientX, clientY } = event;
-    const ctrlKey = event.ctrlKey || event.metaKey;
-    const shiftKey = event.shiftKey;
+  // Scale along the image axes, in image-local coordinates
+  function scaled(d: Drag, u: number, v: number, p: Point, e: PointerEvent) {
+    const local = applyTransform(d.invScreen0, p.x, p.y);
+    const hx = u * width;
+    const hy = v * height;
+    // Anchor: opposite handle, or pivot with Ctrl
+    const [ax, ay] = e.ctrlKey
+      ? [pivot.u * width, pivot.v * height]
+      : [(1 - u) * width, (1 - v) * height];
+    const dx = hx - ax;
+    const dy = hy - ay;
+    const onX = u !== 0.5 && Math.abs(dx) > 1e-9;
+    const onY = v !== 0.5 && Math.abs(dy) > 1e-9;
 
-    if (activeHandle === "pivot") {
-      const localPos = screenToLocal(clientX, clientY);
-      if (localPos) {
-        pivot = localPos;
-        onChange(internalMatrix);
-      }
-      return;
+    let sx = onX ? (local.x - ax) / dx : 1;
+    let sy = onY ? (local.y - ay) / dy : 1;
+    if (e.shiftKey || freezeAR) {
+      // Corner: project pointer on the anchor -> handle diagonal
+      const s =
+        onX && onY
+          ? ((local.x - ax) * dx + (local.y - ay) * dy) / (dx * dx + dy * dy)
+          : onX
+            ? sx
+            : sy;
+      sx = sy = s;
     }
 
-    if (activeHandle === "rotation") {
-      const pivotPos = localToScreen(pivot.x, pivot.y);
-      const dragStartPivotPos = localToScreen(
-        dragStartPivot!.x,
-        dragStartPivot!.y,
-      );
-
-      if (!pivotPos || !dragStartPivotPos) return;
-
-      const startDx = dragStart.x - pivotPos.x;
-      const startDy = dragStart.y - pivotPos.y;
-      const currentDx = clientX - pivotPos.x;
-      const currentDy = clientY - pivotPos.y;
-
-      const startAngle = Math.atan2(startDy, startDx);
-      const currentAngle = Math.atan2(currentDy, currentDx);
-      const rotation = currentAngle - startAngle;
-
-      const rotationMat = createRotationMatrix(rotation, pivot.x, pivot.y);
-      internalMatrix = multiplyMatrix(dragStartMatrix, rotationMat);
-      onChange(internalMatrix);
-      return;
-    }
-
-    // Handle scaling
-    const currentLocal = screenToLocal(clientX, clientY);
-    const startLocal = screenToLocal(dragStart.x, dragStart.y);
-
-    if (!currentLocal || !startLocal) return;
-
-    let scaleOriginX = 0;
-    let scaleOriginY = 0;
-
-    if (ctrlKey) {
-      // Scale around pivot
-      scaleOriginX = pivot.x;
-      scaleOriginY = pivot.y;
-    } else {
-      // Scale from opposite side
-      switch (activeHandle) {
-        case "nw":
-          scaleOriginX = halfW;
-          scaleOriginY = halfH;
-          break;
-        case "ne":
-          scaleOriginX = -halfW;
-          scaleOriginY = halfH;
-          break;
-        case "se":
-          scaleOriginX = -halfW;
-          scaleOriginY = -halfH;
-          break;
-        case "sw":
-          scaleOriginX = halfW;
-          scaleOriginY = -halfH;
-          break;
-        case "n":
-          scaleOriginX = 0;
-          scaleOriginY = halfH;
-          break;
-        case "e":
-          scaleOriginX = -halfW;
-          scaleOriginY = 0;
-          break;
-        case "s":
-          scaleOriginX = 0;
-          scaleOriginY = -halfH;
-          break;
-        case "w":
-          scaleOriginX = halfW;
-          scaleOriginY = 0;
-          break;
-      }
-    }
-
-    // Get the reference handle position in local space
-    let refLocalX = 0,
-      refLocalY = 0;
-    if (activeHandle === "nw") {
-      refLocalX = -halfW;
-      refLocalY = -halfH;
-    } else if (activeHandle === "ne") {
-      refLocalX = halfW;
-      refLocalY = -halfH;
-    } else if (activeHandle === "se") {
-      refLocalX = halfW;
-      refLocalY = halfH;
-    } else if (activeHandle === "sw") {
-      refLocalX = -halfW;
-      refLocalY = halfH;
-    } else if (activeHandle === "n") {
-      refLocalX = 0;
-      refLocalY = -halfH;
-    } else if (activeHandle === "e") {
-      refLocalX = halfW;
-      refLocalY = 0;
-    } else if (activeHandle === "s") {
-      refLocalX = 0;
-      refLocalY = halfH;
-    } else if (activeHandle === "w") {
-      refLocalX = -halfW;
-      refLocalY = 0;
-    }
-
-    // Calculate scale based on distance from origin
-    const originToRefDx = refLocalX - scaleOriginX;
-    const originToRefDy = refLocalY - scaleOriginY;
-    const originToCurrentDx = currentLocal.x - scaleOriginX;
-    const originToCurrentDy = currentLocal.y - scaleOriginY;
-
-    const originToRefDist = Math.sqrt(
-      originToRefDx * originToRefDx + originToRefDy * originToRefDy,
+    return multiplyMatrix(
+      d.transform0,
+      aroundPoint(scaleMatrix(clampScale(sx), clampScale(sy)), ax, ay),
     );
-    const originToCurrentDist = Math.sqrt(
-      originToCurrentDx * originToCurrentDx +
-        originToCurrentDy * originToCurrentDy,
-    );
-
-    let scaleX = originToCurrentDist / Math.max(originToRefDist, 0.001);
-    let scaleY = originToCurrentDist / Math.max(originToRefDist, 0.001);
-
-    if (shiftKey) {
-      // Maintain aspect ratio
-      scaleX = scaleY = originToCurrentDist / Math.max(originToRefDist, 0.001);
-    } else if (["n", "s"].includes(activeHandle)) {
-      // Vertical edge: scale Y only
-      scaleX = 1;
-      scaleY =
-        Math.abs(originToCurrentDy) / Math.max(Math.abs(originToRefDy), 0.001);
-      if (originToRefDy * originToCurrentDy < 0) scaleY = -scaleY;
-    } else if (["e", "w"].includes(activeHandle)) {
-      // Horizontal edge: scale X only
-      scaleY = 1;
-      scaleX =
-        Math.abs(originToCurrentDx) / Math.max(Math.abs(originToRefDx), 0.001);
-      if (originToRefDx * originToCurrentDx < 0) scaleX = -scaleX;
-    } else {
-      // Corner: calculate separate scales
-      scaleX =
-        Math.abs(originToCurrentDx) / Math.max(Math.abs(originToRefDx), 0.001);
-      scaleY =
-        Math.abs(originToCurrentDy) / Math.max(Math.abs(originToRefDy), 0.001);
-      if (originToRefDx * originToCurrentDx < 0) scaleX = -scaleX;
-      if (originToRefDy * originToCurrentDy < 0) scaleY = -scaleY;
-
-      if (shiftKey) {
-        const avgScale = (Math.abs(scaleX) + Math.abs(scaleY)) / 2;
-        const sign = scaleX * scaleY > 0 ? 1 : -1;
-        scaleX = scaleY = sign * avgScale;
-      }
-    }
-
-    const scaleMat = createScaleMatrix(
-      scaleX,
-      scaleY,
-      scaleOriginX,
-      scaleOriginY,
-    );
-    internalMatrix = multiplyMatrix(dragStartMatrix, scaleMat);
-    onChange(internalMatrix);
   }
 
-  // Handle pointer up
-  function onPointerUp() {
-    endDrag();
+  function onPointerMove(e: PointerEvent) {
+    if (!drag) return;
+    const d = drag;
+    const p = pointer(e);
+
+    switch (d.op.kind) {
+      case "move":
+        onChange(
+          inScreen(d, translationMatrix(p.x - d.start.x, p.y - d.start.y)),
+        );
+        break;
+      case "rotate": {
+        const c = applyTransform(d.screen0, pivot.u * width, pivot.v * height);
+        let angle =
+          Math.atan2(p.y - c.y, p.x - c.x) -
+          Math.atan2(d.start.y - c.y, d.start.x - c.x);
+        if (e.shiftKey) angle = Math.round(angle / ROTATE_SNAP) * ROTATE_SNAP;
+        onChange(inScreen(d, aroundPoint(rotationMatrix(angle), c.x, c.y)));
+        break;
+      }
+      case "pivot": {
+        const local = applyTransform(d.invScreen0, p.x, p.y);
+        pivot = { u: local.x / width, v: local.y / height };
+        break;
+      }
+      case "scale":
+        onChange(scaled(d, d.op.u, d.op.v, p, e));
+        break;
+    }
   }
 </script>
 
-<div
-  bind:this={container}
-  class="transform-box-container"
-  onpointerdown={onPointerDown}
+<svg
+  bind:this={svg}
+  class="transform-box"
   onpointermove={onPointerMove}
-  onpointerup={onPointerUp}
-  onpointerleave={onPointerUp}
-  style:--handle-size="{handleSize}px"
-  style:--pivot-size="{pivotSize}px"
+  onpointerup={endDrag}
+  onpointercancel={endDrag}
 >
-  <!-- Box outline - centered at (0,0) with width/height, transformed by matrix -->
-  <div
-    class="box-outline"
-    style={matrixToCss(internalMatrix)}
-    style:width="{width}px"
-    style:height="{height}px"
-    style:margin-left="{-width / 2}px"
-    style:margin-top="{-height / 2}px"
-  ></div>
-
-  <!-- Pivot point -->
-  {#if isAffine}
-    <div
-      class="handle pivot-handle"
-      class:active={activeHandle === "pivot"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${pivot.x}px, ${pivot.y}px)`}
-    ></div>
-  {/if}
-
-  <!-- Corner handles -->
-  {#if isAffine}
-    <div
-      class="handle corner-handle nw"
-      class:active={activeHandle === "nw"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${-halfW}px, ${-halfH}px)`}
-    ></div>
-    <div
-      class="handle corner-handle ne"
-      class:active={activeHandle === "ne"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${halfW}px, ${-halfH}px)`}
-    ></div>
-    <div
-      class="handle corner-handle se"
-      class:active={activeHandle === "se"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${halfW}px, ${halfH}px)`}
-    ></div>
-    <div
-      class="handle corner-handle sw"
-      class:active={activeHandle === "sw"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${-halfW}px, ${halfH}px)`}
-    ></div>
-  {/if}
-
-  <!-- Edge handles -->
-  {#if isAffine}
-    <div
-      class="handle edge-handle n"
-      class:active={activeHandle === "n"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(0px, ${-halfH}px)`}
-    ></div>
-    <div
-      class="handle edge-handle e"
-      class:active={activeHandle === "e"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${halfW}px, 0px)`}
-    ></div>
-    <div
-      class="handle edge-handle s"
-      class:active={activeHandle === "s"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(0px, ${halfH}px)`}
-    ></div>
-    <div
-      class="handle edge-handle w"
-      class:active={activeHandle === "w"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${-halfW}px, 0px)`}
-    ></div>
-  {/if}
-
-  <!-- Rotation handle -->
-  {#if isAffine}
-    <div
-      class="handle rotation-handle"
-      class:active={activeHandle === "rotation"}
-      style={`transform: ${matrixToCss(internalMatrix)} translate(${halfW + 30}px, ${-halfH - 30}px)`}
-    ></div>
-  {/if}
-</div>
+  <polygon
+    class="body"
+    points={corners.map((p) => `${p.x},${p.y}`).join(" ")}
+    onpointerdown={(e) => startDrag(e, { kind: "move" })}
+  />
+  <line
+    class="rotate-stem"
+    x1={topMid.x}
+    y1={topMid.y}
+    x2={rotateHandle.x}
+    y2={rotateHandle.y}
+  />
+  {#each handles as h}
+    <rect
+      class="handle"
+      x={h.x - HANDLE_SIZE / 2}
+      y={h.y - HANDLE_SIZE / 2}
+      width={HANDLE_SIZE}
+      height={HANDLE_SIZE}
+      style="cursor: {h.cursor}"
+      onpointerdown={(e) => startDrag(e, { kind: "scale", u: h.u, v: h.v })}
+    />
+  {/each}
+  <circle
+    class="handle rotate"
+    cx={rotateHandle.x}
+    cy={rotateHandle.y}
+    r={HANDLE_SIZE / 2 + 1}
+    onpointerdown={(e) => startDrag(e, { kind: "rotate" })}
+  />
+  <g
+    class="pivot"
+    transform="translate({pivotScreen.x} {pivotScreen.y})"
+    onpointerdown={(e) => startDrag(e, { kind: "pivot" })}
+  >
+    <circle r="6" />
+    <line x1="-10" y1="0" x2="10" y2="0" />
+    <line x1="0" y1="-10" x2="0" y2="10" />
+  </g>
+</svg>
 
 <style>
-  .transform-box-container {
+  .transform-box {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%;
     height: 100%;
+    overflow: visible;
     pointer-events: none;
   }
 
-  .box-outline {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    border: 2px dashed #4CAF50;
-    pointer-events: none;
-    box-sizing: border-box;
+  .transform-box > * {
+    pointer-events: all;
+    touch-action: none;
   }
 
-  .handle {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: var(--handle-size);
-    height: var(--handle-size);
-    margin-left: calc( -1 * var(--handle-size) / 2 ); 
-    margin-top: calc( -1 * var(--handle-size) / 2 ); 
-    border-radius: 50%;
-    background: white;
-    border: 2px solid #4CAF50;
-    pointer-events: auto;
-    cursor: nwse-resize;
-    transform-origin: center;
-  }
-
-  .pivot-handle {
-    width: var(--pivot-size);
-    height: var(--pivot-size);
-    margin-left: calc( -1 * var(--pivot-size) / 2 );
-    margin-top: calc( -1 * var(--pivot-size) / 2 );
-    background: #FF9800;
-    border-color: white;
+  .body {
+    fill: transparent;
+    stroke: #4da3ff;
+    stroke-width: 1;
     cursor: move;
   }
 
-  .corner-handle {
-    cursor: nwse-resize;
+  .rotate-stem {
+    stroke: #4da3ff;
+    stroke-width: 1;
+    pointer-events: none;
   }
 
-  .edge-handle {
-    cursor: ns-resize;
+  .handle {
+    fill: #fff;
+    stroke: #4da3ff;
+    stroke-width: 1.5;
   }
-  
-  .edge-handle.e, .edge-handle.w { cursor: ew-resize; }
 
-  .rotation-handle {
-    background: white;
-    border-color: #FF9800;
+  .handle.rotate {
     cursor: grab;
   }
 
-  .active {
-    background: #FFEB3B !important;
-    border-color: #FF9800 !important;
-    border-width: 3px !important;
+  .pivot {
+    cursor: crosshair;
+  }
+
+  .pivot circle {
+    fill: rgba(255, 255, 255, 0.2);
+    stroke: #fff;
+    stroke-width: 1.5;
+  }
+
+  .pivot line {
+    stroke: #fff;
+    stroke-width: 1.5;
   }
 </style>
