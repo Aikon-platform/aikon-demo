@@ -19,23 +19,33 @@
         threshold?: number;
     }
 
-    let { matches, open = $bindable(), onClose, threshold=0 }: Props = $props();
+    let {
+        matches,
+        open = $bindable(),
+        onClose,
+        threshold = 0,
+    }: Props = $props();
 
     // Create alignment state for this modal
     const alignmentState = new AlignmentState();
 
     // Track if images have been loaded
+    let previousThreshold = $state(0);
     let imagesLoaded = $state(false);
 
     // Load images from matches into alignment state
     async function loadImagesFromMatches() {
-        if (imagesLoaded) return;
+        if (imagesLoaded && previousThreshold === threshold) return;
         imagesLoaded = true;
+        previousThreshold = threshold;
 
         // Get up to 20 matches (query + 20 results)
         const imagesToLoad = [
             matches.query,
-            ...matches.matches.filter((m) => m.similarity >= threshold).slice(0, 20).map((m) => m.image),
+            ...matches.matches
+                .filter((m) => m.similarity >= threshold)
+                .slice(0, 20)
+                .map((m) => m.image),
         ];
         console.log(imagesToLoad);
 
@@ -129,7 +139,7 @@
         }
 
         if (img.width === 0 || img.height === 0) {
-            return null
+            return null;
         }
 
         return {
@@ -158,7 +168,7 @@
 
     // Load images when modal opens
     $effect(() => {
-        if (open && !imagesLoaded) {
+        if (open && (!imagesLoaded || previousThreshold !== threshold)) {
             loadImagesFromMatches();
         }
     });
