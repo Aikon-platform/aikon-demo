@@ -15,7 +15,7 @@ export interface RawImage {
     data: any;
 }
 
-export type Point = { x: number; y: number, disabled?: boolean };
+export type Point = { x: number; y: number; disabled?: boolean };
 
 export interface AligningImage {
     image: RawImage;
@@ -77,8 +77,9 @@ export class AlignmentState {
         this.keypointsChanged();
     }
 
-    toggleKeypoint(image:number, k: number) {
-        this.images[image].keypoints[k].disabled = !this.images[image].keypoints[k].disabled
+    toggleKeypoint(image: number, k: number) {
+        this.images[image].keypoints[k].disabled =
+            !this.images[image].keypoints[k].disabled;
         this.keypointsChanged(image);
     }
 
@@ -126,15 +127,23 @@ export class AlignmentState {
         });
 
         let model = this.transformModel;
-        
+
         if (src.length < 2) {
             img.fitWarning = null;
             return;
         }
 
-        const relative = estimateTransform(model, src, dst, this.keepAspectRatio);
+        const relative = estimateTransform(
+            model,
+            src,
+            dst,
+            this.keepAspectRatio,
+        );
         if (!relative) {
-            this.setFitWarning(img, "degenerate keypoints (coincident or collinear)");
+            this.setFitWarning(
+                img,
+                "degenerate keypoints (coincident or collinear)",
+            );
             return;
         }
         const m = multiplyMatrix(ref.transform, relative);
