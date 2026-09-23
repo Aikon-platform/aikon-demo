@@ -6,11 +6,19 @@
     import AlignLayers from "./AlignLayers.svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
 
-    const alignmentState = new AlignmentState();
+    interface Props {
+        alignmentState: AlignmentState;
+    }
+
+    let { alignmentState }: Props = $props();
+
+    if (!alignmentState) {
+        alignmentState = new AlignmentState();
+    }
 
     // Open the candidates modal by default so the user picks images first;
     // it can be reopened at any time from the toolbar.
-    let showCandidates = $state(true);
+    let showCandidates = $state(alignmentState.images.length === 0);
     let showKeypoints = $state(true);
 
     // Resizable panel state
@@ -52,7 +60,7 @@
     <div class="alignment-toolbar">
         <IconBtn
             icon="mdi:image-plus"
-            label="Add images"
+            label="Select images"
             class="is-link is-light"
             onclick={() => (showCandidates = true)}
         />
@@ -64,11 +72,13 @@
         />
     </div>
 
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
         class="alignment-layout"
-        on:mousemove={handleResize}
-        on:mouseup={stopResize}
-        on:mouseleave={stopResize}
+        onmousemove={handleResize}
+        onmouseup={stopResize}
+        onmouseleave={stopResize}
+        role="region"
     >
         <div
             class="alignment-sidebar"
@@ -76,18 +86,20 @@
         >
             <AlignLayers {alignmentState} />
         </div>
-        <div
+        <button
             class="resize-handle"
-            on:mousedown={(e) => startResize("sidebar", e)}
-        />
+            aria-label="Resize panel"
+            onmousedown={(e) => startResize("sidebar", e)}
+        ></button>
         <div class="alignment-main">
             <AlignCanvas {alignmentState} />
         </div>
         {#if showKeypoints}
-            <div
+            <button
                 class="resize-handle"
-                on:mousedown={(e) => startResize("keypoints", e)}
-            />
+                onmousedown={(e) => startResize("keypoints", e)}
+                aria-label="Resize panel"
+            ></button>
             <div
                 class="alignment-keypoints"
                 style="width: {keypointsWidth}px; flex: 0 0 {keypointsWidth}px;"
@@ -163,6 +175,10 @@
         flex: 0 0 8px;
         transition: background-color 0.2s;
         user-select: none;
+        margin: 0;
+        padding: 0;
+        min-width: 8px;
+        border-radius: 0;
     }
 
     .resize-handle:hover,
