@@ -40,6 +40,9 @@
   let panStart = { x: 0, y: 0 };
   let panOrigin = { x: 0, y: 0 };
 
+  // Transform box handles move image corners independently (perspective)
+  let freeform = $state(false);
+
   const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
 
   function zoomAt(clientX: number, clientY: number, factor: number) {
@@ -279,6 +282,7 @@
           {view}
           width={selected.image.width}
           height={selected.image.height}
+          {freeform}
           onChange={(m: TransformMatrix) => {
             selected.transform = m;
           }}
@@ -294,6 +298,12 @@
   </div>
 
   <div class="align-canvas-controls">
+    <IconBtn
+      icon="mdi:perspective-more"
+      label="Freeform"
+      class={["is-small", freeform ? "is-link" : "is-ghost"]}
+      onclick={() => (freeform = !freeform)}
+    />
     <IconBtn icon="mdi:magnify-minus" class="is-ghost is-small" onclick={() => zoomButton(1 / 1.25)} />
     <span class="zoom-level">{Math.round(zoom * 100)}%</span>
     <IconBtn icon="mdi:magnify-plus" class="is-ghost is-small" onclick={() => zoomButton(1.25)} />

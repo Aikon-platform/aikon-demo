@@ -4,9 +4,12 @@
     aroundPoint,
     invertMatrix,
     multiplyMatrix,
+    quadOrientation,
+    rectToQuad,
     rotationMatrix,
     scaleMatrix,
     translationMatrix,
+    type Quad,
     type TransformMatrix,
   } from "../transform";
 
@@ -20,7 +23,7 @@
     onChange: (m: TransformMatrix) => void;
     onDragStart?: () => void;
     onDragEnd?: () => void;
-    /** Not implemented yet: independent corner (perspective) handles */
+    /** Handles move the image corners independently (perspective) */
     freeform?: boolean;
     /** Always keep aspect ratio when scaling (same as holding Shift) */
     freezeAR?: boolean;
@@ -34,6 +37,7 @@
     onChange,
     onDragStart,
     onDragEnd,
+    freeform = false,
     freezeAR = false,
   }: Props = $props();
 
@@ -71,17 +75,20 @@
   const toScreen = (u: number, v: number) =>
     applyTransform(screen, u * width, v * height);
 
-  const corners = $derived([
-    toScreen(0, 0),
-    toScreen(1, 0),
-    toScreen(1, 1),
-    toScreen(0, 1),
-  ]);
+  // Image corners as (u, v), clockwise from top-left
+  const CORNERS: [number, number][] = [
+    [0, 0],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+  ];
+
+  const corners = $derived(CORNERS.map(([u, v]) => toScreen(u, v)) as Quad);
   const center = $derived(toScreen(0.5, 0.5));
   const handles = $derived(
     HANDLES.map(([u, v]) => {
       const p = toScreen(u, v);
-      return { u, v, ...p, cursor: resizeCursor(p) };
+      return { u, v, ...p, cursor: freeform ? "move" : resizeCursor(p) };
     }),
   );
   const topMid = $derived(toScreen(0.5, 0));
@@ -108,7 +115,8 @@
     | { kind: "move" }
     | { kind: "rotate" }
     | { kind: "pivot" }
-    | { kind: "scale"; u: number; v: number };
+    | { kind: "scale"; u: number; v: number }
+    | { kind: "distort"; corners: number[] };
 
   interface Drag {
     op: Operation;
@@ -118,6 +126,7 @@
     invView0: TransformMatrix;
     screen0: TransformMatrix;
     invScreen0: TransformMatrix;
+    corners0: Quad;
   }
 
   let drag: Drag | null = null;
@@ -147,6 +156,7 @@
       invView0,
       screen0,
       invScreen0,
+      corners0: $state.snapshot(corners) as Quad,
     };
     onDragStart?.();
   }
@@ -201,6 +211,30 @@
     );
   }
 
+  // Corners (indices in CORNERS) moved by the handle at (u, v) in freeform
+  // mode: the corner itself, or both ends of an edge
+  function handleCorners(u: number, v: number): number[] {
+    return CORNERS.flatMap(([cu, cv], k) =>
+      (u === 0.5 || cu === u) && (v === 0.5 || cv === v) ? [k] : [],
+    );
+  }
+
+  // Move some corners by the pointer delta, and solve for the perspective
+  // transform. Null if the resulting quad would fold or flip.
+  function distorted(d: Drag, moved: number[], p: Point) {
+    const dx = p.x - d.start.x;
+    const dy = p.y - d.start.y;
+    const quad = d.corners0.map((c, k) =>
+      moved.includes(k) ? { x: c.x + dx, y: c.y + dy } : c,
+    ) as Quad;
+    const orientation = quadOrientation(quad);
+    if (orientation === 0 || orientation !== quadOrientation(d.corners0)) {
+      return null;
+    }
+    const m = rectToQuad(width, height, quad);
+    return m && multiplyMatrix(d.invView0, m);
+  }
+
   function onPointerMove(e: PointerEvent) {
     if (!drag) return;
     const d = drag;
@@ -229,6 +263,11 @@
       case "scale":
         onChange(scaled(d, d.op.u, d.op.v, p, e));
         break;
+      case "distort": {
+        const m = distorted(d, d.op.corners, p);
+        if (m) onChange(m);
+        break;
+      }
     }
   }
 </script>
@@ -260,7 +299,13 @@
       width={HANDLE_SIZE}
       height={HANDLE_SIZE}
       style="cursor: {h.cursor}"
-      onpointerdown={(e) => startDrag(e, { kind: "scale", u: h.u, v: h.v })}
+      onpointerdown={(e) =>
+        startDrag(
+          e,
+          freeform
+            ? { kind: "distort", corners: handleCorners(h.u, h.v) }
+            : { kind: "scale", u: h.u, v: h.v },
+        )}
     />
   {/each}
   <circle
