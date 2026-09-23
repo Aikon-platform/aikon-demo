@@ -135,7 +135,7 @@
             multiplyMatrix(inv, img.transform),
         );
 
-        // Find bounds of all visible transformed images
+        // Find bounds of the first visible image only
         let minX = Infinity;
         let minY = Infinity;
         let maxX = -Infinity;
@@ -162,6 +162,7 @@
                 maxX = Math.max(maxX, corner.x);
                 maxY = Math.max(maxY, corner.y);
             }
+            break;
         }
 
         // If no visible images, return identity transforms and no offset
