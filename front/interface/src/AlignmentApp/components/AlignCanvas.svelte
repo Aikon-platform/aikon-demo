@@ -222,6 +222,22 @@
   const selectedImage: number | null = $derived(
     alignmentState.selected[0] ?? null,
   );
+
+  // Clear selection if the selected image is not visible or is the first layer
+  $effect(() => {
+    if (selectedImage !== null && 
+        (alignmentState.images[selectedImage]?.visible === false || 
+         selectedImage === 0)) {
+      alignmentState.selected = [];
+    }
+  });
+
+  // Only show TransformBox if the selected image is visible and not the first layer
+  const showTransformBox = $derived(
+    selectedImage !== null && 
+    selectedImage !== 0 &&
+    alignmentState.images[selectedImage]?.visible !== false
+  );
 </script>
 
 <svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
@@ -255,8 +271,8 @@
         />
       {/if}
     {/each}
-    {#if selectedImage !== null && alignmentState.images[selectedImage]}
-      {@const selected = alignmentState.images[selectedImage]}
+    {#if showTransformBox}
+      {@const selected = alignmentState.images[selectedImage!]}
       {#key selectedImage}
         <TransformBox
           transform={selected.transform}
