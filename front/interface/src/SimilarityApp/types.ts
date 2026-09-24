@@ -20,7 +20,7 @@ export interface TSimilarityIndexRaw {
             metadata?: { [key: string]: string };
         }
     ]
-    transpositions?: TMatchTransposition[];
+    transpositions?: (TMatchTransposition | number)[];
 }
 
 export type TSimpleSimilarityMatchRaw = [number, number, number] // [source_index, query_index, similarity]

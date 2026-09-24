@@ -7,7 +7,7 @@ import type {
     TSimilarityOutputRaw,
     TSimilarityMatch,
 } from "./types";
-import type { TImageInfo } from "../shared/types";
+import type { TImageInfo, TMatchTransposition } from "../shared/types";
 
 /**
  * Unserializes a similarity index
@@ -33,8 +33,24 @@ function unserializeSimilarityIndex(index: TSimilarityIndexRaw): TSimilarityInde
     return {
         sources: Object.values(source_documents),
         images: source_images,
-        transpositions: index.transpositions || ["none"],
+        transpositions: (index.transpositions || ["none"]).map(unserializeTransposition)
     };
+}
+
+// Based on PIL.Image.Transpose enum values
+const PIL_TRANSPOSITION_MAP: Record<number, TMatchTransposition> = {
+    0: "hflip",
+    1: "rot180 hflip",
+    2: "rot90",
+    3: "rot180",
+    4: "rot270",
+    [-1]: "none"
+}
+
+function unserializeTransposition(t: TMatchTransposition | number): TMatchTransposition {
+    if (t in PIL_TRANSPOSITION_MAP) return PIL_TRANSPOSITION_MAP[t as number];
+    if (typeof(t) === "string") return t;
+    return "none";
 }
 
 /**

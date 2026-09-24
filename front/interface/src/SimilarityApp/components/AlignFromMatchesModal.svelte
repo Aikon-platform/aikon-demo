@@ -8,7 +8,7 @@
     import type { TSimilarityMatches } from "../types";
     import {
         applyTransform,
-        identityMatrix,
+        initialMatrix,
     } from "../../AlignmentApp/transform";
     import AlignmentApp from "../../AlignmentApp/components/AlignmentApp.svelte";
 
@@ -40,26 +40,38 @@
         previousThreshold = threshold;
 
         // Get up to 20 matches (query + 20 results)
+        // + Prepare the expected transposition
         const imagesToLoad = [
-            matches.query,
+            [matches.query, "none", "none"] as const,
             ...matches.matches
                 .filter((m) => m.similarity >= threshold)
                 .slice(0, 20)
-                .map((m) => m.image),
+                .map(
+                    (m) =>
+                        [
+                            m.image,
+                            m.m_transposition,
+                            m.q_transposition,
+                        ] as const,
+                ),
         ];
-        console.log(imagesToLoad);
+        console.log(imagesToLoad)
 
         // Clear existing images
         alignmentState.images = [];
 
         // Load each image
-        for (const img of imagesToLoad) {
+        for (const [img, m_transp, q_transp] of imagesToLoad) {
             try {
                 const rawImage = await imageInfoToRawImage(img);
                 if (rawImage) {
                     const aligningImage: AligningImage = {
                         image: rawImage,
-                        transform: identityMatrix(),
+                        // TODO use m_transp & q_transp to preload transform
+                        transform: initialMatrix(
+                            rawImage.width,
+                            rawImage.height,
+                        ),
                         visible: true,
                         keypoints:
                             alignmentState.images.length > 0
@@ -71,6 +83,11 @@
                                       ),
                                   )
                                 : [],
+                        opacity: 0.7,
+                        invertColors: false,
+                        hFlip:
+                            m_transp.includes("hflip") !==
+                            q_transp.includes("hflip"),
                     };
                     alignmentState.images = [
                         ...alignmentState.images,

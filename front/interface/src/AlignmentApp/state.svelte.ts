@@ -26,6 +26,7 @@ export interface AligningImage {
     fitWarning?: string | null;
     opacity: number;
     invertColors: boolean;
+    hFlip: boolean;
 }
 
 /** Temporary keypoint under the cursor, in the hovered image's pixels */

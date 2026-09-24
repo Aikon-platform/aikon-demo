@@ -318,22 +318,21 @@
                                 src={aligningImage.image.data}
                                 alt={aligningImage.image.file_name}
                                 class="rgb-channel-img"
+                                class:flipped={aligningImage.hFlip}
                             />
-                        {#if aligningImage.invertColors}
-                            <div
-                                class="rgb-channel-bg"
-                                style:background="#fff"
-                                style:mix-blend-mode="difference"
-                            ></div>
-                        {/if}
+                            {#if aligningImage.invertColors}
+                                <div
+                                    class="rgb-channel-bg"
+                                    style:background="#fff"
+                                    style:mix-blend-mode="difference"
+                                ></div>
+                            {/if}
                         </div>
                     {:else}
                         <img
                             src={aligningImage.image.data}
                             alt={aligningImage.image.file_name}
-                            class="align-image"
-                            width={aligningImage.image.width}
-                            height={aligningImage.image.height}
+                            class:flipped={aligningImage.hFlip}
                         />
                         {#if aligningImage.invertColors}
                             <div
@@ -493,6 +492,10 @@
         max-width: none;
         max-height: none;
         isolation: isolate;
+    }
+
+    .flipped {
+        transform:scaleX(-1);
     }
 
     .rgb-layer {

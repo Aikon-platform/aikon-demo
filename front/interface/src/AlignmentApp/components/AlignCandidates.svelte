@@ -121,7 +121,8 @@
                       )
                     : [],
             opacity: 0.7,
-            invertColors: false
+            invertColors: false,
+            hFlip: false
         };
 
         // Add to state

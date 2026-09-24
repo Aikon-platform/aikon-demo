@@ -238,13 +238,16 @@
         onpointerleave={handlePointerLeave}
         role="application"
     >
+        <div class="img-wrapper"
+            style:transform={matrixToCss(view)}>
         <img
             src={aligningImage.image.data}
             alt={aligningImage.image.file_name}
             {width}
             {height}
-            style="transform: {matrixToCss(view)};"
+            class:flipped={aligningImage.hFlip}
         />
+        </div>
         <svg class="keypoint-overlay">
             {#each aligningImage.keypoints as kp, k}
                 {@const s = toScreen(kp)}
@@ -312,7 +315,7 @@
         cursor: grabbing;
     }
 
-    .keypoint-view-canvas img {
+    .keypoint-view-canvas .img-wrapper {
         position: absolute;
         top: 0;
         left: 0;
@@ -388,5 +391,10 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .flipped {
+        transform: scaleX(-1);
+        transform-origin: center;
     }
 </style>
