@@ -8,8 +8,12 @@
     import Icon from "@iconify/svelte";
     import EditableSpan from "../../shared/components/EditableSpan.svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import { applyTransform, identityMatrix } from "../transform.js";
-    import { fly } from "svelte/transition";
+    import {
+        applyTransform,
+        initialMatrix,
+        invertMatrix,
+        multiplyMatrix,
+    } from "../transform.js";
 
     interface Props {
         alignmentState: AlignmentState;
@@ -95,20 +99,25 @@
             data: objectUrl,
         };
 
+        const matrix = initialMatrix(img.width, img.height);
+        const kpMatrix =
+            alignmentState.images.length > 0
+                ? multiplyMatrix(
+                      invertMatrix(matrix)!,
+                      alignmentState.images[0].transform,
+                  )
+                : undefined;
+
         // Create AligningImage with identity transform
         const aligningImage: AligningImage = {
             image: rawImage,
-            transform: identityMatrix(),
+            transform: matrix,
             visible: true,
             // Reference keypoints, warped into this image (identity transform)
             keypoints:
                 alignmentState.images.length > 0
                     ? alignmentState.images[0].keypoints.map((p) =>
-                          applyTransform(
-                              alignmentState.images[0].transform,
-                              p.x,
-                              p.y,
-                          ),
+                          applyTransform(kpMatrix!, p.x, p.y),
                       )
                     : [],
         };

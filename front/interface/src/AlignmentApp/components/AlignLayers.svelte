@@ -122,16 +122,8 @@
                 >
                 <button
                     class="align-layer-overlay is-overlay"
-                    onclick={() =>
-                        i !== 0 &&
-                        image.visible &&
-                        (alignmentState.selected = [i])}
-                    disabled={!image.visible || i === 0}
-                    title={!image.visible
-                        ? "Cannot select hidden layer"
-                        : i === 0
-                          ? "Bottom layer cannot be selected"
-                          : "Select"}
+                    onclick={() => (alignmentState.selected = [i])}
+                    title="Select image"
                     aria-label="Select {image.image.file_name}"
                 ></button>
             </div>

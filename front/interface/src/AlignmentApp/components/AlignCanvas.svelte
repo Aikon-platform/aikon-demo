@@ -12,7 +12,6 @@
     } from "../transform";
     import TransformBox from "./TransformBox.svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import Icon from "@iconify/svelte";
 
     interface Props {
         alignmentState: AlignmentState;
@@ -232,17 +231,6 @@
     const selectedImage: number | null = $derived(
         alignmentState.selected[0] ?? null,
     );
-
-    // Clear selection if the selected image is not visible or is the first layer
-    $effect(() => {
-        if (
-            selectedImage !== null &&
-            (alignmentState.images[selectedImage]?.visible === false ||
-                selectedImage === 0)
-        ) {
-            alignmentState.selected = [];
-        }
-    });
 
     // Only show TransformBox if the selected image is visible and not the first layer
     const showTransformBox = $derived(

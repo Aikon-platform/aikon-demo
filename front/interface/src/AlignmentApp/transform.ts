@@ -24,6 +24,11 @@ export function identityMatrix(): TransformMatrix {
     };
 }
 
+export function initialMatrix(width: number, height: number): TransformMatrix {
+    const scale = 500 / Math.hypot(width, height);
+    return { ...identityMatrix(), a: scale, d: scale, e: -scale*width/2, f: -scale*height/2}
+}
+
 export function translationMatrix(tx: number, ty: number): TransformMatrix {
     return { ...identityMatrix(), e: tx, f: ty };
 }
