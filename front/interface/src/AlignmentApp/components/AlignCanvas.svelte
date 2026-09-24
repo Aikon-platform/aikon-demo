@@ -269,6 +269,11 @@
         onpointercancel={handlePointerUp}
         role="application"
     >
+        <button
+            class="align-canvas-background"
+            aria-label="Deselect"
+            onclick={() => (alignmentState.selected = [])}
+        ></button>
         {#each alignmentState.images as aligningImage, i}
             {#if aligningImage.visible}
                 <img
@@ -375,6 +380,15 @@
         position: relative;
         overflow: hidden;
         touch-action: none;
+        cursor: default;
+    }
+
+    .align-canvas-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         cursor: default;
     }
 
