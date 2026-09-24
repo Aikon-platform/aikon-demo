@@ -24,6 +24,7 @@ export interface AligningImage {
     /** keypoints[k] matches across all images */
     keypoints: Point[];
     fitWarning?: string | null;
+    opacity: number;
 }
 
 /** Temporary keypoint under the cursor, in the hovered image's pixels */

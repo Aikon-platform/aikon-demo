@@ -269,7 +269,7 @@
         onpointercancel={handlePointerUp}
         role="application"
     >
-        {#each alignmentState.images as aligningImage}
+        {#each alignmentState.images as aligningImage, i}
             {#if aligningImage.visible}
                 <img
                     src={aligningImage.image.data}
@@ -282,7 +282,7 @@
             transform: {matrixToCss(
                         multiplyMatrix(view, aligningImage.transform),
                     )};
-            opacity: 0.7;
+            opacity: {i === 0 ? 1.0 : aligningImage.opacity};
           "
                 />
             {/if}

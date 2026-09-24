@@ -1,6 +1,7 @@
 <script lang="ts">
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import type { AlignmentState } from "../state.svelte";
+    import type { AlignmentState, AligningImage } from "../state.svelte";
+    import { identityMatrix, initialMatrix } from "../transform";
 
     interface Props {
         alignmentState: AlignmentState;
@@ -10,6 +11,16 @@
 
     let draggedIndex: number | null = $state(null);
     let dragOverIndex: number | null = $state(null);
+    let opacityInput: HTMLInputElement;
+
+    const selectedImages = $derived(
+        alignmentState.selected
+            .map((i) => alignmentState.images[i])
+            .filter(Boolean) as AligningImage[],
+    );
+
+    // Check if transforms can be reset
+    const canResetTransforms = $derived(alignmentState.selected.length > 0);
 
     function handleDragStart(event: DragEvent, index: number) {
         draggedIndex = index;
@@ -53,15 +64,7 @@
         alignmentState.resync();
 
         // Update selection to match the new index
-        const selectedIndices = alignmentState.selected.map((i) =>
-            i === draggedIndex
-                ? targetIndex
-                : i > draggedIndex! && i <= targetIndex
-                  ? i - 1
-                  : i < draggedIndex! && i >= targetIndex
-                    ? i + 1
-                    : i,
-        );
+        const selectedIndices = [targetIndex];
         alignmentState.selected = selectedIndices;
 
         draggedIndex = null;
@@ -78,6 +81,44 @@
         img.visible = !img.visible;
         if (img.visible && alignmentState.selected.length === 0) {
             alignmentState.selected = [index];
+        }
+    }
+
+    function resetTransforms() {
+        for (const index of alignmentState.selected) {
+            const img = alignmentState.images[index];
+            if (img) {
+                img.transform = initialMatrix(
+                    img.image.width,
+                    img.image.height,
+                );
+                if (
+                    alignmentState.syncWithKeypoints &&
+                    alignmentState.images[0]
+                ) {
+                    const ref = alignmentState.images[0];
+                    img.keypoints = ref.keypoints.map((p) =>
+                        alignmentState.warpPoint(0, index, p),
+                    );
+                }
+            }
+        }
+        alignmentState.resync();
+    }
+
+    function setOpacity(value: number) {
+        const opacity = Math.min(1, Math.max(0, parseFloat(value.toString())));
+        for (const index of alignmentState.selected) {
+            const img = alignmentState.images[index];
+            if (img) {
+                img.opacity = opacity;
+            }
+        }
+    }
+
+    function syncOpacityFromInput() {
+        if (opacityInput && !isNaN(parseFloat(opacityInput.value))) {
+            setOpacity(parseFloat(opacityInput.value));
         }
     }
 
@@ -132,6 +173,51 @@
             <p class="has-text-grey align-layers-empty">No layers yet.</p>
         {/if}
     </div>
+
+    {#if selectedImages.length > 0}
+        <div class="align-layers-properties">
+            {#if alignmentState.selected.length === 1 && alignmentState.selected[0] !== 0}
+                <div class="property-group">
+                    <label class="property-label">Opacity</label>
+                    <div class="property-controls">
+                        <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            bind:value={alignmentState.images[
+                                alignmentState.selected[0]
+                            ].opacity}
+                            class="opacity-slider"
+                        />
+                        <input
+                            type="number"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            bind:this={opacityInput}
+                            value={alignmentState.images[
+                                alignmentState.selected[0]
+                            ].opacity.toFixed(2)}
+                            onblur={syncOpacityFromInput}
+                            onchange={syncOpacityFromInput}
+                            class="opacity-input"
+                        />
+                    </div>
+                </div>
+            {/if}
+            {#if canResetTransforms}
+                <div class="property-group reset-group">
+                    <IconBtn
+                        icon="mdi:undo"
+                        class="is-ghost is-small"
+                        onclick={resetTransforms}
+                        label="Reset layer's transform"
+                    />
+                </div>
+            {/if}
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">
@@ -247,5 +333,58 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .align-layers-properties {
+        flex: none;
+        padding: 0.5rem;
+        border-top: 1px solid var(--bulma-border, #dbdbdb);
+        background: var(--bulma-scheme-main-bis, #f5f5f5);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .property-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: space-between;
+    }
+
+    .property-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--bulma-text, #363636);
+    }
+
+    .property-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .opacity-slider {
+        flex: 1;
+        min-width: 80px;
+    }
+
+    .opacity-input {
+        width: 60px;
+        padding: 0.25rem;
+        border: 1px solid var(--bulma-border, #dbdbdb);
+        border-radius: var(--bulma-radius-small, 3px);
+        font-size: 0.75rem;
+        text-align: center;
+    }
+
+    .opacity-input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .reset-group {
+        justify-content: flex-start;
+        gap: 0.5rem;
     }
 </style>
