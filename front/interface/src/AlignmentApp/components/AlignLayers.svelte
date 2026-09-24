@@ -176,7 +176,12 @@
 
     {#if selectedImages.length > 0}
         <div class="align-layers-properties">
-            {#if alignmentState.selected.length === 1 && alignmentState.selected[0] !== 0}
+            {#if alignmentState.selected.length === 1}
+
+        {@const image = alignmentState.images[
+                                alignmentState.selected[0]
+                            ]}
+            {#if alignmentState.selected[0] !== 0}
                 <div class="property-group">
                     <label class="property-label">Opacity</label>
                     <div class="property-controls">
@@ -196,15 +201,22 @@
                             max="1"
                             step="0.01"
                             bind:this={opacityInput}
-                            value={alignmentState.images[
-                                alignmentState.selected[0]
-                            ].opacity.toFixed(2)}
+                            value={image.opacity.toFixed(2)}
                             onblur={syncOpacityFromInput}
                             onchange={syncOpacityFromInput}
                             class="opacity-input"
                         />
                     </div>
                 </div>
+            {/if}
+            <div class="property-group">
+        <IconBtn
+            icon="mdi:invert-colors"
+            label="Invert colors"
+            class={["is-small", image.invertColors ? "is-link" : "is-ghost"]}
+            onclick={() => (image.invertColors = !image.invertColors)}
+        />
+            </div>
             {/if}
             {#if canResetTransforms}
                 <div class="property-group reset-group">

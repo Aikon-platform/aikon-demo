@@ -19,6 +19,19 @@
 
     let { alignmentState }: Props = $props();
 
+    // RGB mode: render each of up to 3 visible images as a R/G/B additive
+    // channel instead of stacking them with opacity.
+    const RGB_CHANNEL_COLORS = ["#ff0000", "#00ff00", "#0000ff"];
+    let rgbMode = $state(true);
+    const visibleIndices = $derived(
+        alignmentState.images
+            .map((_, i) => i)
+            .filter((i) => alignmentState.images[i].visible),
+    );
+    const rgbModeAvailable = $derived(
+        visibleIndices.length >= 2 && visibleIndices.length <= 3,
+    );
+
     // Container reference for resize observation
     let container: HTMLDivElement;
 
@@ -262,6 +275,7 @@
         class="align-canvas"
         class:pannable={spaceHeld}
         class:panning={isPanning}
+        class:rgb-mode={rgbMode && rgbModeAvailable}
         onwheel={handleWheel}
         onpointerdown={handlePointerDown}
         onpointermove={handlePointerMove}
@@ -276,20 +290,60 @@
         ></button>
         {#each alignmentState.images as aligningImage, i}
             {#if aligningImage.visible}
-                <img
-                    src={aligningImage.image.data}
-                    alt={aligningImage.image.file_name}
-                    class="align-image"
-                    width={aligningImage.image.width}
-                    height={aligningImage.image.height}
-                    style="
-            transform-origin: 0 0;
-            transform: {matrixToCss(
+                <div
+                    class="align-image-layer"
+                    class:rgb-layer={rgbMode && rgbModeAvailable}
+                    style:transform-origin="0 0"
+                    style:transform={matrixToCss(
                         multiplyMatrix(view, aligningImage.transform),
-                    )};
-            opacity: {i === 0 ? 1.0 : aligningImage.opacity};
-          "
-                />
+                    )}
+                    style:width="{aligningImage.image.width}px"
+                    style:height="{aligningImage.image.height}px"
+                    style:opacity={i === 0 ? 1.0 : aligningImage.opacity}
+                >
+                    {#if rgbMode && rgbModeAvailable}
+                        {@const channelColor =
+                            RGB_CHANNEL_COLORS[visibleIndices.indexOf(i)]}
+
+                        <div
+                            class="rgb-channel-bg"
+                            style="background: {channelColor};"
+                        ></div>
+                        <div class="rgb-channel-img-wrapper">
+                            <div
+                                class="rgb-channel-bg"
+                                style:background="#fff"
+                            ></div>
+                            <img
+                                src={aligningImage.image.data}
+                                alt={aligningImage.image.file_name}
+                                class="rgb-channel-img"
+                            />
+                        {#if aligningImage.invertColors}
+                            <div
+                                class="rgb-channel-bg"
+                                style:background="#fff"
+                                style:mix-blend-mode="difference"
+                            ></div>
+                        {/if}
+                        </div>
+                    {:else}
+                        <img
+                            src={aligningImage.image.data}
+                            alt={aligningImage.image.file_name}
+                            class="align-image"
+                            width={aligningImage.image.width}
+                            height={aligningImage.image.height}
+                        />
+                        {#if aligningImage.invertColors}
+                            <div
+                                class="rgb-channel-bg"
+                                style:background="#fff"
+                                style:mix-blend-mode="difference"
+                            ></div>
+                        {/if}
+                    {/if}
+                </div>
             {/if}
         {/each}
         {#if showTransformBox}
@@ -316,6 +370,13 @@
     </div>
 
     <div class="align-canvas-controls">
+        <IconBtn
+            icon="mdi:palette"
+            label="RGB mode"
+            class={["is-small", rgbMode ? "is-link" : "is-ghost"]}
+            disabled={!rgbModeAvailable}
+            onclick={() => (rgbMode = !rgbMode)}
+        />
         {#if alignmentState.transformModel.startsWith("scale")}
             <IconBtn
                 icon={alignmentState.keepAspectRatio
@@ -400,6 +461,10 @@
         cursor: grabbing;
     }
 
+    .align-canvas.rgb-mode {
+        background: #000;
+    }
+
     .align-canvas-controls {
         position: absolute;
         right: 0.75rem;
@@ -420,12 +485,39 @@
         color: #fff;
     }
 
-    .align-image {
+    .align-image-layer {
         position: absolute;
         top: 0;
         left: 0;
         pointer-events: none;
         max-width: none;
         max-height: none;
+        isolation: isolate;
+    }
+
+    .rgb-layer {
+        mix-blend-mode: plus-lighter;
+    }
+
+    .rgb-channel-bg {
+        position: absolute;
+        inset: 0;
+    }
+
+    .rgb-channel-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        max-height: none;
+        mix-blend-mode: luminosity;
+        background-color: #000;
+    }
+
+    .rgb-channel-img-wrapper {
+        background-color: #fff;
+        mix-blend-mode: multiply;
     }
 </style>

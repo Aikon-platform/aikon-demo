@@ -120,7 +120,8 @@
                           applyTransform(kpMatrix!, p.x, p.y),
                       )
                     : [],
-            opacity: 0.7
+            opacity: 0.7,
+            invertColors: false
         };
 
         // Add to state
