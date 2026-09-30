@@ -727,7 +727,7 @@ export function pivot(p: Primitive): Pt {
         case "ellipse":
             return { ...p.center };
         case "arc":
-            return { ...p.p1 };
+            return { x: (p.p1.x + p.p2.x + p.p3.x) / 3, y: (p.p1.y + p.p2.y + p.p3.y) / 3 };
         case "path": {
             const i = Math.floor((p.segs.length - 1) / 2);
             const from = i === 0 ? p.start : p.segs[i - 1].p;

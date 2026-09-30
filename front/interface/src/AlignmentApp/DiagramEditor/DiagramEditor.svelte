@@ -21,11 +21,9 @@
         lineToPath,
         moveHandle,
         newId,
-        parseSvg,
         pathD,
         pathToLine,
         pivot,
-        serializeSvg,
         toHexColor,
         translate,
         viewBoxTransform,
@@ -248,8 +246,6 @@
                 };
         }
     }
-
-    $inspect(selected);
 
     function updateCreating(p: Pt) {
         if (!creating) return;
@@ -771,7 +767,7 @@
                 {selected ? `Selected ${selected.kind}` : "New shapes"}
             </div>
             {#if selected?.kind === "line" || (selected?.kind === "path" && canBecomeLine(selected))}
-                <button class="button is-small" onclick={convertSelected}>
+                <button class="button is-small is-link is-light" onclick={convertSelected}>
                     {selected.kind === "line"
                         ? "Convert to bezier path"
                         : "Convert to line"}
