@@ -659,6 +659,17 @@
                         {/each}
                     {/if}
                     {#each hs as h (h.key)}
+                        {#if h.key === "ry"}
+                            <rect
+                                class="diagram-handle"
+                                data-handle={h.key}
+                                x={h.s.x - HANDLE_RADIUS}
+                                y={h.s.y - HANDLE_RADIUS}
+                                width={HANDLE_RADIUS * 2}
+                                height={HANDLE_RADIUS * 2}
+                                transform="rotate(45 {h.s.x} {h.s.y})"
+                            />
+                        {:else}
                         <circle
                             class="diagram-handle"
                             data-handle={h.key}
@@ -666,6 +677,7 @@
                             cy={h.s.y}
                             r={HANDLE_RADIUS}
                         />
+                        {/if}
                     {/each}
                     <rect
                         class="diagram-pivot"

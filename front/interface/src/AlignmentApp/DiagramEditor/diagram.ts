@@ -554,6 +554,7 @@ export function moveHandle(p: Primitive, key: HandleKey, pt: Pt): void {
                 p.center = { ...pt };
             } else if (key === "rx") {
                 const r = Math.hypot(dx, dy);
+                p.ry = r * (p.ry / p.rx);
                 p.rx = r;
                 if (r > 1e-9) p.rotation = (Math.atan2(dy, dx) * 180) / Math.PI;
             } else if (key === "ry") {
