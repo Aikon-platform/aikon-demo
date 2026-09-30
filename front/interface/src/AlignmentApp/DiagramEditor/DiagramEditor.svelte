@@ -15,10 +15,15 @@
     import IconBtn from "../../shared/components/IconBtn.svelte";
     import {
         arcPathD,
+        arcToPath,
+        canBecomeLine,
         handles,
+        lineToPath,
         moveHandle,
         newId,
         parseSvg,
+        pathD,
+        pathToLine,
         pivot,
         serializeSvg,
         toHexColor,
@@ -211,9 +216,12 @@
     /** Primitive being created: its control points are placed in sequence */
     let creating = $state<{
         prim: Primitive;
+        sequence: string[];
         stage: number;
         downAt: { x: number; y: number };
         isFirstClick: boolean;
+        /** Arc tool: the three points the bezier path is computed from */
+        arc?: { p1: Pt; p2: Pt; p3: Pt };
     } | null>(null);
 
     function newPrimitive(kind: Exclude<Tool, "select">, p: Pt): Primitive {
@@ -241,26 +249,35 @@
         }
     }
 
+    $inspect(selected);
+
     function updateCreating(p: Pt) {
         if (!creating) return;
         const prim = creating.prim;
-        const seq = CREATE_SEQUENCE[prim.kind];
-        const key = seq[creating.stage];
-        moveHandle(prim, key, p);
-        if (prim.kind === "ellipse" && key === "rx") prim.ry = prim.rx;
-        if (prim.kind === "arc" && key === "p3") {
-            // Keep the through point in the middle until it is placed
-            prim.p2 = {
-                x: (prim.p1.x + prim.p3.x) / 2,
-                y: (prim.p1.y + prim.p3.y) / 2,
-            };
+        const key = creating.sequence[creating.stage];
+        if (creating.arc && prim.kind === "path") {
+            const arc = creating.arc;
+            if (key === "p1") arc.p1 = { ...p };
+            else if (key === "p3") arc.p3 = { ...p };
+            else arc.p2 = { ...p };
+            if (key !== "p2") {
+                // Keep the through point in the middle until it is placed
+                arc.p2 = {
+                    x: (arc.p1.x + arc.p3.x) / 2,
+                    y: (arc.p1.y + arc.p3.y) / 2,
+                };
+            }
+            Object.assign(prim, arcToPath(arc.p1, arc.p2, arc.p3));
+            return;
         }
+        moveHandle(prim, key as HandleKey, p);
+        if (prim.kind === "ellipse" && key === "rx") prim.ry = prim.rx;
     }
 
     function advanceCreating() {
         if (!creating) return;
         creating.stage++;
-        if (creating.stage < CREATE_SEQUENCE[creating.prim.kind].length) return;
+        if (creating.stage < creating.sequence.length) return;
         const prim = creating.prim;
         creating = null;
         if (isDegenerate(prim)) {
@@ -285,6 +302,8 @@
                 return p.rx < eps || p.ry < eps;
             case "arc":
                 return Math.hypot(p.p3.x - p.p1.x, p.p3.y - p.p1.y) < eps;
+            default:
+                return false;
         }
     }
 
@@ -316,6 +335,8 @@
             const proxy = diagram.items[diagram.items.length - 1] as Primitive;
             creating = {
                 prim: proxy,
+                sequence: CREATE_SEQUENCE[tool],
+                arc: tool === "arc" ? { p1: p, p2: p, p3: p } : undefined,
                 stage: 1,
                 downAt: { x: e.clientX, y: e.clientY },
                 isFirstClick: true,
@@ -476,18 +497,22 @@
         }
     });
 
+    /** Replace the selected line by a 2-point bezier path, or the reverse */
+    function convertSelected() {
+        if (!diagram || !selected) return;
+        const i = diagram.items.findIndex((it) => it.id === selected.id);
+        if (selected.kind === "line") diagram.items[i] = lineToPath(selected);
+        else if (selected.kind === "path" && canBecomeLine(selected))
+            diagram.items[i] = pathToLine(selected);
+        else return;
+        dirty = true;
+    }
+
     function itemLabel(it: DiagramItem): string {
         if (it.kind !== "foreign") return it.kind;
         const tag = /^<\s*([\w:-]+)/.exec(it.markup)?.[1] ?? "element";
         return `<${tag}>`;
     }
-
-    const ITEM_ICONS: Record<DiagramItem["kind"], string> = {
-        line: "mdi:vector-line",
-        ellipse: "mdi:ellipse-outline",
-        arc: "mdi:vector-curve",
-        foreign: "mdi:code-tags",
-    };
 </script>
 
 <svelte:window onkeydown={onKeyDown} onkeyup={onKeyUp} />
@@ -581,7 +606,12 @@
                         {#if it.kind === "foreign"}
                             <g class="diagram-foreign">{@html it.markup}</g>
                         {:else}
-                            {@const d = it.kind === "arc" ? arcPathD(it) : null}
+                            {@const d =
+                                it.kind === "arc"
+                                    ? arcPathD(it)
+                                    : it.kind === "path"
+                                      ? pathD(it)
+                                      : null}
                             {#if it.kind === "line"}
                                 <line
                                     x1={it.p1.x}
@@ -646,6 +676,35 @@
                         s: toScreen(h.pt),
                     }))}
                     {@const pv = toScreen(pivot(selected))}
+                    {#if selected.kind === "path"}
+                        <!-- Control point guides: each c1 to its start anchor, c2 to its end anchor -->
+                        {#each selected.segs as seg, i}
+                            {#if seg.c1}
+                                {@const from = toScreen(
+                                    i === 0
+                                        ? selected.start
+                                        : selected.segs[i - 1].p,
+                                )}
+                                {@const to = toScreen(seg.p)}
+                                {@const c1 = toScreen(seg.c1)}
+                                {@const c2 = toScreen(seg.c2)}
+                                <line
+                                    class="diagram-guide"
+                                    x1={from.x}
+                                    y1={from.y}
+                                    x2={c1.x}
+                                    y2={c1.y}
+                                />
+                                <line
+                                    class="diagram-guide"
+                                    x1={to.x}
+                                    y1={to.y}
+                                    x2={c2.x}
+                                    y2={c2.y}
+                                />
+                            {/if}
+                        {/each}
+                    {/if}
                     {#if selected.kind === "ellipse"}
                         {@const c = toScreen(selected.center)}
                         {#each hs.filter((h) => h.key !== "center") as h}
@@ -659,7 +718,7 @@
                         {/each}
                     {/if}
                     {#each hs as h (h.key)}
-                        {#if h.key === "ry"}
+                        {#if h.key === "ry" || h.key.startsWith("c")}
                             <rect
                                 class="diagram-handle"
                                 data-handle={h.key}
@@ -670,13 +729,13 @@
                                 transform="rotate(45 {h.s.x} {h.s.y})"
                             />
                         {:else}
-                        <circle
-                            class="diagram-handle"
-                            data-handle={h.key}
-                            cx={h.s.x}
-                            cy={h.s.y}
-                            r={HANDLE_RADIUS}
-                        />
+                            <circle
+                                class="diagram-handle"
+                                data-handle={h.key}
+                                cx={h.s.x}
+                                cy={h.s.y}
+                                r={HANDLE_RADIUS}
+                            />
                         {/if}
                     {/each}
                     <rect
@@ -693,9 +752,7 @@
 
         <span class="diagram-hint">
             {#if creating}
-                Click to place the {CREATE_SEQUENCE[creating.prim.kind][
-                    creating.stage
-                ] === "p2" && creating.prim.kind === "arc"
+                Click to place the {creating.sequence[creating.stage] === "p2"
                     ? "through point"
                     : "next point"} · Esc to cancel
             {:else if tool !== "select"}
@@ -713,6 +770,13 @@
             <div class="diagram-panel-title">
                 {selected ? `Selected ${selected.kind}` : "New shapes"}
             </div>
+            {#if selected?.kind === "line" || (selected?.kind === "path" && canBecomeLine(selected))}
+                <button class="button is-small" onclick={convertSelected}>
+                    {selected.kind === "line"
+                        ? "Convert to bezier path"
+                        : "Convert to line"}
+                </button>
+            {/if}
             <div class="diagram-prop">
                 <label for="diagram-stroke">Color</label>
                 <input
@@ -798,7 +862,6 @@
         height: 92vh;
         max-height: 92vh;
     }
-
 
     .diagram-toolbar {
         flex: none;

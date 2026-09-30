@@ -31,7 +31,20 @@ export interface ArcPrim extends PrimitiveBase {
     p3: Pt;
 }
 
-export type Primitive = LinePrim | EllipsePrim | ArcPrim;
+/** Path segment ending at `p`: a straight line (no controls) or a cubic bezier (c1, c2) */
+export type PathSeg = { p: Pt } & (
+    | { c1: Pt; c2: Pt }
+    | { c1?: undefined; c2?: undefined }
+);
+
+/** Open path of straight and cubic bezier segments, starting at `start` */
+export interface PathPrim extends PrimitiveBase {
+    kind: "path";
+    start: Pt;
+    segs: PathSeg[]; // never empty
+}
+
+export type Primitive = LinePrim | EllipsePrim | ArcPrim | PathPrim;
 
 /** Element the editor does not understand, preserved verbatim (outerHTML) */
 export interface ForeignItem {
@@ -51,8 +64,21 @@ export interface Diagram {
     items: DiagramItem[]; // document order = paint order (last on top)
 }
 
-/** Draggable control points of a primitive, in user units */
-export type HandleKey = "p1" | "p2" | "p3" | "center" | "rx" | "ry";
+/**
+ * Draggable control points of a primitive, in user units.
+ * Paths: `a<i>` anchor i (a0 = start, a<i+1> = end of segment i),
+ * `c1-<i>` / `c2-<i>` control points of segment i.
+ */
+export type HandleKey =
+    | "p1"
+    | "p2"
+    | "p3"
+    | "center"
+    | "rx"
+    | "ry"
+    | `a${number}`
+    | `c1-${number}`
+    | `c2-${number}`;
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const DEFAULT_STROKE = "#000000";
@@ -150,7 +176,8 @@ function onlyKnownAttrs(el: Element, geometry: string[]): boolean {
         if (
             COMMON_ATTRS.has(name) ||
             geometry.includes(name) ||
-            name.startsWith("data-")
+            name.startsWith("data-") ||
+            name.startsWith("sodipodi:")
         )
             continue;
         return false;
@@ -236,6 +263,91 @@ function readRotation(el: Element, center: Pt): number | null {
     return a;
 }
 
+const PATH_TOKEN_RE =
+    /([MmLlHhVvCcZzSsQqTtAa])|([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)|[\s,]+|(.)/gi;
+const PATH_ARITY: Record<string, number> = { m: 2, l: 2, h: 1, v: 1, c: 6 };
+
+/**
+ * Parses a path `d` made of a single subpath of M, L, H, V, C (absolute or relative).
+ * Parses a path `d` made of a single A to ArcPrim.
+ * Returns null for anything else (Z, S, Q, T, A, several subpaths, malformed data).
+ */
+function parsePathD(
+    d: string | null,
+):
+    | Omit<ArcPrim, keyof PrimitiveBase>
+    | Omit<LinePrim, keyof PrimitiveBase>
+    | Omit<PathPrim, keyof PrimitiveBase>
+    | null {
+    if (d === null) return null;
+    const cmds: { cmd: string; args: number[] }[] = [];
+    for (const m of d.matchAll(PATH_TOKEN_RE)) {
+        if (m[3] !== undefined) return null;
+        if (m[1] !== undefined) cmds.push({ cmd: m[1], args: [] });
+        else if (m[2] !== undefined) {
+            if (cmds.length === 0) return null;
+            cmds[cmds.length - 1].args.push(Number(m[2]));
+        }
+    }
+    if (cmds.length < 2 || cmds[0].cmd.toLowerCase() !== "m") return null;
+    if (cmds.length === 2 && cmds[1].cmd.toLowerCase() === "a") {
+        const start = { x: cmds[0].args[0], y: cmds[0].args[1] };
+        const arcPts = parseArcPathD(start, cmds[1].args);
+        if (arcPts === null) return null;
+        return {
+            kind: "arc",
+            ...arcPts,
+        };
+    }
+    let cur: Pt = { x: 0, y: 0 };
+    let start: Pt | null = null;
+    const segs: PathSeg[] = [];
+    for (const { cmd, args } of cmds) {
+        const lower = cmd.toLowerCase();
+        const arity = PATH_ARITY[lower];
+        if (
+            arity === undefined ||
+            args.length === 0 ||
+            args.length % arity !== 0
+        )
+            return null;
+        const rel = cmd !== cmd.toUpperCase();
+        // Only one subpath: M is allowed first only (extra pairs after it are lineto)
+        if (lower === "m" && cmd !== cmds[0].cmd) return null;
+        for (let i = 0; i < args.length; i += arity) {
+            const a = args.slice(i, i + arity);
+            const ox = rel ? cur.x : 0;
+            const oy = rel ? cur.y : 0;
+            const at = (k: number): Pt => ({ x: ox + a[k], y: oy + a[k + 1] });
+            if (lower === "m" && i === 0) {
+                cur = at(0);
+                start = cur;
+            } else if (lower === "m" || lower === "l") {
+                cur = at(0);
+                segs.push({ p: cur });
+            } else if (lower === "h") {
+                cur = { x: ox + a[0], y: cur.y };
+                segs.push({ p: cur });
+            } else if (lower === "v") {
+                cur = { x: cur.x, y: oy + a[0] };
+                segs.push({ p: cur });
+            } else {
+                cur = at(4);
+                segs.push({ c1: at(0), c2: at(2), p: cur });
+            }
+        }
+    }
+    if (start === null || segs.length === 0) return null;
+    if (segs.length === 1) {
+        return {
+            kind: "line",
+            p1: start,
+            p2: segs[0].p,
+        };
+    }
+    return { kind: "path", start, segs };
+}
+
 function parsePrimitive(el: Element, usedIds: Set<string>): Primitive | null {
     if (el.namespaceURI !== SVG_NS) return null;
     const tag = el.localName;
@@ -289,13 +401,17 @@ function parsePrimitive(el: Element, usedIds: Set<string>): Primitive | null {
     }
 
     if (tag === "path") {
-        if (el.getAttribute("data-diagram") !== "arc") return null;
         if (el.hasAttribute("transform")) return null;
-        const p1 = parsePt(el.getAttribute("data-p1"));
-        const p2 = parsePt(el.getAttribute("data-p2"));
-        const p3 = parsePt(el.getAttribute("data-p3"));
-        if (!p1 || !p2 || !p3) return null;
-        return { kind: "arc", id: pickId(), ...strokeInfo, p1, p2, p3 };
+        if (el.getAttribute("data-diagram") === "arc") {
+            const p1 = parsePt(el.getAttribute("data-p1"));
+            const p2 = parsePt(el.getAttribute("data-p2"));
+            const p3 = parsePt(el.getAttribute("data-p3"));
+            if (p1 && p2 && p3)
+                return { kind: "arc", id: pickId(), ...strokeInfo, p1, p2, p3 };
+        }
+        const pathInfo = parsePathD(el.getAttribute("d"));
+        if (pathInfo === null) return null;
+        return { ...pathInfo, ...strokeInfo, id: pickId() };
     }
 
     return null;
@@ -438,6 +554,8 @@ function serializeItem(item: DiagramItem): string {
                 `data-p1="${fmtPt(item.p1)}" data-p2="${fmtPt(item.p2)}" data-p3="${fmtPt(item.p3)}" ` +
                 `${strokeAttrs(item)}/>`
             );
+        case "path":
+            return `<path id="${escapeAttr(item.id)}" d="${pathD(item)}" ${strokeAttrs(item)}/>`;
     }
 }
 
@@ -521,6 +639,19 @@ export function handles(p: Primitive): { key: HandleKey; pt: Pt }[] {
                 { key: "p2", pt: { ...p.p2 } },
                 { key: "p3", pt: { ...p.p3 } },
             ];
+        case "path": {
+            const out: { key: HandleKey; pt: Pt }[] = [
+                { key: "a0", pt: { ...p.start } },
+            ];
+            p.segs.forEach((s, i) => {
+                if (s.c1) {
+                    out.push({ key: `c1-${i}`, pt: { ...s.c1 } });
+                    out.push({ key: `c2-${i}`, pt: { ...s.c2 } });
+                }
+                out.push({ key: `a${i + 1}`, pt: { ...s.p } });
+            });
+            return out;
+        }
         case "ellipse": {
             const t = deg2rad(p.rotation);
             const cos = Math.cos(t);
@@ -547,6 +678,28 @@ export function moveHandle(p: Primitive, key: HandleKey, pt: Pt): void {
             else if (key === "p2") p.p2 = { ...pt };
             else if (key === "p3") p.p3 = { ...pt };
             return;
+        case "path": {
+            const m = /^(a|c1-|c2-)(\d+)$/.exec(key);
+            if (!m) return;
+            const i = Number(m[2]);
+            if (m[1] === "a") {
+                // An anchor drags its adjacent control points along
+                const old = i === 0 ? p.start : p.segs[i - 1]?.p;
+                if (!old) return;
+                const dx = pt.x - old.x;
+                const dy = pt.y - old.y;
+                if (i === 0) p.start = { ...pt };
+                else p.segs[i - 1].p = { ...pt };
+                const out = p.segs[i];
+                if (out?.c1) out.c1 = shift(out.c1, dx, dy);
+                const inc = i > 0 ? p.segs[i - 1] : undefined;
+                if (inc?.c2) inc.c2 = shift(inc.c2, dx, dy);
+            } else {
+                const seg = p.segs[i];
+                if (seg?.c1) seg[m[1] === "c1-" ? "c1" : "c2"] = { ...pt };
+            }
+            return;
+        }
         case "ellipse": {
             const dx = pt.x - p.center.x;
             const dy = pt.y - p.center.y;
@@ -566,7 +719,7 @@ export function moveHandle(p: Primitive, key: HandleKey, pt: Pt): void {
     }
 }
 
-/** Pivot used to translate the whole primitive: line midpoint, ellipse center, arc p2 */
+/** Pivot used to translate the whole primitive: line midpoint, ellipse center, path middle */
 export function pivot(p: Primitive): Pt {
     switch (p.kind) {
         case "line":
@@ -574,7 +727,12 @@ export function pivot(p: Primitive): Pt {
         case "ellipse":
             return { ...p.center };
         case "arc":
-            return { ...p.p2 };
+            return { ...p.p1 };
+        case "path": {
+            const i = Math.floor((p.segs.length - 1) / 2);
+            const from = i === 0 ? p.start : p.segs[i - 1].p;
+            return segPoint(from, p.segs[i], 0.5);
+        }
     }
 }
 
@@ -596,10 +754,23 @@ export function translate(p: Primitive, dx: number, dy: number): void {
             p.p2 = shift(p.p2, dx, dy);
             p.p3 = shift(p.p3, dx, dy);
             return;
+        case "path":
+            p.start = shift(p.start, dx, dy);
+            p.segs = p.segs.map(
+                (s): PathSeg =>
+                    s.c1
+                        ? {
+                              c1: shift(s.c1, dx, dy),
+                              c2: shift(s.c2, dx, dy),
+                              p: shift(s.p, dx, dy),
+                          }
+                        : { p: shift(s.p, dx, dy) },
+            );
+            return;
     }
 }
 
-// Arc geometry
+// Path geometry
 
 /** Circle through three points; null if (near-)collinear */
 export function circleThrough(
@@ -648,6 +819,100 @@ function arcGeom(p: ArcPrim): ArcGeom | null {
     return { cx, cy, r, start: a1, span: sweep ? d3 : TAU - d3, sweep };
 }
 
+/** Straight segment represented as a cubic bezier */
+function straightCubic(from: Pt, to: Pt): PathSeg {
+    return {
+        c1: lerp(from, to, 1 / 3),
+        c2: lerp(from, to, 2 / 3),
+        p: { ...to },
+    };
+}
+
+function lerp(a: Pt, b: Pt, t: number): Pt {
+    return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+}
+
+/**
+ * Circular arc from p1 through p2 to p3 as a bezier path: one cubic segment per
+ * half circle at most (radius error <= 1.8%), straight when the points are collinear
+ */
+export function arcToPath(
+    p1: Pt,
+    p2: Pt,
+    p3: Pt,
+): { start: Pt; segs: PathSeg[] } {
+    const c = circleThrough(p1, p2, p3);
+    if (!c) return { start: { ...p1 }, segs: [straightCubic(p1, p3)] };
+    const a1 = Math.atan2(p1.y - c.cy, p1.x - c.cx);
+    const d2 = normAngle(Math.atan2(p2.y - c.cy, p2.x - c.cx) - a1);
+    const d3 = normAngle(Math.atan2(p3.y - c.cy, p3.x - c.cx) - a1);
+    // Signed angular extent from p1 to p3 passing through p2
+    const span = d2 < d3 ? d3 : d3 - TAU;
+    const n = Math.max(1, Math.ceil(Math.abs(span) / Math.PI - 1e-9));
+    const step = span / n;
+    const k = (4 / 3) * Math.tan(step / 4) * c.r;
+    const at = (a: number): Pt => ({
+        x: c.cx + c.r * Math.cos(a),
+        y: c.cy + c.r * Math.sin(a),
+    });
+    const segs: PathSeg[] = [];
+    for (let i = 0; i < n; i++) {
+        const a = a1 + i * step;
+        const b = a + step;
+        const from = at(a);
+        const to = i === n - 1 ? { ...p3 } : at(b);
+        segs.push({
+            c1: { x: from.x - k * Math.sin(a), y: from.y + k * Math.cos(a) },
+            c2: { x: to.x + k * Math.sin(b), y: to.y - k * Math.cos(b) },
+            p: to,
+        });
+    }
+    return { start: { ...p1 }, segs };
+}
+
+/** Point at parameter t of a segment starting at `from` */
+function segPoint(from: Pt, s: PathSeg, t: number): Pt {
+    if (!s.c1) return lerp(from, s.p, t);
+    const u = 1 - t;
+    const w = [u * u * u, 3 * u * u * t, 3 * u * t * t, t * t * t];
+    return {
+        x: w[0] * from.x + w[1] * s.c1.x + w[2] * s.c2.x + w[3] * s.p.x,
+        y: w[0] * from.y + w[1] * s.c1.y + w[2] * s.c2.y + w[3] * s.p.y,
+    };
+}
+
+/** Each segment with its start point */
+function segsWithStart(p: PathPrim): { from: Pt; seg: PathSeg }[] {
+    return p.segs.map((seg, i) => ({
+        from: i === 0 ? p.start : p.segs[i - 1].p,
+        seg,
+    }));
+}
+
+/** Parameters in (0, 1) where one coordinate of a cubic bezier has a local extremum */
+function cubicExtrema(
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+): number[] {
+    // Derivative / 3 = a t^2 + b t + c
+    const a = -p0 + 3 * p1 - 3 * p2 + p3;
+    const b = 2 * (p0 - 2 * p1 + p2);
+    const c = p1 - p0;
+    const roots: number[] = [];
+    if (Math.abs(a) < 1e-12) {
+        if (Math.abs(b) > 1e-12) roots.push(-c / b);
+    } else {
+        const disc = b * b - 4 * a * c;
+        if (disc >= 0) {
+            const q = Math.sqrt(disc);
+            roots.push((-b + q) / (2 * a), (-b - q) / (2 * a));
+        }
+    }
+    return roots.filter((t) => t > 0 && t < 1);
+}
+
 type Bounds = { minX: number; minY: number; maxX: number; maxY: number };
 
 /** Axis-aligned bounds of the primitive's stroke, in user units */
@@ -685,6 +950,19 @@ export function primitiveBounds(p: Primitive): Bounds {
                         });
                     }
                 }
+            }
+            break;
+        }
+        case "path": {
+            pts = [p.start];
+            for (const { from, seg } of segsWithStart(p)) {
+                pts.push(seg.p);
+                if (!seg.c1) continue;
+                const ts = [
+                    ...cubicExtrema(from.x, seg.c1.x, seg.c2.x, seg.p.x),
+                    ...cubicExtrema(from.y, seg.c1.y, seg.c2.y, seg.p.y),
+                ];
+                for (const t of ts) pts.push(segPoint(from, seg, t));
             }
             break;
         }
@@ -752,6 +1030,136 @@ export function arcPathD(p: ArcPrim): string {
     return `${m} A ${r} ${r} 0 ${g.span > Math.PI ? 1 : 0} ${g.sweep ? 1 : 0} ${fmt(p.p3.x)} ${fmt(p.p3.y)}`;
 }
 
+/**
+ * Reverse of arcPathD: parse a path string and return the 3 control points.
+ * For arc paths: returns p1, the midpoint of the arc as p2, and p3.
+ * For polyline fallback: returns p1, p2, p3 from the L commands.
+ */
+export function parseArcPathD(
+    p1: Pt,
+    arcArgs: number[],
+): { p1: Pt; p2: Pt; p3: Pt } | null {
+    const r = arcArgs[0];
+    const largeArcFlag = arcArgs[3] === 1;
+    const sweepFlag = arcArgs[4] === 1;
+    const p3 = { x: arcArgs[5], y: arcArgs[6] };
+
+    // Compute the two possible centers for the circular arc
+    const dx = p3.x - p1.x;
+    const dy = p3.y - p1.y;
+    const d2 = dx * dx + dy * dy;
+    const d = Math.sqrt(d2);
+
+    // If points coincide or are too far apart for this radius
+    if (d < 1e-12 || d > 2 * r) return null;
+
+    const h = Math.sqrt(r * r - d2 / 4);
+    const mid = { x: (p1.x + p3.x) / 2, y: (p1.y + p3.y) / 2 };
+    const perpX = -dy / d;
+    const perpY = dx / d;
+
+    const center1 = { x: mid.x + h * perpX, y: mid.y + h * perpY };
+    const center2 = { x: mid.x - h * perpX, y: mid.y - h * perpY };
+
+    // Choose the correct center based on sweep and large-arc flags
+    // For each center, compute what the flags would be and match them
+    const a1_1 = Math.atan2(p1.y - center1.y, p1.x - center1.x);
+    const a3_1 = Math.atan2(p3.y - center1.y, p3.x - center1.x);
+    let span1 = a3_1 - a1_1;
+    if (span1 < 0) span1 += TAU;
+    const sweep1 = a3_1 >= a1_1;
+
+    const a1_2 = Math.atan2(p1.y - center2.y, p1.x - center2.x);
+    const a3_2 = Math.atan2(p3.y - center2.y, p3.x - center2.x);
+    let span2 = a3_2 - a1_2;
+    if (span2 < 0) span2 += TAU;
+    const sweep2 = a3_2 >= a1_2;
+
+    // Pick the center that matches both flags
+    let center: Pt;
+    const match1 =
+        (largeArcFlag && span1 > Math.PI) ||
+        (!largeArcFlag && span1 <= Math.PI);
+    const match2 =
+        (largeArcFlag && span2 > Math.PI) ||
+        (!largeArcFlag && span2 <= Math.PI);
+
+    if (match1 && !match2) {
+        center = center1;
+    } else if (match2 && !match1) {
+        center = center2;
+    } else {
+        // Both or neither match largeArcFlag, use sweep flag to decide
+        if (match1 && match2) {
+            center = sweep1 === sweepFlag ? center1 : center2;
+        } else {
+            center = sweep1 === sweepFlag ? center1 : center2;
+        }
+    }
+
+    // Compute p2 as the midpoint of the arc
+    const startAngle = Math.atan2(p1.y - center.y, p1.x - center.x);
+    const endAngle = Math.atan2(p3.y - center.y, p3.x - center.x);
+
+    let from = startAngle;
+    let to = endAngle;
+
+    if (sweepFlag) {
+        if (to < from) to += TAU;
+    } else {
+        if (to > from) to -= TAU;
+    }
+
+    const midAngle = from + (to - from) / 2;
+    const p2 = {
+        x: center.x + r * Math.cos(midAngle),
+        y: center.y + r * Math.sin(midAngle),
+    };
+
+    return { p1, p2, p3 };
+}
+
+/** SVG path `d` of a path primitive */
+export function pathD(p: PathPrim): string {
+    let d = `M ${fmt(p.start.x)} ${fmt(p.start.y)}`;
+    for (const s of p.segs) {
+        d += s.c1
+            ? ` C ${fmt(s.c1.x)} ${fmt(s.c1.y)} ${fmt(s.c2.x)} ${fmt(s.c2.y)} ${fmt(s.p.x)} ${fmt(s.p.y)}`
+            : ` L ${fmt(s.p.x)} ${fmt(s.p.y)}`;
+    }
+    return d;
+}
+
+// Conversions between a line and a 2-point path
+
+/** Line as a 2-point bezier path (straight until the control points are moved) */
+export function lineToPath(l: LinePrim): PathPrim {
+    return {
+        kind: "path",
+        id: l.id,
+        stroke: l.stroke,
+        strokeWidth: l.strokeWidth,
+        start: { ...l.p1 },
+        segs: [straightCubic(l.p1, l.p2)],
+    };
+}
+
+/** True when the path has exactly two points and can become a line (control points are lost) */
+export function canBecomeLine(p: PathPrim): boolean {
+    return p.segs.length === 1;
+}
+
+export function pathToLine(p: PathPrim): LinePrim {
+    return {
+        kind: "line",
+        id: p.id,
+        stroke: p.stroke,
+        strokeWidth: p.strokeWidth,
+        p1: { ...p.start },
+        p2: { ...p.segs[0].p },
+    };
+}
+
 // Hit testing
 
 function segmentDistance(pt: Pt, a: Pt, b: Pt): number {
@@ -767,6 +1175,7 @@ function segmentDistance(pt: Pt, a: Pt, b: Pt): number {
 }
 
 const ELLIPSE_SAMPLES = 64;
+const PATH_SAMPLES = 24;
 
 /** Shortest distance from pt to the primitive's stroke (for hit testing) */
 export function distanceTo(p: Primitive, pt: Pt): number {
@@ -810,6 +1219,20 @@ export function distanceTo(p: Primitive, pt: Pt): number {
             if (offset <= g.span)
                 return Math.abs(Math.hypot(pt.x - g.cx, pt.y - g.cy) - g.r);
             return Math.min(dist(pt, p.p1), dist(pt, p.p3));
+        }
+        case "path": {
+            let best = Infinity;
+            for (const { from, seg } of segsWithStart(p)) {
+                // Flatten curves; close enough for hit testing
+                const n = seg.c1 ? PATH_SAMPLES : 1;
+                let prev = from;
+                for (let i = 1; i <= n; i++) {
+                    const cur = segPoint(from, seg, i / n);
+                    best = Math.min(best, segmentDistance(pt, prev, cur));
+                    prev = cur;
+                }
+            }
+            return best;
         }
     }
 }
