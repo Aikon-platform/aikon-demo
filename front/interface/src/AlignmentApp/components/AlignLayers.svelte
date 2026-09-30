@@ -2,6 +2,8 @@
     import IconBtn from "../../shared/components/IconBtn.svelte";
     import type { AlignmentState, AligningImage } from "../state.svelte";
     import { identityMatrix, initialMatrix } from "../transform";
+    import DiagramEditor from "../DiagramEditor/DiagramEditor.svelte";
+    import DiagramEditorDialog from "../DiagramEditor/DiagramEditorDialog.svelte";
 
     interface Props {
         alignmentState: AlignmentState;
@@ -11,7 +13,13 @@
 
     let draggedIndex: number | null = $state(null);
     let dragOverIndex: number | null = $state(null);
-    let opacityInput: HTMLInputElement;
+    // svelte-ignore non_reactive_update
+    let opacityInput: HTMLInputElement; // NOT A STATE
+    /** Index of the SVG layer open in the diagram editor */
+    let editingIndex: number | null = $state(null);
+
+    const isSvg = (img: AligningImage) =>
+        img.image.file_name.toLowerCase().endsWith(".svg");
 
     const selectedImages = $derived(
         alignmentState.selected
@@ -161,6 +169,13 @@
                 <span class="align-layer-name" title={image.image.file_name}
                     >{image.image.file_name}</span
                 >
+                {#if isSvg(image)}
+                    <IconBtn
+                        icon="mdi:pencil"
+                        class="is-ghost is-small align-layer-edit"
+                        onclick={() => (editingIndex = i)}
+                    />
+                {/if}
                 <button
                     class="align-layer-overlay is-overlay"
                     onclick={() => (alignmentState.selected = [i])}
@@ -179,6 +194,9 @@
             {#if alignmentState.selected.length === 1}
                 {@const image =
                     alignmentState.images[alignmentState.selected[0]]}
+                <p class="align-layers-header">
+                    {image.image.file_name} properties
+                </p>
                 {#if alignmentState.selected[0] !== 0}
                     <div class="property-group">
                         <label class="property-label">Opacity</label>
@@ -227,8 +245,7 @@
                             "is-small",
                             image.hFlip ? "is-link" : "is-ghost",
                         ]}
-                        onclick={() =>
-                            (image.hFlip = !image.hFlip)}
+                        onclick={() => (image.hFlip = !image.hFlip)}
                     />
                 </div>
             {/if}
@@ -245,6 +262,15 @@
         </div>
     {/if}
 </div>
+
+{#if editingIndex !== null}
+    <DiagramEditorDialog
+        {alignmentState}
+        index={editingIndex}
+        open={true}
+        onClose={() => (editingIndex = null)}
+    />
+{/if}
 
 <style lang="scss">
     .align-layers {
@@ -325,7 +351,8 @@
         opacity: 0;
     }
 
-    .align-layer :global(.align-layer-visibility) {
+    .align-layer :global(.align-layer-visibility),
+    .align-layer :global(.align-layer-edit) {
         position: relative;
         z-index: 1;
         flex: none;
