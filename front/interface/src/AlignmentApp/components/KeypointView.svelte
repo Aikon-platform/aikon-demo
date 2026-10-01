@@ -289,7 +289,7 @@
     </div>
 </div>
 
-<style>
+<style lang="scss">
     .keypoint-view {
         position: relative;
         height: 100%;
@@ -324,6 +324,10 @@
         max-height: none;
         pointer-events: none;
         user-select: none;
+        img {
+            max-width: unset;
+            max-height: unset;
+        }
     }
 
     .keypoint-overlay {
