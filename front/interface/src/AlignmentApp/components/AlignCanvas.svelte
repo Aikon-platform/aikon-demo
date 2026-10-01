@@ -396,7 +396,7 @@
         <div class="select is-small">
             <select
                 bind:value={alignmentState.transformModel}
-                onchange={() => alignmentState.resync()}
+                onchange={() => alignmentState.resync(true)}
                 title="Transform model"
             >
                 <option value="scale">Scale</option>

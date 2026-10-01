@@ -96,10 +96,11 @@ export class AlignmentState {
     }
 
     /** Refit all transforms, e.g. after the model or the first image changed */
-    resync() {
+    resync(force: boolean = false) {
         if (!this.syncWithKeypoints) return;
         if (this.images[0]) this.images[0].fitWarning = null;
-        for (let i = 1; i < this.images.length; i++) this.fitToReference(i);
+        for (let i = 1; i < this.images.length; i++)
+            this.fitToReference(i, force);
     }
 
     /** Keypoints of `image` (or of every image) changed */
@@ -115,8 +116,9 @@ export class AlignmentState {
      * Fit image `index` pixels -> first image pixels on their shared enabled
      * keypoints, then compose with the first image's transform. A degenerate
      * fit keeps the current (last correct) transform and sets a warning.
+     * force: try to fit even if there are no keypoints (use corners)
      */
-    private fitToReference(index: number) {
+    private fitToReference(index: number, force: boolean = false) {
         const ref = this.images[0];
         const img = this.images[index];
         const src: Point[] = [];
@@ -132,8 +134,24 @@ export class AlignmentState {
         let model = this.transformModel;
 
         if (src.length < 2) {
-            img.fitWarning = null;
-            return;
+            if (force) {
+                // Use corners if there are no keypoints
+                const pts = [
+                    { x: 0, y: 0 },
+                    { x: img.image.width, y: 0 },
+                    { x: img.image.width, y: img.image.height },
+                    { x: 0, y: img.image.height },
+                ];
+                src.length = 0;
+                dst.length = 0;
+                for (const p of pts) {
+                    src.push(p);
+                    dst.push(this.warpPoint(index, 0, p));
+                }
+            } else {
+                img.fitWarning = null;
+                return;
+            }
         }
 
         const relative = estimateTransform(
