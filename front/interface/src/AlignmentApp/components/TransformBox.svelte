@@ -2,6 +2,7 @@
     import {
         applyTransform,
         aroundPoint,
+        identityMatrix,
         invertMatrix,
         multiplyMatrix,
         quadOrientation,
@@ -43,10 +44,10 @@
     }: Props = $props();
 
     // Derive freeform from transform model
-    // freeform is true for affine and homography (perspective)
-    const freeform = $derived(
-        transformModel === "affine" || transformModel === "homography",
-    );
+    // freeform is true for homography (perspective): handles move corners.
+    // In affine mode, corners scale and side handles skew.
+    const freeform = $derived(transformModel === "homography");
+    const affine = $derived(transformModel === "affine");
 
     type Point = { x: number; y: number };
 
@@ -95,7 +96,14 @@
     const handles = $derived(
         HANDLES.map(([u, v]) => {
             const p = toScreen(u, v);
-            return { u, v, ...p, cursor: freeform ? "move" : resizeCursor(p) };
+            const side = u === 0.5 || v === 0.5;
+            return {
+                u,
+                v,
+                side,
+                ...p,
+                cursor: freeform ? "move" : resizeCursor(p, affine && side),
+            };
         }),
     );
     const topMid = $derived(toScreen(0.5, 0));
@@ -112,7 +120,8 @@
     const pivotScreen = $derived(toScreen(pivot.u, pivot.v));
 
     // Pick the resize cursor closest to the handle direction on screen
-    function resizeCursor(p: Point): string {
+    function resizeCursor(p: Point, skew = false): string {
+        if (skew) return "move";
         const angle = Math.atan2(p.y - center.y, p.x - center.x);
         const octant = Math.round(angle / (Math.PI / 4));
         return RESIZE_CURSORS[((octant % 4) + 4) % 4];
@@ -123,6 +132,7 @@
         | { kind: "rotate" }
         | { kind: "pivot" }
         | { kind: "scale"; u: number; v: number }
+        | { kind: "skew"; u: number; v: number }
         | { kind: "distort"; corners: number[] };
 
     interface Drag {
@@ -226,6 +236,26 @@
         );
     }
 
+    // Skew along the edge of a side handle, in image-local coordinates: the
+    // handle follows the pointer along the edge, the opposite edge (or the
+    // pivot line with Ctrl) stays fixed
+    function skewed(d: Drag, u: number, v: number, p: Point, e: PointerEvent) {
+        const local = applyTransform(d.invScreen0, p.x, p.y);
+        const hx = u * width;
+        const hy = v * height;
+        const horizontal = u === 0.5; // top/bottom edge: shear along x
+        const [ax, ay] = e.ctrlKey
+            ? [pivot.u * width, pivot.v * height]
+            : [(1 - u) * width, (1 - v) * height];
+        const dist = horizontal ? hy - ay : hx - ax;
+        if (Math.abs(dist) < 1e-9) return d.transform0;
+        const k = horizontal ? (local.x - hx) / dist : (local.y - hy) / dist;
+        const shear = horizontal
+            ? { ...identityMatrix(), c: k }
+            : { ...identityMatrix(), b: k };
+        return multiplyMatrix(d.transform0, aroundPoint(shear, ax, ay));
+    }
+
     // Corners (indices in CORNERS) moved by the handle at (u, v) in freeform
     // mode: the corner itself, or both ends of an edge
     function handleCorners(u: number, v: number): number[] {
@@ -290,6 +320,9 @@
             case "scale":
                 onChange(scaled(d, d.op.u, d.op.v, p, e));
                 break;
+            case "skew":
+                onChange(skewed(d, d.op.u, d.op.v, p, e));
+                break;
             case "distort": {
                 const m = distorted(d, d.op.corners, p);
                 if (m) onChange(m);
@@ -333,7 +366,11 @@
                     e,
                     freeform
                         ? { kind: "distort", corners: handleCorners(h.u, h.v) }
-                        : { kind: "scale", u: h.u, v: h.v },
+                        : {
+                              kind: affine && h.side ? "skew" : "scale",
+                              u: h.u,
+                              v: h.v,
+                          },
                 )}
         />
     {/each}
