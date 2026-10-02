@@ -17,6 +17,8 @@ export interface RawImage {
 
 export type Point = { x: number; y: number; disabled?: boolean };
 
+export type Tool = "transform" | "keypoints";
+
 export interface AligningImage {
     image: RawImage;
     transform: TransformMatrix;
@@ -45,6 +47,7 @@ export class AlignmentState {
     syncWithKeypoints = $state(true);
     transformModel: TransformModel = $state("scale");
     keepAspectRatio = $state(true);
+    tool: Tool = $state("transform");
 
     /** Image `from` pixels -> image `to` pixels, through world space */
     warpMatrix(from: number, to: number): TransformMatrix | null {

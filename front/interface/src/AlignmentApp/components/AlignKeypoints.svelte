@@ -59,21 +59,18 @@
         {/if}
     </div>
     <div class="align-keypoints-grid" bind:this={gridElement}>
-        {#each alignmentState.images as _, index (alignmentState.images[index])}
+        {#each alignmentState.selected as index (alignmentState.images[index])}
             <KeypointView {alignmentState} imageIndex={index} />
         {/each}
         {#if alignmentState.images.length === 0}
-            <p class="has-text-grey align-keypoints-empty">No layers yet.</p>
+            <p class="has-text-grey align-keypoints-empty">
+                No layer selected.
+            </p>
         {/if}
-    </div>
-
-    <div class="align-keypoints-help">
-        click: add / drag · ctrl+click: remove · shift+click: disable ⋅
-        middle-drag: pan · wheel: zoom
     </div>
 </div>
 
-<style>
+<style lang="scss">
     .align-keypoints {
         display: flex;
         flex-direction: column;
@@ -100,12 +97,19 @@
     .align-keypoints-grid {
         flex: 1 1 auto;
         overflow-y: auto;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        grid-auto-rows: 260px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
         gap: 0.5rem;
         padding: 0.5rem;
         padding-right: 1.5rem;
+        align-items: stretch;
+        & > * {
+            flex: 1 1 auto;
+            min-height: 300px;
+            width: 100%;
+        }
     }
 
     .align-keypoints-empty {

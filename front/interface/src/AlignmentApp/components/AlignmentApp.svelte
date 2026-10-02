@@ -19,11 +19,14 @@
     // Open the candidates modal by default so the user picks images first;
     // it can be reopened at any time from the toolbar.
     let showCandidates = $state(alignmentState.images.length === 0);
-    let showKeypoints = $state(true);
+    let showKeypoints = $derived(
+        alignmentState.tool === "keypoints" &&
+            alignmentState.selected.length == 1,
+    );
 
     // Resizable panel state
     let sidebarWidth = $state(260);
-    let keypointsWidth = $state(300);
+    let keypointsWidth = $state(500);
     let startX = $state(0);
     let startWidth = $state(0);
     let activeHandle = $state<"sidebar" | "keypoints" | null>(null);
@@ -63,12 +66,6 @@
             label="Select images"
             class="is-link is-light"
             onclick={() => (showCandidates = true)}
-        />
-        <IconBtn
-            icon="mdi:vector-point"
-            label="Keypoints"
-            class={["is-link", showKeypoints ? "" : "is-light"]}
-            onclick={() => (showKeypoints = !showKeypoints)}
         />
     </div>
 

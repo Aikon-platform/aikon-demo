@@ -11,6 +11,7 @@
         type TransformMatrix,
     } from "../transform";
     import TransformBox from "./TransformBox.svelte";
+    import KeypointOverlay from "./KeypointOverlay.svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
 
     interface Props {
@@ -22,7 +23,7 @@
     // RGB mode: render each of up to 3 visible images as a R/G/B additive
     // channel instead of stacking them with opacity.
     const RGB_CHANNEL_COLORS = ["#ff0000", "#00ff00", "#0000ff"];
-    let rgbMode = $state(true);
+    let rgbMode = $state(false);
     const visibleIndices = $derived(
         alignmentState.images
             .map((_, i) => i)
@@ -247,9 +248,17 @@
 
     // Only show TransformBox if the selected image is visible and not the first layer
     const showTransformBox = $derived(
-        selectedImage !== null &&
+        alignmentState.tool === "transform" &&
+            selectedImage !== null &&
             selectedImage !== 0 &&
             alignmentState.images[selectedImage]?.visible !== false,
+    );
+
+    // Keypoint tool edits the selected image, or the reference if none
+    const keypointImage: number | null = $derived(
+        alignmentState.tool === "keypoints" && alignmentState.images.length
+            ? 0
+            : null,
     );
 
     function onTransformChange(selected: AligningImage, m: TransformMatrix) {
@@ -270,6 +279,73 @@
 <svelte:window onkeydown={handleKeyDown} onkeyup={handleKeyUp} />
 
 <div class="align-canvas-wrap">
+    <div class="align-canvas-toolbar">
+        <div class="buttons has-addons">
+            <IconBtn
+                icon="mdi:cursor-move"
+                label="Transform"
+                class={[
+                    "is-small",
+                    alignmentState.tool === "transform" ? "is-link" : "",
+                ]}
+                onclick={() => (alignmentState.tool = "transform")}
+            />
+            <IconBtn
+                icon="mdi:vector-point"
+                label="Keypoints"
+                class={[
+                    "is-small",
+                    alignmentState.tool === "keypoints" ? "is-link" : "",
+                ]}
+                onclick={() => (alignmentState.tool = "keypoints")}
+            />
+        </div>
+        <div class="toolbar-separator"></div>
+        <div class="select is-small">
+            <select
+                bind:value={alignmentState.transformModel}
+                onchange={() => alignmentState.resync(true)}
+                title="Transform model"
+            >
+                <option value="scale">Scale</option>
+                <option value="scale+rotate">Scale + Rotate</option>
+                <option value="affine">Affine</option>
+                <option value="homography">Homography</option>
+            </select>
+        </div>
+        {#if alignmentState.transformModel.startsWith("scale")}
+            <IconBtn
+                icon={alignmentState.keepAspectRatio
+                    ? "mdi:link-variant"
+                    : "mdi:link-variant-off"}
+                label="Isotropic"
+                class={[
+                    "is-small",
+                    alignmentState.keepAspectRatio ? "is-link is-light" : "",
+                ]}
+                onclick={() => {
+                    alignmentState.keepAspectRatio =
+                        !alignmentState.keepAspectRatio;
+                    alignmentState.resync();
+                }}
+            />
+        {/if}
+        <span class="toolbar-hint">
+            {#if alignmentState.tool === "keypoints"}
+                {#if keypointImage === null}
+                    Keypoints: the edited layer is hidden
+                {:else}
+                    Keypoints on <b
+                        >{keypointImage === 0
+                            ? "Ref."
+                            : alignmentState.images[keypointImage].image
+                                  .file_name}</b
+                    > · click: add / drag · ctrl+click: remove · shift+click: disable
+                {/if}
+            {/if}
+        </span>
+    </div>
+
     <div
         bind:this={container}
         class="align-canvas"
@@ -366,6 +442,23 @@
                 />
             {/key}
         {/if}
+        {#if keypointImage !== null}
+            {@const index = keypointImage}
+            {#key index}
+                <KeypointOverlay
+                    {alignmentState}
+                    imageIndex={index}
+                    ghostIndex={alignmentState.selected.length == 1
+                        ? alignmentState.selected[0]
+                        : undefined}
+                    matrix={multiplyMatrix(
+                        view,
+                        alignmentState.images[index].transform,
+                    )}
+                    enabled={!spaceHeld && !isPanning}
+                />
+            {/key}
+        {/if}
     </div>
 
     <div class="align-canvas-controls">
@@ -376,35 +469,6 @@
             disabled={!rgbModeAvailable}
             onclick={() => (rgbMode = !rgbMode)}
         />
-        {#if alignmentState.transformModel.startsWith("scale")}
-            <IconBtn
-                icon={alignmentState.keepAspectRatio
-                    ? "mdi:link-variant"
-                    : "mdi:link-variant-off"}
-                label="Isotropic"
-                class={[
-                    "is-small",
-                    alignmentState.keepAspectRatio ? "is-link" : "is-ghost",
-                ]}
-                onclick={() => {
-                    alignmentState.keepAspectRatio =
-                        !alignmentState.keepAspectRatio;
-                    alignmentState.resync();
-                }}
-            />
-        {/if}
-        <div class="select is-small">
-            <select
-                bind:value={alignmentState.transformModel}
-                onchange={() => alignmentState.resync(true)}
-                title="Transform model"
-            >
-                <option value="scale">Scale</option>
-                <option value="scale+rotate">Scale + Rotate</option>
-                <option value="affine">Affine</option>
-                <option value="homography">Homography</option>
-            </select>
-        </div>
         <IconBtn
             icon="mdi:magnify-minus"
             class="is-ghost is-small"
@@ -428,13 +492,52 @@
 <style>
     .align-canvas-wrap {
         position: relative;
+        display: flex;
+        flex-direction: column;
         width: 100%;
         height: 100%;
     }
 
+    .align-canvas-toolbar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.5rem;
+        border-bottom: 1px solid var(--bulma-border, #dbdbdb);
+        background: var(--bulma-scheme-main, #fff);
+        min-width: 0;
+    }
+
+    .align-canvas-toolbar .buttons {
+        flex-wrap: nowrap;
+        margin-bottom: 0;
+    }
+
+    .align-canvas-toolbar :global(.buttons .button) {
+        margin-bottom: 0;
+    }
+
+    .toolbar-separator {
+        align-self: stretch;
+        width: 1px;
+        background: var(--bulma-border, #dbdbdb);
+    }
+
+    .toolbar-hint {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: right;
+        font-size: 0.75rem;
+        color: var(--bulma-text-weak, #666);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .align-canvas {
+        flex: 1 1 auto;
         width: 100%;
-        height: 100%;
         min-height: 400px;
         background: #222;
         position: relative;
@@ -495,7 +598,7 @@
     }
 
     .flipped {
-        transform:scaleX(-1);
+        transform: scaleX(-1);
     }
 
     .rgb-layer {
