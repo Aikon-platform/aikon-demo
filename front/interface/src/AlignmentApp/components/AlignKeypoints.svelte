@@ -31,7 +31,7 @@
 </script>
 
 <div class="align-keypoints">
-    <div class="align-keypoints-header" on:wheel={handleHeaderWheel}>
+    <div class="align-keypoints-header" onwheel={handleHeaderWheel}>
         Keypoints ({keypointCount})
 
         <IconBtn
@@ -84,14 +84,6 @@
         font-weight: 600;
         font-size: 0.85rem;
         border-bottom: 1px solid var(--bulma-border, #dbdbdb);
-    }
-
-    .align-keypoints-help {
-        display: block;
-        font-weight: normal;
-        font-size: 0.7rem;
-        padding: 0.5rem 0.75rem;
-        color: var(--bulma-text-weak, #666);
     }
 
     .align-keypoints-grid {
