@@ -146,8 +146,6 @@
     </div>
     <div class="keypoint-view-header">
         <span class="keypoint-view-name" title={aligningImage.image.file_name}>
-            {#if imageIndex === 0}<b>Ref.</b>{/if}
-            {aligningImage.image.file_name}
         </span>
         <IconBtn
             icon="mdi:fit-to-page-outline"
@@ -163,7 +161,6 @@
         height: 100%;
         min-height: 0;
         background: #222;
-        border-radius: var(--bulma-radius, 4px);
         overflow: hidden;
     }
 

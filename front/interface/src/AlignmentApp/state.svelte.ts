@@ -40,6 +40,7 @@ export interface HoverKeypoint {
 export class AlignmentState {
     images: AligningImage[] = $state([]);
     selected: number[] = $state([]);
+    solo: number | null = $state(null);
     hover: HoverKeypoint | null = $state(null);
     /** Index of the keypoint currently hovered or dragged, in any image */
     activeKeypoint: number | null = $state(null);

@@ -28,35 +28,27 @@
             gridElement.scrollTop += event.deltaY;
         }
     }
+
+    function getSelectedImage() {
+        return alignmentState.selected.length > 0
+            ? alignmentState.selected[0]
+            : 1;
+    }
+
+    function setSelectedImage(index: number) {
+        alignmentState.selected = [index];
+    }
 </script>
 
 <div class="align-keypoints">
     <div class="align-keypoints-header" onwheel={handleHeaderWheel}>
-        Keypoints ({keypointCount})
-
-        <IconBtn
-            icon="mdi:vector-link"
-            label="Sync"
-            class={[
-                "is-small",
-                alignmentState.syncWithKeypoints ? "is-link" : "is-ghost",
-            ]}
-            onclick={() =>
-                alignmentState.setSyncWithKeypoints(
-                    !alignmentState.syncWithKeypoints,
-                )}
-        />
-
-        {#if fitWarnings.length}
-            <span class="fit-warning" title={fitWarnings.join("\n")}>
-                <Icon icon="mdi:alert" />
-                <span class="fit-warning-text">
-                    {fitWarnings.length === 1
-                        ? fitWarnings[0]
-                        : `${fitWarnings.length} fits rejected`}
-                </span>
-            </span>
-        {/if}
+        <div class="select">
+            <select bind:value={getSelectedImage, setSelectedImage}>
+                {#each alignmentState.images.slice(0).reverse() as image, i}
+                    <option value={i}>{image.image.file_name}</option>
+                {/each}
+            </select>
+        </div>
     </div>
     <div class="align-keypoints-grid" bind:this={gridElement}>
         {#each alignmentState.selected as index (alignmentState.images[index])}
@@ -66,6 +58,18 @@
             <p class="has-text-grey align-keypoints-empty">
                 No layer selected.
             </p>
+        {/if}
+    </div>
+    <div class="align-keypoints-footer">
+        {#if fitWarnings.length}
+            <span class="fit-warning" title={fitWarnings.join("\n")}>
+                <Icon icon="mdi:alert" />
+                <span class="fit-warning-text">
+                    {fitWarnings.length === 1
+                        ? fitWarnings[0]
+                        : `${fitWarnings.length} fits rejected`}
+                </span>
+            </span>
         {/if}
     </div>
 </div>
@@ -94,8 +98,6 @@
         width: 100%;
         height: 100%;
         gap: 0.5rem;
-        padding: 0.5rem;
-        padding-right: 1.5rem;
         align-items: stretch;
         & > * {
             flex: 1 1 auto;

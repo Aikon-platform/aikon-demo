@@ -92,6 +92,15 @@
         }
     }
 
+    function toggleSolo(index: number) {
+        if (alignmentState.solo === index) {
+            alignmentState.solo = null;
+        } else {
+            alignmentState.solo = index;
+            alignmentState.selected = [index];
+        }
+    }
+
     function resetTransforms() {
         for (const index of alignmentState.selected) {
             const img = alignmentState.images[index];
@@ -159,9 +168,18 @@
                     <span class="align-layer-ref">Reference</span>
                 {/if}
                 <IconBtn
-                    icon={image.visible ? "mdi:eye" : "mdi:eye-off"}
+                    icon={image.visible || i === 0 ? "mdi:eye" : "mdi:eye-off"}
                     class="is-ghost is-small align-layer-visibility"
                     onclick={() => toggleVisible(i)}
+                    disabled={i === 0 || alignmentState.solo !== null}
+                />
+                <IconBtn
+                    icon="mdi:numeric-1-circle-outline"
+                    class={[
+                        "is-small align-layer-visibility",
+                        i === alignmentState.solo ? "is-link" : "is-ghost",
+                    ]}
+                    onclick={() => toggleSolo(i)}
                 />
                 <div class="align-layer-thumb">
                     <img src={image.image.data} alt={image.image.file_name} />

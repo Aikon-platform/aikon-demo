@@ -122,12 +122,15 @@
                     : [],
             opacity: 0.7,
             invertColors: false,
-            hFlip: false
+            hFlip: false,
         };
 
         // Add to state
         alignmentState.images = [...alignmentState.images, aligningImage];
         alignmentState.resync();
+        if (alignmentState.selected.length === 0) {
+            alignmentState.selected = [1];
+        }
     }
 
     // Remove an image from the state

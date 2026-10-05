@@ -30,7 +30,9 @@
             .filter((i) => alignmentState.images[i].visible),
     );
     const rgbModeAvailable = $derived(
-        visibleIndices.length >= 2 && visibleIndices.length <= 3,
+        alignmentState.solo === null
+            ? visibleIndices.length >= 2 && visibleIndices.length <= 3
+            : alignmentState.solo !== 0,
     );
 
     // Container reference for resize observation
@@ -365,7 +367,7 @@
             onclick={() => (alignmentState.selected = [])}
         ></button>
         {#each alignmentState.images as aligningImage, i}
-            {#if aligningImage.visible}
+            {#if i === 0 || (alignmentState.solo === null ? aligningImage.visible : i === alignmentState.solo)}
                 <div
                     class="align-image-layer"
                     class:rgb-layer={rgbMode && rgbModeAvailable}
@@ -423,24 +425,26 @@
         {/each}
         {#if showTransformBox}
             {@const selected = alignmentState.images[selectedImage!]}
-            {#key selectedImage}
-                <TransformBox
-                    transform={selected.transform}
-                    {view}
-                    width={selected.image.width}
-                    height={selected.image.height}
-                    transformModel={alignmentState.transformModel}
-                    keepAspectRatio={alignmentState.keepAspectRatio}
-                    onChange={(m: TransformMatrix) =>
-                        onTransformChange(selected, m)}
-                    onDragStart={() => {
-                        frozenLayout = liveLayout;
-                    }}
-                    onDragEnd={() => {
-                        frozenLayout = null;
-                    }}
-                />
-            {/key}
+            {#if selected}
+                {#key selectedImage}
+                    <TransformBox
+                        transform={selected.transform}
+                        {view}
+                        width={selected.image.width}
+                        height={selected.image.height}
+                        transformModel={alignmentState.transformModel}
+                        keepAspectRatio={alignmentState.keepAspectRatio}
+                        onChange={(m: TransformMatrix) =>
+                            onTransformChange(selected, m)}
+                        onDragStart={() => {
+                            frozenLayout = liveLayout;
+                        }}
+                        onDragEnd={() => {
+                            frozenLayout = null;
+                        }}
+                    />
+                {/key}
+            {/if}
         {/if}
         {#if keypointImage !== null}
             {@const index = keypointImage}
