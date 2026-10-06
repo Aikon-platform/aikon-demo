@@ -266,6 +266,11 @@
                                                 placeholder="Filename"
                                                 class="filename-span"
                                             />
+                                            {#if index === 0}
+                                                <p class="has-text-link is-bold">
+                                                    Reference image
+                                                </p>
+                                            {/if}
                                         </div>
                                     {/each}
                                     {#if alignmentState.images.length === 0}

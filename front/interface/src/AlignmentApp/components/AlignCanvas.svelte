@@ -46,6 +46,8 @@
     let containerWidth = $state(0);
     let containerHeight = $state(0);
 
+    const imageCount = $derived(alignmentState.images.length);
+
     // Canvas zoom/pan applied on top of the auto-fit layout, expressed
     // as a "fit-space -> screen" transform: screen = zoom * fitPoint + pan
     const MIN_ZOOM = 0.05;
@@ -268,6 +270,12 @@
 
     // Compute layout reactively
     let layout = $state(computeLayout());
+    $effect(() => {
+        const reactive = $state.snapshot(imageCount);
+        untrack(() => {
+            resetView();
+        });
+    });
 
     // User zoom/pan, applied on top of the auto-fit "world -> container pixel" view
     const zoomPan = $derived(
