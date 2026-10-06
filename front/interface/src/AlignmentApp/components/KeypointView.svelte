@@ -116,7 +116,7 @@
     }
 </script>
 
-<div class="keypoint-view" class:hidden-layer={!aligningImage.visible}>
+<div class="keypoint-view">
     <div
         bind:this={container}
         class="keypoint-view-canvas"

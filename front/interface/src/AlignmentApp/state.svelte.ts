@@ -65,7 +65,10 @@ export class AlignmentState {
     /** Add a keypoint set at `p` in image `from`, warped into all other images */
     addKeypoint(from: number, p: Point): number {
         for (let i = 0; i < this.images.length; i++) {
-            this.images[i].keypoints.push(this.warpPoint(from, i, p));
+            this.images[i].keypoints.push({
+                ...this.warpPoint(from, i, p),
+                disabled: i !== from && i !== 0,
+            });
         }
         this.keypointsChanged();
         return this.images[from].keypoints.length - 1;

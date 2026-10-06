@@ -19,13 +19,10 @@
     // Open the candidates modal by default so the user picks images first;
     // it can be reopened at any time from the toolbar.
     let showCandidates = $state(alignmentState.images.length === 0);
-    let showKeypoints = $derived(
-        alignmentState.tool === "keypoints" &&
-            alignmentState.selected.length == 1,
-    );
+    let showKeypoints = $derived(alignmentState.tool === "keypoints");
 
     // Resizable panel state
-    let sidebarWidth = $state(260);
+    let sidebarWidth = $state(320);
     let keypointsWidth = $state(500);
     let startX = $state(0);
     let startWidth = $state(0);
@@ -47,7 +44,7 @@
         const delta = e.clientX - startX;
         if (activeHandle === "sidebar") {
             const newWidth = startWidth + delta;
-            if (newWidth >= 150 && newWidth <= 500) {
+            if (newWidth >= 150 && newWidth <= 600) {
                 sidebarWidth = newWidth;
             }
         } else if (activeHandle === "keypoints") {
@@ -82,6 +79,9 @@
             style="width: {sidebarWidth}px; flex: 0 0 {sidebarWidth}px;"
         >
             <AlignLayers {alignmentState} />
+            {#if alignmentState.tool === "keypoints"}
+                <AlignCanvas {alignmentState} />
+            {/if}
         </div>
         <button
             class="resize-handle"
@@ -89,7 +89,75 @@
             onmousedown={(e) => startResize("sidebar", e)}
         ></button>
         <div class="alignment-main">
-            <AlignCanvas {alignmentState} />
+            <div class="align-canvas-toolbar">
+                <div class="buttons has-addons">
+                    <IconBtn
+                        icon="mdi:cursor-move"
+                        label="Transform"
+                        class={[
+                            "is-small",
+                            alignmentState.tool === "transform"
+                                ? "is-link"
+                                : "",
+                        ]}
+                        onclick={() => (alignmentState.tool = "transform")}
+                    />
+                    <IconBtn
+                        icon="mdi:vector-point"
+                        label="Keypoints"
+                        class={[
+                            "is-small",
+                            alignmentState.tool === "keypoints"
+                                ? "is-link"
+                                : "",
+                        ]}
+                        onclick={() => (alignmentState.tool = "keypoints")}
+                    />
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="select is-small">
+                    <select
+                        bind:value={alignmentState.transformModel}
+                        onchange={() => alignmentState.resync(true)}
+                        title="Transform model"
+                    >
+                        <option value="scale">Scale</option>
+                        <option value="scale+rotate">Scale + Rotate</option>
+                        <option value="affine">Affine</option>
+                        <option value="homography">Homography</option>
+                    </select>
+                </div>
+                {#if alignmentState.transformModel.startsWith("scale")}
+                    <IconBtn
+                        icon={alignmentState.keepAspectRatio
+                            ? "mdi:link-variant"
+                            : "mdi:link-variant-off"}
+                        label="Isotropic"
+                        class={[
+                            "is-small",
+                            alignmentState.keepAspectRatio
+                                ? "is-link is-light"
+                                : "",
+                        ]}
+                        onclick={() => {
+                            alignmentState.keepAspectRatio =
+                                !alignmentState.keepAspectRatio;
+                            alignmentState.resync();
+                        }}
+                    />
+                {/if}
+                <span class="toolbar-hint">
+                    {#if alignmentState.tool === "keypoints"}
+                        Keypoints: click: add / drag · ctrl+click: remove ·
+                        shift+click: disable
+                    {/if}
+                </span>
+            </div>
+            {#if alignmentState.tool === "transform"}
+                <AlignCanvas {alignmentState} />
+            {:else}
+                <AlignKeypoints {alignmentState} target="reference" />
+            {/if}
         </div>
         {#if showKeypoints}
             <button
@@ -101,7 +169,7 @@
                 class="alignment-keypoints"
                 style="width: {keypointsWidth}px; flex: 0 0 {keypointsWidth}px;"
             >
-                <AlignKeypoints {alignmentState} />
+                <AlignKeypoints {alignmentState} target="selected" />
             </div>
         {/if}
     </div>
@@ -146,6 +214,10 @@
         background: var(--bulma-scheme-main, #fff);
         min-width: 150px;
         max-width: 500px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: stretch;
     }
 
     .alignment-main {
@@ -153,6 +225,8 @@
         height: 100%;
         min-width: 0;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
 
     .alignment-keypoints {
@@ -185,5 +259,42 @@
 
     :global(.aligner-viewer) {
         width: 100%;
+    }
+
+    .align-canvas-toolbar {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.5rem;
+        border-bottom: 1px solid var(--bulma-border, #dbdbdb);
+        background: var(--bulma-scheme-main, #fff);
+        min-width: 0;
+    }
+
+    .align-canvas-toolbar .buttons {
+        flex-wrap: nowrap;
+        margin-bottom: 0;
+    }
+
+    .align-canvas-toolbar :global(.buttons .button) {
+        margin-bottom: 0;
+    }
+
+    .toolbar-separator {
+        align-self: stretch;
+        width: 1px;
+        background: var(--bulma-border, #dbdbdb);
+    }
+
+    .toolbar-hint {
+        flex: 1 1 auto;
+        min-width: 0;
+        text-align: right;
+        font-size: 0.75rem;
+        color: var(--bulma-text-weak, #666);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>

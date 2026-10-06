@@ -6,18 +6,23 @@
 
     interface Props {
         alignmentState: AlignmentState;
+        target: "reference" | "selected";
     }
 
-    let { alignmentState }: Props = $props();
-
-    const keypointCount = $derived(
-        alignmentState.images[0]?.keypoints.length ?? 0,
-    );
+    let { alignmentState, target = "selected" }: Props = $props();
 
     const fitWarnings = $derived(
         alignmentState.images.flatMap((img) =>
             img.fitWarning ? [`${img.image.file_name}: ${img.fitWarning}`] : [],
         ),
+    );
+
+    const imageShown = $derived(
+        target === "reference"
+            ? 0
+            : alignmentState.selected.length > 0
+              ? alignmentState.selected[0]
+              : 1,
     );
 
     let gridElement: HTMLDivElement;
@@ -41,24 +46,39 @@
 </script>
 
 <div class="align-keypoints">
-    <div class="align-keypoints-header" onwheel={handleHeaderWheel}>
-        <div class="select">
-            <select bind:value={getSelectedImage, setSelectedImage}>
-                {#each alignmentState.images.slice(0).reverse() as image, i}
-                    <option value={i}>{image.image.file_name}</option>
-                {/each}
-            </select>
+    {#if target !== "reference"}
+        <div class="align-keypoints-header" onwheel={handleHeaderWheel}>
+            <div class="select">
+                <select bind:value={getSelectedImage, setSelectedImage}>
+                    {#each alignmentState.images.slice(1).reverse() as image, i}
+                        <option value={i}>{image.image.file_name}</option>
+                    {/each}
+                </select>
+            </div>
+            <IconBtn
+                icon="mdi:vector-link"
+                label="Sync"
+                class={[
+                    "is-small",
+                    alignmentState.syncWithKeypoints ? "is-link" : "is-ghost",
+                ]}
+                onclick={() =>
+                    alignmentState.setSyncWithKeypoints(
+                        !alignmentState.syncWithKeypoints,
+                    )}
+            />
+            {#if !alignmentState.syncWithKeypoints}
+                <IconBtn
+                    icon="mdi:update"
+                    label="Align"
+                    class={"is-small is-link"}
+                    onclick={() => alignmentState.resync()}
+                />
+            {/if}
         </div>
-    </div>
+    {/if}
     <div class="align-keypoints-grid" bind:this={gridElement}>
-        {#each alignmentState.selected as index (alignmentState.images[index])}
-            <KeypointView {alignmentState} imageIndex={index} />
-        {/each}
-        {#if alignmentState.images.length === 0}
-            <p class="has-text-grey align-keypoints-empty">
-                No layer selected.
-            </p>
-        {/if}
+        <KeypointView {alignmentState} imageIndex={imageShown} />
     </div>
     <div class="align-keypoints-footer">
         {#if fitWarnings.length}

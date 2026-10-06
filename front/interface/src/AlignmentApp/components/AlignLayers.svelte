@@ -248,7 +248,7 @@
                 <div class="property-group">
                     <IconBtn
                         icon="mdi:invert-colors"
-                        label="Invert colors"
+                        title="Invert colors"
                         class={[
                             "is-small",
                             image.invertColors ? "is-link" : "is-ghost",
@@ -258,23 +258,21 @@
                     />
                     <IconBtn
                         icon="mdi:flip-horizontal"
-                        label="Flip"
+                        title="Flip"
                         class={[
                             "is-small",
                             image.hFlip ? "is-link" : "is-ghost",
                         ]}
                         onclick={() => (image.hFlip = !image.hFlip)}
                     />
-                </div>
-            {/if}
-            {#if canResetTransforms}
-                <div class="property-group reset-group">
-                    <IconBtn
-                        icon="mdi:undo"
-                        class="is-ghost is-small"
-                        onclick={resetTransforms}
-                        label="Reset layer's transform"
-                    />
+                    {#if canResetTransforms}
+                        <IconBtn
+                            icon="mdi:undo"
+                            class="is-ghost is-small"
+                            onclick={resetTransforms}
+                            title="Reset layer's transform"
+                        />
+                    {/if}
                 </div>
             {/if}
         </div>
@@ -294,8 +292,12 @@
     .align-layers {
         display: flex;
         flex-direction: column;
-        height: 100%;
         width: 100%;
+        flex: 1;
+        max-height: 65%;
+        &:only-child {
+            max-height: 100%;
+        }
     }
 
     .align-layers-header {
