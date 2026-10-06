@@ -140,6 +140,13 @@
     }
 
     let reversedImages = $derived(alignmentState.images.slice().reverse());
+
+    function ellipsis(str: string, len: number) {
+        if (str.length > len) {
+            return str.slice(0, len - 3) + "...";
+        }
+        return str;
+    }
 </script>
 
 <div class="align-layers">
@@ -168,7 +175,11 @@
                     <span class="align-layer-ref">Reference</span>
                 {/if}
                 <IconBtn
-                    icon={image.visible || i === 0 ? "mdi:eye" : "mdi:eye-off"}
+                    icon={i == 0
+                        ? "mdi:pin"
+                        : image.visible
+                          ? "mdi:eye"
+                          : "mdi:eye-off"}
                     class="is-ghost is-small align-layer-visibility"
                     onclick={() => toggleVisible(i)}
                     disabled={i === 0 || alignmentState.solo !== null}
@@ -213,7 +224,7 @@
                 {@const image =
                     alignmentState.images[alignmentState.selected[0]]}
                 <p class="align-layers-header">
-                    {image.image.file_name} properties
+                    {ellipsis(image.image.file_name, 20)} properties
                 </p>
                 {#if alignmentState.selected[0] !== 0}
                     <div class="property-group">
@@ -325,8 +336,8 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem 0.5rem;
+        gap: 0.1rem;
+        padding: 0.2rem 0.3rem;
         border-bottom: 1px solid var(--bulma-border, #eee);
         cursor: grab;
 
@@ -335,7 +346,8 @@
         }
 
         &.first {
-            border-top: 2px solid var(--bulma-border, #eee);
+            border-top: 2px solid var(--bulma-link, #eee);
+            background: var(--bulma-link-light, #f5f5f5);
         }
     }
 
@@ -344,7 +356,8 @@
         top: 0rem;
         right: 0.5rem;
         font-size: 0.7rem;
-        color: var(--bulma-text-weak, #666);
+        color: var(--bulma-link, #666);
+        font-weight: 700;
     }
 
     .align-layer.selected {

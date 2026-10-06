@@ -22,8 +22,8 @@
     let showKeypoints = $derived(alignmentState.tool === "keypoints");
 
     // Resizable panel state
-    let sidebarWidth = $state(320);
-    let keypointsWidth = $state(500);
+    let sidebarWidth = $state(400);
+    let keypointsWidth = $state(700);
     let startX = $state(0);
     let startWidth = $state(0);
     let activeHandle = $state<"sidebar" | "keypoints" | null>(null);

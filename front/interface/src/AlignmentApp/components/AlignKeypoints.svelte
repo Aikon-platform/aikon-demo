@@ -51,7 +51,7 @@
             <div class="select">
                 <select bind:value={getSelectedImage, setSelectedImage}>
                     {#each alignmentState.images.slice(1).reverse() as image, i}
-                        <option value={i}>{image.image.file_name}</option>
+                        <option value={i + 1}>{image.image.file_name}</option>
                     {/each}
                 </select>
             </div>
@@ -72,7 +72,7 @@
                     icon="mdi:update"
                     label="Align"
                     class={"is-small is-link"}
-                    onclick={() => alignmentState.resync()}
+                    onclick={() => alignmentState.refit(getSelectedImage())}
                 />
             {/if}
         </div>

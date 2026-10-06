@@ -84,12 +84,6 @@
         pan = { x: 0, y: 0 };
     }
 
-    function zoomButton(factor: number) {
-        if (!container) return;
-        const rect = container.getBoundingClientRect();
-        zoomAt(rect.left + rect.width / 2, rect.top + rect.height / 2, factor);
-    }
-
     function isPanTrigger(e: PointerEvent) {
         return e.button === 1 || (e.button === 0 && spaceHeld);
     }
@@ -142,9 +136,7 @@
             };
         }
 
-        const firstMatrix = images[0].transform;
-        const firstInverse = invertMatrix(firstMatrix);
-        const inv = identityMatrix(); // || firstInverse || identityMatrix();
+        const inv = identityMatrix();
 
         const relativeTransforms = images.map((img) =>
             multiplyMatrix(inv, img.transform),
@@ -258,16 +250,9 @@
 
     function onTransformChange(selected: AligningImage, m: TransformMatrix) {
         selected.transform = m;
-        if (!alignmentState.syncWithKeypoints) return;
-
-        // Update keypoints for the selected image from reference
-        const ref = alignmentState.images[0];
-        if (ref && ref.keypoints.length > 0) {
-            selected.keypoints = ref.keypoints.map((p) =>
-                alignmentState.warpPoint(0, selectedImage!, p),
-            );
-            selected.fitWarning = null;
-        }
+        selected.keypoints = selected.keypoints.map((p) => {
+            return { ...p, disabled: true };
+        });
     }
 </script>
 
@@ -292,9 +277,9 @@
             aria-label="Deselect"
             onclick={() => (alignmentState.selected = [])}
         ></button>
-        {#each alignmentState.images as aligningImage, i}
+        {#each alignmentState.images as aligningImage, i (aligningImage)}
             {#if i === 0 || (alignmentState.solo === null ? aligningImage.visible : i === alignmentState.solo)}
-                <div
+                <button
                     class="align-image-layer"
                     class:rgb-layer={rgbMode && rgbModeAvailable}
                     style:transform-origin="0 0"
@@ -304,6 +289,14 @@
                     style:width="{aligningImage.image.width}px"
                     style:height="{aligningImage.image.height}px"
                     style:opacity={i === 0 ? 1.0 : aligningImage.opacity}
+                    onclick={(e) => {
+                        console.log("Clicking image", i);
+                        if (alignmentState.tool === "transform") {
+                            e.preventDefault();
+                            console.log("Selecting image", i);
+                            alignmentState.selected = [i];
+                        }
+                    }}
                 >
                     {#if rgbMode && rgbModeAvailable}
                         {@const channelColor =
@@ -346,7 +339,7 @@
                             ></div>
                         {/if}
                     {/if}
-                </div>
+                </button>
             {/if}
         {/each}
         {#if showTransformBox}
@@ -372,6 +365,18 @@
                 {/key}
             {/if}
         {/if}
+        {#if alignmentState.tool === "keypoints"}
+            <KeypointOverlay
+                {alignmentState}
+                imageIndex={0}
+                ghostMode
+                matrix={multiplyMatrix(
+                    view,
+                    alignmentState.images[0].transform,
+                )}
+                enabled={false}
+            />
+        {/if}
     </div>
 
     <div class="align-canvas-controls">
@@ -379,25 +384,14 @@
             <IconBtn
                 icon="mdi:palette"
                 title="RGB mode"
-                class={["is-small", rgbMode ? "is-link" : "is-ghost"]}
+                class={["is-small is-white", rgbMode ? "is-link" : "is-ghost"]}
                 onclick={() => (rgbMode = !rgbMode)}
             />
         {/if}
         <IconBtn
-            icon="mdi:magnify-minus"
-            class="is-ghost is-small"
-            onclick={() => zoomButton(1 / 1.25)}
-        />
-        <span class="zoom-level">{Math.round(zoom * 100)}%</span>
-        <IconBtn
-            icon="mdi:magnify-plus"
-            class="is-ghost is-small"
-            onclick={() => zoomButton(1.25)}
-        />
-        <IconBtn
             icon="mdi:fit-to-page-outline"
-            label="Reset"
-            class="is-ghost is-small"
+            title="Reset view"
+            class="is-ghost is-white is-small"
             onclick={resetView}
         />
     </div>
@@ -447,21 +441,14 @@
 
     .align-canvas-controls {
         position: absolute;
-        right: 0.75rem;
-        bottom: 0.75rem;
+        right: 0.25rem;
+        top: 0.25rem;
         display: flex;
         align-items: center;
         gap: 0.25rem;
         background: rgba(30, 30, 30, 0.75);
         border-radius: var(--bulma-radius, 4px);
-        padding: 0.25rem 0.5rem;
-        color: #fff;
-    }
-
-    .zoom-level {
-        font-size: 0.75rem;
-        min-width: 3em;
-        text-align: center;
+        padding: 0.25rem;
         color: #fff;
     }
 
@@ -469,10 +456,11 @@
         position: absolute;
         top: 0;
         left: 0;
-        pointer-events: none;
         max-width: none;
         max-height: none;
         isolation: isolate;
+        padding: 0;
+        margin: 0;
     }
 
     .flipped {

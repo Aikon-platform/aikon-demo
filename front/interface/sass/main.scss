@@ -1,7 +1,7 @@
 @use "sass:color";
 @use "bulma/sass" with (
     $scheme-main: hsl(233, 100%, 63%),
-    $success: hsl(84, 74%, 43%),
+    $success: hsl(84, 74%, 43%)
 );
 @use "variables" as *;
 @use "DatasetApp" as *;
@@ -11,13 +11,17 @@
 @use "RegionsApp" as *;
 @use "WatermarksApp" as *;
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
 body {
     background-color: $bg-color;
-    font: 100% Helvetica, sans-serif;
+    font:
+        100% Helvetica,
+        sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -101,10 +105,13 @@ pre {
     display: inline-block;
 }
 
-input[type="submit"], input[type="file"], button:not(.not-button), .btn {
+input[type="submit"],
+input[type="file"],
+button:not(.not-button),
+.btn {
     white-space: normal;
     text-align: center;
-    font: 16px $headfont;
+    font-family: $headfont;
     font-weight: 500;
     border: none;
     padding: 0.6em 0.6em;
@@ -112,8 +119,8 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
     display: inline-flex;
     vertical-align: middle;
     margin: 0.1em 0.3em;
-    min-height: 1.5em;
-    min-width: 1.5em;
+    min-height: var(--bulma-control-size, 1.5em);
+    min-width: var(--bulma-control-size, 1.5em);
     align-items: center;
     justify-content: space-evenly;
     text-decoration: none;
@@ -135,7 +142,8 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
         }
     }
 
-    &.cancel, &.validate {
+    &.cancel,
+    &.validate {
         color: #fff;
         padding: 0 5px;
     }
@@ -147,12 +155,12 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
         background: $green;
         border-color: color.adjust($green, $lightness: -20%);
     }
-    &:disabled, &.disabled {
-        background-color: #ccc;
-        border-color: #ccc;
-        color: #fff;
-        pointer-events: none;
-    }
+    // &:disabled, &.disabled {
+    //     background-color: #ccc;
+    //     border-color: #ccc;
+    //     color: #fff;
+    //     pointer-events: none;
+    // }
     &.big {
         font-size: 1.3em;
     }
@@ -190,7 +198,8 @@ ul.messages {
             background-color: color.adjust($green, $lightness: -50%);
             color: #fff;
         }
-        &.warning, &.error {
+        &.warning,
+        &.error {
             background-color: color.adjust($red, $lightness: -50%);
             color: #fff;
         }
@@ -214,7 +223,8 @@ ul.messages {
         align-items: center;
         padding: 1.5em 1em 1em;
 
-        h2, p {
+        h2,
+        p {
             margin: 0;
         }
         h2 {
@@ -265,7 +275,8 @@ ul.messages {
     margin: 0;
     border-radius: $border-radius;
     font-weight: bold;
-    &.status-CANCELLED, &.status-UNKNOWN {
+    &.status-CANCELLED,
+    &.status-UNKNOWN {
         background-color: $grey;
     }
     &.status-PENDING {
@@ -312,14 +323,15 @@ ul.messages {
     overflow: hidden;
 }
 
-
 .clickable {
     transition: all 0.3s ease;
-    box-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.3);
+    box-shadow: 0 0.5em 1em -0.125em
+        hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.3);
 }
 .clickable:hover {
     transform: translateY(2px);
-    box-shadow: 0 0.5em 0.4em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.4);
+    box-shadow: 0 0.5em 0.4em -0.125em
+        hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.4);
 }
 
 .is-top {
@@ -413,5 +425,13 @@ ul.messages {
     &.long {
         background-color: color.adjust($red, $lightness: 50%);
         color: $red;
+    }
+}
+
+// misc
+
+.is-ghost {
+    &.is-white {
+        --bulma-button-ghost-color: var(--bulma-white);
     }
 }

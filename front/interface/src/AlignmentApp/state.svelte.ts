@@ -110,6 +110,10 @@ export class AlignmentState {
             this.fitToReference(i, force);
     }
 
+    refit(index: number) {
+        this.fitToReference(index);
+    }
+
     /** Keypoints of `image` (or of every image) changed */
     private keypointsChanged(image?: number) {
         if (image === undefined || image === 0) {

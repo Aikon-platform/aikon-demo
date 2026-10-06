@@ -11,7 +11,7 @@
         alignmentState: AlignmentState;
         /** Index of the edited image in alignmentState.images */
         imageIndex: number;
-        ghostIndex?: number | undefined;
+        ghostMode?: boolean;
         /** Image pixels -> overlay (container) pixels */
         matrix: TransformMatrix;
         /** When false, pointer events pass through to the container */
@@ -23,7 +23,7 @@
     let {
         alignmentState,
         imageIndex,
-        ghostIndex,
+        ghostMode,
         matrix,
         enabled = true,
         onDragStart,
@@ -166,9 +166,11 @@
     const keypointColor = (k: number) => `hsl(${(k * 137.5) % 360}, 90%, 55%)`;
 
     const ghostKeypoints = $derived.by(() => {
-        if (!ghostIndex) return [];
-        return alignmentState.images[ghostIndex].keypoints.map((p) =>
-            alignmentState.warpPoint(ghostIndex, imageIndex, p),
+        if (!ghostMode) return [];
+        return alignmentState.images.map((tg, tgIndex) =>
+            tg.keypoints.map((p) =>
+                alignmentState.warpPoint(tgIndex, imageIndex, p),
+            ),
         );
     });
 </script>
@@ -184,13 +186,20 @@
     onpointercancel={handlePointerUp}
     onpointerleave={handlePointerLeave}
 >
-    {#each ghostKeypoints as kp, k}
-        {@const s = toScreen(kp)}
-        {@const t = toScreen(aligningImage.keypoints[k])}
-        <g class="keypoint ghost" style="--kp-color: {keypointColor(k)}">
-            <circle r={KEYPOINT_RADIUS * 0.5} cx={s.x} cy={s.y} />
-            <line x1={s.x} y1={s.y} x2={t.x} y2={t.y} />
-        </g>
+    {#each ghostKeypoints as kps}
+        {#each kps as kp, k}
+            {#if !kp.disabled}
+                {@const s = toScreen(kp)}
+                {@const t = toScreen(aligningImage.keypoints[k])}
+                <g
+                    class="keypoint ghost"
+                    style="--kp-color: {keypointColor(k)}"
+                >
+                    <circle r={KEYPOINT_RADIUS * 0.5} cx={s.x} cy={s.y} />
+                    <line x1={s.x} y1={s.y} x2={t.x} y2={t.y} />
+                </g>
+            {/if}
+        {/each}
     {/each}
     {#each aligningImage.keypoints as kp, k}
         {@const s = toScreen(kp)}

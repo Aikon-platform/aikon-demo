@@ -20,7 +20,7 @@
     const MIN_ZOOM = 0.2;
     const MAX_ZOOM = 50;
     const FIT_MARGIN = 0.95;
-    const TOP_MARGIN = 36;
+    const TOP_MARGIN = 0;
 
     const aligningImage = $derived(alignmentState.images[imageIndex]);
     const width = $derived(aligningImage.image.width);
@@ -145,11 +145,9 @@
         />
     </div>
     <div class="keypoint-view-header">
-        <span class="keypoint-view-name" title={aligningImage.image.file_name}>
-        </span>
         <IconBtn
             icon="mdi:fit-to-page-outline"
-            class="is-ghost is-small"
+            class="is-ghost is-white is-small"
             onclick={resetView}
         />
     </div>
@@ -196,16 +194,15 @@
 
     .keypoint-view-header {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        right: 0.25rem;
+        top: 0.25rem;
         display: flex;
         align-items: center;
         gap: 0.25rem;
-        padding: 0 0 0 0.5rem;
         background: rgba(30, 30, 30, 0.75);
+        border-radius: var(--bulma-radius, 4px);
+        padding: 0.25rem;
         color: #fff;
-        font-size: 0.75rem;
     }
 
     .keypoint-view-name {

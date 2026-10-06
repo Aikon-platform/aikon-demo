@@ -146,6 +146,13 @@
         );
         alignmentState.resync();
     }
+
+    function setAsReference(index: number) {
+        alignmentState.images = [
+            alignmentState.images[index],
+            ...alignmentState.images.filter((_, i) => i !== index),
+        ];
+    }
 </script>
 
 <Dialog.Root bind:open>
@@ -213,14 +220,36 @@
 
                                 <div class="images-list">
                                     {#each alignmentState.images as aligningImage, index (index)}
-                                        <div class="image-card">
-                                            <button
-                                                class="delete is-small delete-button"
-                                                onclick={() =>
-                                                    removeImage(index)}
-                                                title="Delete"
-                                                aria-label="Delete"
-                                            ></button>
+                                        <div
+                                            class="image-card"
+                                            class:reference-image={index === 0}
+                                        >
+                                            <p class="image-meta">
+                                                {aligningImage.image
+                                                    .width}×{aligningImage.image
+                                                    .height}
+                                            </p>
+                                            <div class="image-actions">
+                                                <IconBtn
+                                                    icon="mdi:pin"
+                                                    class={[
+                                                        "is-small",
+                                                        index === 0
+                                                            ? "is-link"
+                                                            : "",
+                                                    ]}
+                                                    onclick={() =>
+                                                        setAsReference(index)}
+                                                    title="Use as reference"
+                                                />
+                                                <IconBtn
+                                                    icon="mdi:close"
+                                                    class="is-small is-white is-dark"
+                                                    onclick={() =>
+                                                        removeImage(index)}
+                                                    title="Delete"
+                                                />
+                                            </div>
                                             <div class="image-thumb">
                                                 <img
                                                     src={aligningImage.image
@@ -237,11 +266,6 @@
                                                 placeholder="Filename"
                                                 class="filename-span"
                                             />
-                                            <span class="image-meta"
-                                                >{aligningImage.image
-                                                    .width}×{aligningImage.image
-                                                    .height}</span
-                                            >
                                         </div>
                                     {/each}
                                     {#if alignmentState.images.length === 0}
@@ -327,6 +351,11 @@
         flex-direction: column;
         align-items: center;
         gap: 0.25rem;
+
+        &.reference-image {
+            border-color: var(--bulma-link);
+            background-color: var(--bulma-link-light, rgba(76, 175, 80, 0.1));
+        }
     }
 
     .image-thumb {
@@ -357,9 +386,11 @@
     .image-meta {
         font-size: 0.7rem;
         color: var(--bulma-text-weak, #666);
+        text-align: left;
+        width: 100%;
     }
 
-    .delete-button {
+    .image-actions {
         position: absolute;
         top: 0.35rem;
         right: 0.35rem;
