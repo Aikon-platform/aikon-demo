@@ -13,6 +13,7 @@
     import TransformBox from "./TransformBox.svelte";
     import KeypointOverlay from "./KeypointOverlay.svelte";
     import IconBtn from "../../shared/components/IconBtn.svelte";
+    import { untrack } from "svelte";
 
     interface Props {
         alignmentState: AlignmentState;
@@ -49,6 +50,7 @@
     // as a "fit-space -> screen" transform: screen = zoom * fitPoint + pan
     const MIN_ZOOM = 0.05;
     const MAX_ZOOM = 20;
+    const FIT_MARGIN = 10;
     let zoom = $state(1);
     let pan = $state({ x: 0, y: 0 });
     let spaceHeld = $state(false);
@@ -80,6 +82,7 @@
     }
 
     function resetView() {
+        layout = computeLayout();
         zoom = 1;
         pan = { x: 0, y: 0 };
     }
@@ -130,8 +133,9 @@
         if (images.length === 0) {
             return {
                 transforms: [],
-                centerX: 0,
-                centerY: 0,
+                width: 0,
+                height: 0,
+                baseScale: 1,
                 view: identityMatrix(),
             };
         }
@@ -142,7 +146,7 @@
             multiplyMatrix(inv, img.transform),
         );
 
-        // Find bounds of the first visible image only
+        // Find bounds of all the visible images only
         let minX = Infinity;
         let minY = Infinity;
         let maxX = -Infinity;
@@ -169,28 +173,49 @@
                 maxX = Math.max(maxX, corner.x);
                 maxY = Math.max(maxY, corner.y);
             }
-            break;
         }
 
         // If no visible images, return identity transforms and no offset
         if (!hasVisible) {
             return {
                 transforms: relativeTransforms,
-                centerX: 0,
-                centerY: 0,
+                width: 0,
+                height: 0,
+                baseScale: 1,
                 view: inv,
             };
         }
 
         const width = maxX - minX;
         const height = maxY - minY;
-        const centerX = containerWidth / 2 - (minX + width / 2);
-        const centerY = containerHeight / 2 - (minY + height / 2);
+        const baseScale = Math.max(
+            Math.min(
+                5,
+                (containerWidth - FIT_MARGIN * 2) / width,
+                (containerHeight - FIT_MARGIN * 2) / height,
+            ),
+            0.1,
+        );
 
         // World -> container pixels
-        const view = multiplyMatrix(translationMatrix(centerX, centerY), inv);
+        const view = multiplyMatrix(
+            translationMatrix(containerWidth / 2, containerHeight / 2),
+            multiplyMatrix(
+                scaleMatrix(baseScale, baseScale),
+                multiplyMatrix(
+                    translationMatrix(-minX - width / 2, -minY - height / 2),
+                    inv,
+                ),
+            ),
+        );
 
-        return { transforms: relativeTransforms, centerX, centerY, view };
+        return {
+            transforms: relativeTransforms,
+            width,
+            height,
+            view,
+            baseScale,
+        };
     }
 
     // Update container dimensions
@@ -198,8 +223,28 @@
         if (!container) return;
 
         const rect = container.getBoundingClientRect();
-        containerWidth = Math.floor(rect.width);
-        containerHeight = Math.floor(rect.height);
+        untrack(() => {
+            const invLayout = multiplyMatrix(
+                scaleMatrix(1 / layout.baseScale, 1 / layout.baseScale),
+                translationMatrix(-containerWidth / 2, -containerHeight / 2),
+            );
+            containerWidth = Math.floor(rect.width);
+            containerHeight = Math.floor(rect.height);
+            layout.baseScale = Math.max(
+                Math.min(
+                    (containerWidth - FIT_MARGIN * 2) / layout.width,
+                    (containerHeight - FIT_MARGIN * 2) / layout.height,
+                ),
+                0.1,
+            );
+            layout.view = multiplyMatrix(
+                translationMatrix(containerWidth / 2, containerHeight / 2),
+                multiplyMatrix(
+                    scaleMatrix(layout.baseScale, layout.baseScale),
+                    multiplyMatrix(invLayout, layout.view),
+                ),
+            );
+        });
     }
 
     // Initialize resize observer and compute layout
@@ -222,10 +267,7 @@
     });
 
     // Compute layout reactively
-    const liveLayout = $derived(computeLayout());
-    // Layout is frozen while a transform is being dragged, to avoid re-centering
-    let frozenLayout: ReturnType<typeof computeLayout> | null = $state(null);
-    const layout = $derived(frozenLayout ?? liveLayout);
+    let layout = $state(computeLayout());
 
     // User zoom/pan, applied on top of the auto-fit "world -> container pixel" view
     const zoomPan = $derived(
@@ -355,12 +397,6 @@
                         keepAspectRatio={alignmentState.keepAspectRatio}
                         onChange={(m: TransformMatrix) =>
                             onTransformChange(selected, m)}
-                        onDragStart={() => {
-                            frozenLayout = liveLayout;
-                        }}
-                        onDragEnd={() => {
-                            frozenLayout = null;
-                        }}
                     />
                 {/key}
             {/if}

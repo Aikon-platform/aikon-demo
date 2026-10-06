@@ -1,3 +1,8 @@
+// Transformation Matrix of format
+// [ a  c  0  e ]   Column-major: a,b,0,g, c,d,0,h, 0,0,1,0, e,f,0,i
+// [ b  d  0  f ]
+// [ 0  0  1  0 ]
+// [ g  h  0  i ]
 export interface TransformMatrix {
     a: number;
     b: number;
@@ -26,7 +31,13 @@ export function identityMatrix(): TransformMatrix {
 
 export function initialMatrix(width: number, height: number): TransformMatrix {
     const scale = 500 / Math.hypot(width, height);
-    return { ...identityMatrix(), a: scale, d: scale, e: -scale*width/2, f: -scale*height/2}
+    return {
+        ...identityMatrix(),
+        a: scale,
+        d: scale,
+        e: (-scale * width) / 2,
+        f: (-scale * height) / 2,
+    };
 }
 
 export function translationMatrix(tx: number, ty: number): TransformMatrix {
