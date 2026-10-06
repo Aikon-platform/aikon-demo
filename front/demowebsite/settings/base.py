@@ -159,3 +159,5 @@ DATABASES = {
         "PORT": ENV.str("DB_PORT", default="5432"),
     }
 }
+
+print(DATABASES)
