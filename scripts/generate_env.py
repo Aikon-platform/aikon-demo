@@ -238,7 +238,11 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
             else "http://web:8000" if in_docker  # local: api container → web
             else f"http://localhost:{v['DJANGO_PORT']}"  # dev: api on host → localhost
         ),
-        "API_URL": v["PROD_API_URL"] if prod else f"http://{'api' if in_docker else 'localhost'}:{v['API_PORT']}",
+        "API_URL": (
+            v["PROD_API_URL"] if prod 
+            else f"http://api:{v['API_PORT']}" if in_docker 
+            else f"http://localhost:{v['API_PORT']}"
+        ),
     }
 
 
