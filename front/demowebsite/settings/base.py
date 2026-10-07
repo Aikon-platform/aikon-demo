@@ -87,7 +87,10 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = Path(ENV("MEDIA_ROOT", default=BASE_DIR / "media"))
+# path to media files, defined conditionnally depending on if the app runs in a docker container:
+# "/data/mediafiles" if in_docker else f"{v['MEDIA_ROOT']}/mediafiles"
+MEDIA_ROOT = Path(ENV("MEDIA_DIR", default=BASE_DIR / "media"))
+# MEDIA_ROOT = Path(ENV("MEDIA_ROOT", default=BASE_DIR / "media"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
