@@ -193,11 +193,11 @@ if __name__ == "__main__":
         run_api("down")
     elif action == "build":
         compose("up", "-d", "--build")
+        run_api("build")
     elif action == "logs":
         compose("logs -f")
     elif action == "up":
         compose("up", "-d", "--remove-orphans")
-        # TODO aren't API processes started both by run_api and run_dev if mode=="dev" ??
         run_api("up")
         if ENV["MODE"] == "dev":
             run_dev()

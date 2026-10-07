@@ -79,14 +79,13 @@ RUN \
     find ${UV_PYTHON_INSTALL_DIR} -print0 | xargs -0 -P ${N_PROCESS} chmod a+rX & \
     wait
 
-# Must match the PORT in docker.sh
-EXPOSE ${PORT}
-
 RUN mkdir -p /home/${USER}/app/staticfiles && chown ${USER}:${USER} /home/${USER}/app/staticfiles
 COPY --from=svelte_build --chown=${USER}:${USER} /app/shared/static/dist/ /home/${USER}/app/shared/static/dist/
 
 COPY --from=conf --chown=${USER} manage.sh /home/${USER}/manage.sh
 RUN chmod +x /home/${USER}/manage.sh
+
+EXPOSE ${PORT}
 
 # Launch app
 CMD /home/${USER}/manage.sh && \
