@@ -262,20 +262,33 @@ def write_env(path: Path, variables: dict) -> None:
 
 
 def generate_nginx_conf(v: dict) -> None:
+    # dict of special values to overwrite the .env values
+    overwrite = { 
+        "local": {
+            "PROD_URL": "localhost"
+        }
+    }
+    mode = v["MODE"]
+
     def apply_template(template: str) -> str:
         # replace all variables with values + rename file + write template to file
         text = template.read_text()
         for key in ("DJANGO_PORT", "PROD_URL", "NGINX_PORT", "NGINX_MAX_BODY_SIZE",
                     "NGINX_TIMEOUT", "SSL_CERTIFICATE", "SSL_KEY"):
-            if val := v.get(key):
+            # 1st, try to replace by hardcoded values in `overwrite``
+            if key in overwrite.get(mode, {}).keys():
+                text = text.replace(key, overwrite[mode][key])
+            # fallback on .env variables (normal behaviour)
+            elif val := v.get(key):
                 text = text.replace(key, val)
-        out = template.with_suffix("")  # nginx_external.conf.template → nginx_external.conf
+        # output name: nginx_external.conf.template → nginx_external.conf
+        out = template.with_suffix("")  
         out.write_text(text)
         print(f"  wrote {out.relative_to(ROOT)}")
 
-    if v["MODE"] == "dev":
+    if mode == "dev":
         return
-    elif v["MODE"] == "local":
+    elif mode == "local":
         template = ROOT / "docker" / "web" / "nginx.conf.template"
         apply_template(template)
         text = template.read_text()
