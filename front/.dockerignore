@@ -9,9 +9,12 @@ venv/*
 .idea/
 
 **/__pycache__/
+**/*.py[cod]
 
 install.py
 run.py
 
 README.md
 docs/*
+
+./shared/static/dist/
