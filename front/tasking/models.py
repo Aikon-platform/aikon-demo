@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from datasets.models import Dataset
-from demowebsite.settings import APP_URL_FROM_API, INTERNAL_URL
+from shared.utils import get_url_host_and_scheme, rewrite_api_url_for_front
 
 """
 MODELS: AbstractAPITask
@@ -35,6 +35,7 @@ User = get_user_model()
 
 API_URL = getattr(settings, "API_URL", "http://localhost:5000")
 BASE_URL = getattr(settings, "BASE_URL", "http://localhost:8000")
+APP_URL_FROM_API = getattr(settings, "APP_URL_FROM_API", None)
 
 TypeDurationEval = Literal["short", "mid", "long"]
 TypeDuration = TypedDict("TypeDuration", {"delta": str, "eval": TypeDurationEval})

@@ -19,10 +19,9 @@ from django.conf import settings
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 
-from shared.utils import pprint
+from shared.utils import pprint, rewrite_api_url_for_front, rewrite_front_url_for_api
 from .utils import PathAndRename, IMG_EXTENSIONS, unzip_on_the_fly, sanitize_str
 from .fields import URLListModelField
-from demowebsite.settings import BASE_URL, APP_URL_FROM_API
 
 User = get_user_model()
 path_datasets = PathAndRename("datasets/")
@@ -352,23 +351,14 @@ class Dataset(AbstractDataset):
         """
         return sum(len(doc.images) for doc in self.documents)
 
-    @staticmethod
-    def rewrite_url_for_api(doc: dict) -> dict:
-        """
-        rewrite `src` URL so that it can be reached fron API when mode==local|prod
-        NOTE: in IIIF documents, `doc.src` is the original IIIF url ;
-            in ZIP and PDF, `doc.src` is an URL defined based on the current frontend URL
-            => rewrite only those, based on `BASE_URL` (localhost:XXXX in dev/local,
-            `$PROD_URL` in prod)
-        """
-        doc["src"] = doc["src"].replace(BASE_URL, APP_URL_FROM_API)
-        return doc
-
     def documents_for_api(self) -> List[Dict]:
-
+        def update_url(d: dict) -> dict:
+            d["src"] = rewrite_front_url_for_api(d["src"])
+            return d
         print("**** DOC TO DICT PRE  :", [doc.to_dict() for doc in self.documents])
-        docs = [self.rewrite_url_for_api(doc.to_dict()) for doc in self.documents]
+        docs = [update_url(doc.to_dict()) for doc in self.documents]
         print("**** DOC TO DICT POST :", docs)
+        # docs = [doc.to_dict() for doc in self.documents]
         return docs
 
     def download_from_api(self, doc_to_extract=None) -> None:
