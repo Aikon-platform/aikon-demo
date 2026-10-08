@@ -218,7 +218,7 @@ def AbstractTask(task_prefix: str):
             Returns the URL to notify the front-end
             """
             print(
-                "****", f"{APP_URL_FROM_API}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
+                "**** NOTIFY URL", f"{APP_URL_FROM_API}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
             )
             return f"{APP_URL_FROM_API}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
 
@@ -483,9 +483,9 @@ def AbstractAPITaskOnDataset(task_prefix: str):
                     files=self.get_task_files(),
                 )
                 print(
-                    f"$$$$$ START ENDPOINT FULL={self.api_endpoint_prefix}/{endpoint} / BASE={self.api_endpoint_prefix} / ENDPOINT={endpoint}"
+                    f"**** START ENDPOINT FULL={self.api_endpoint_prefix}/{endpoint} / BASE={self.api_endpoint_prefix} / ENDPOINT={endpoint}"
                 )
-                print("$$$$$ DATA", data)
+                print("**** DATA", data)
             except (ConnectionError, RequestException):
                 self.write_log("Connection error when starting task")
                 self.status = "ERROR"
