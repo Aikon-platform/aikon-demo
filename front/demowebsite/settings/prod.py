@@ -19,6 +19,11 @@ if ENV.bool("IS_API_ON_SAME_SERVER", default=False):
 else:
     INTERNAL_URL = BASE_URL
 
+# URL for the API to send HTTP requests to the Django app
+# if the API is dockerized with the frontend, container name is used; 
+# otherwise, a localhost URL or actual URL will be used
+APP_URL_FROM_API = ENV.str("APP_URL_FROM_API", default=BASE_URL)
+
 hosts = ENV.list("ALLOWED_HOSTS", default=[]) + [DOMAIN_NAME, "localhost"]
 hosts += ["web"]  # for docker nginx service
 https_hosts = [f"https://{host}" for host in hosts]

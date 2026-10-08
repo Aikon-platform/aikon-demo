@@ -206,7 +206,7 @@ def resolve_values(mode: Literal["local","dev","prod"], assume_yes: bool) -> dic
 def derive(v: dict, mode: str, in_docker: bool) -> dict:
     """set values that depend on the build context (host vs container)."""
     host = lambda svc: svc if in_docker else "localhost"
-    port = lambda key: INTERNAL_PORTS[key] if in_docker else v[key]
+    port = lambda key: INTERNAL_PORTS[key] if in_docker and key in INTERNAL_PORTS.keys() else v[key]
     prod = mode == "prod"
     nginx = mode != "dev"  # nginx is the entrypoint whenever the front is containerized
     base = (
@@ -235,7 +235,7 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
         ),
         "APP_URL_FROM_API": (
             base if prod
-            else "http://web:8000" if in_docker  # local: api container → web
+            else f"http://web:{v['DJANGO_PORT']}" if in_docker  # local: api container → web
             else f"http://localhost:{v['DJANGO_PORT']}"  # dev: api on host → localhost
         ),
         "API_URL": (
@@ -313,10 +313,10 @@ def generate(mode: str, assume_yes: bool) -> None:
 
     front_in_docker = mode != "dev"
 
-    # front: perspective of the Django process (container in local/prod, host in dev)
+    # environment for django front: perspective of the Django process (container in local/prod, host in dev)
     write_env(ROOT / "front/.env", v | derive(v, mode, front_in_docker))
 
-    # cantaloupe: always a container
+    # environment for docker front: perspective of the docker co
     d = derive(v, mode, in_docker=True)
 
     # docker: perspective of compose and of every container (redis, db...).

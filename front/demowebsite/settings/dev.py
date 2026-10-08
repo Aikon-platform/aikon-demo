@@ -12,4 +12,10 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 API_URL = ENV("API_URL", default=f"http://localhost:{ENV('API_PORT', default=5000)}")
 BASE_URL = f"http://localhost:{ENV('FRONT_PORT', default=8000)}"
 INTERNAL_URL = BASE_URL
+
+# URL for the API to send HTTP requests to the Django app
+# if the API is dockerized with the frontend, container name is used; 
+# otherwise, a localhost URL or actual URL will be used
+APP_URL_FROM_API = ENV.str("APP_URL_FROM_API", default=BASE_URL)
+
 LOGIN_REQUIRED = True

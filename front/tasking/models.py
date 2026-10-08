@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from datasets.models import Dataset
-from demowebsite.settings import INTERNAL_URL
+from demowebsite.settings import APP_URL_FROM_API, INTERNAL_URL
 
 """
 MODELS: AbstractAPITask
@@ -217,7 +217,10 @@ def AbstractTask(task_prefix: str):
             """
             Returns the URL to notify the front-end
             """
-            return f"{INTERNAL_URL}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
+            print(
+                "****", f"{APP_URL_FROM_API}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
+            )
+            return f"{APP_URL_FROM_API}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
 
         def get_task_kwargs(self):
             return {"parameters": self.parameters}

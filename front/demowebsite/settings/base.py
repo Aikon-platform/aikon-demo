@@ -149,7 +149,6 @@ LOGGING = {
 
 LOGOUT_REDIRECT_URL = reverse_lazy("home")
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
