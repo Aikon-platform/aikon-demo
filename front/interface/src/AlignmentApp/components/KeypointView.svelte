@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { AlignmentState, Point } from "../state.svelte";
     import {
+        invertMatrix,
         matrixToCss,
         multiplyMatrix,
         scaleMatrix,
@@ -137,6 +138,30 @@
                 class:flipped={aligningImage.hFlip}
             />
         </div>
+        {#if alignmentState.showKpImageOverlay && alignmentState.kpImageOverlay !== null && alignmentState.syncWithKeypoints && alignmentState.kpImageOverlay !== imageIndex}
+            {@const showImage =
+                alignmentState.images[alignmentState.kpImageOverlay]}
+            <div
+                class="img-wrapper img-overlay"
+                style:transform={matrixToCss(
+                    multiplyMatrix(
+                        view,
+                        multiplyMatrix(
+                            invertMatrix(aligningImage.transform)!,
+                            showImage.transform,
+                        ),
+                    ),
+                )}
+            >
+                <img
+                    src={showImage.image.data}
+                    alt={showImage.image.file_name}
+                    width={showImage.image.width}
+                    height={showImage.image.height}
+                    class:flipped={showImage.hFlip}
+                />
+            </div>
+        {/if}
         <KeypointOverlay
             {alignmentState}
             {imageIndex}
@@ -216,5 +241,9 @@
     .flipped {
         transform: scaleX(-1);
         transform-origin: center;
+    }
+
+    .img-overlay {
+        opacity: 0.4;
     }
 </style>

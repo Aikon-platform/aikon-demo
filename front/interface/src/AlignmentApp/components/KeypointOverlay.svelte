@@ -120,6 +120,7 @@
         alignmentState.activeKeypoint = k;
         clearHover();
         svg.setPointerCapture(e.pointerId);
+        alignmentState.kpImageOverlay = imageIndex;
         onDragStart?.();
     }
 
@@ -137,6 +138,7 @@
         if (dragged === null) return;
         dragged = null;
         svg.releasePointerCapture(e.pointerId);
+        alignmentState.kpImageOverlay = null;
         onDragEnd?.();
         updateHover(e);
     }

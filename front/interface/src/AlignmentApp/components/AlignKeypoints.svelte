@@ -58,6 +58,7 @@
             <IconBtn
                 icon="mdi:vector-link"
                 label="Sync"
+                title="Update image transform while moving keypoints"
                 class={[
                     "is-small",
                     alignmentState.syncWithKeypoints ? "is-link" : "is-ghost",
@@ -67,7 +68,22 @@
                         !alignmentState.syncWithKeypoints,
                     )}
             />
-            {#if !alignmentState.syncWithKeypoints}
+            {#if alignmentState.syncWithKeypoints}
+                <IconBtn
+                    icon="mdi:layers-outline"
+                    label="Overlay"
+                    title="Show transformed image overlay while moving keypoints"
+                    class={[
+                        "is-small",
+                        alignmentState.showKpImageOverlay
+                            ? "is-link"
+                            : "is-ghost",
+                    ]}
+                    onclick={() =>
+                        (alignmentState.showKpImageOverlay =
+                            !alignmentState.showKpImageOverlay)}
+                />
+            {:else}
                 <IconBtn
                     icon="mdi:update"
                     label="Align"
@@ -124,10 +140,6 @@
             min-height: 300px;
             width: 100%;
         }
-    }
-
-    .align-keypoints-empty {
-        font-size: 0.85rem;
     }
 
     .fit-warning {

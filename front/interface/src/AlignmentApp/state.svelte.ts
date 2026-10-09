@@ -44,6 +44,8 @@ export class AlignmentState {
     hover: HoverKeypoint | null = $state(null);
     /** Index of the keypoint currently hovered or dragged, in any image */
     activeKeypoint: number | null = $state(null);
+    kpImageOverlay: number | null = $state(null);
+    showKpImageOverlay = $state(true);
     /** Fit each image's transform onto the first image from keypoints */
     syncWithKeypoints = $state(true);
     transformModel: TransformModel = $state("scale");
