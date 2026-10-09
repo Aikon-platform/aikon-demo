@@ -23,7 +23,7 @@ $error_log
 to reset the PostgreSQL user password, run:
     docker exec -it aikondemo-db-1 psql -U $POSTGRES_USER -d $POSTGRES_DB -c "ALTER USER $POSTGRES_USER WITH PASSWORD '$POSTGRES_PASSWORD';"
 to update Django superuser password, run:
-    docker exec -it aikondemo-web-1 .venv/bin/python ./manage.py update_admin_password
+    python run.py build && docker exec -it aikondemo-web-1 .venv/bin/python ./manage.py update_admin_password
 
 🗝️ .env used to connect to the database:
 $env_contents

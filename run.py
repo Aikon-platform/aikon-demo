@@ -1,4 +1,8 @@
 """
+Run an AIKON instance.
+
+Usage:
+    python run.py (up|build|down|logs)
 
 as a reminder:
 - if MODE="dev", front/ webapp and api both run on the host server, other services (DB) run in Dockers
@@ -138,7 +142,7 @@ def run_dev() -> None:
     procs = {name: spawn(name, cmd, cwd, env) for name, cmd, cwd, env in procs_def}
     # run the app
     try:
-        # while True keeps monitoring the processes after starting them: 
+        # while True keeps monitoring the processes after starting them:
         # every 2 seconds, we poll for process status. without while True, we would exit
         while True:
             for name, p in procs.items():
@@ -207,4 +211,7 @@ if __name__ == "__main__":
                 f"https://{ENV['PROD_URL']}" if ENV["MODE"] == "prod" else f"http://localhost:{port}"
             )
             print(f"→ {url} (stop with `python run.py down`)")
-                    
+    else:
+        print(f"❌ Unknown action: '{action}' !")
+        print(__doc__)
+
