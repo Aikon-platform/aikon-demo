@@ -37,7 +37,7 @@
     // images is sent to Django.
     const switch_field = form.querySelector("#id_format") as HTMLInputElement;
     const defaultTab = "pdf";
-    let tab: TDatasetValue | null = $state(null);  // set in `onMount`
+    let tab: TDatasetValue | undefined = $state(undefined);  // set in `onMount`
 
     const iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
     const zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
@@ -117,9 +117,10 @@
         }
     }
 
-    function onTabChange(value: string) {
-        updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value)
+    function onTabChange(value: string):TDatasetValue {
+        value = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value);
         switch_field.value = value == "images" ? "zip" : value;
+        return value as TDatasetValue;
     }
 
     function onDatasetReuseChange(value: boolean) {
@@ -149,7 +150,7 @@
             ? urlDatasetType
             : defaultTab;
         // validate tab, and if `urlDatasetType` and sync tab and URL param, sync with field.
-        onTabChange(rawTab);
+        tab = onTabChange(rawTab);
 
         // set dataset_reuse_value from URL, if possible.
         const urlDatasetReuse = maybeBooleanToBoolean(urlSearchParams.get("dataset_reuse"));
