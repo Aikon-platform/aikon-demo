@@ -228,7 +228,7 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
         "REDIS_DB_INDEX": "2" if mode == "dev" else "0",
         # django-side data directory, used to build django MEDIA_ROOT. DATA_DIR is the path on the host,
         # MEDIA_DIR is either the path on the host OR in the docker, depending on build context.
-        "MEDIA_DIR": "/data/mediafiles" if in_docker else f"{v['DATA_DIR']}/mediafiles",
+        "MEDIA_DIR": "/data" if in_docker else f"{v['DATA_DIR']}",
         "BASE_URL": base,
         "APP_URL_FROM_DOCKER": (
             base if prod
@@ -339,7 +339,7 @@ def generate(mode: str, assume_yes: bool) -> None:
         },
     )
 
-    (Path(v["DATA_DIR"]) / "mediafiles/img").mkdir(parents=True, exist_ok=True)
+    (Path(v["DATA_DIR"]) / "img").mkdir(parents=True, exist_ok=True)
 
     generate_nginx_conf(v)
 
