@@ -41,7 +41,7 @@ AUTOGEN = ("POSTGRES_PASSWORD", "SECRET_KEY")
 # the host-side mappings (see docker/compose*.yml)
 INTERNAL_PORTS = {"DB_PORT": "5432", "REDIS_PORT": "6379"}
 
-# cross-platform separator for multiple confs in COMPOSE_FILES 
+# cross-platform separator for multiple confs in COMPOSE_FILES
 # https://docs.docker.com/compose/how-tos/environment-variables/envvars/#compose_file
 SEPARATOR = ";" if platform.system() == "Windows" else ":"
 
@@ -54,12 +54,12 @@ COMPOSE_FILES = {
 # variables prompted per mode; everything else keeps its default/current value
 PROMPTED = {
     "local": ("POSTGRES_PASSWORD",),
-    "dev": ("POSTGRES_PASSWORD", "MEDIA_ROOT"),
+    "dev": ("POSTGRES_PASSWORD", "DATA_DIR"),
     "prod": (
         "POSTGRES_PASSWORD",
         "APP_NAME",
         "APP_LANG",
-        "MEDIA_ROOT",
+        "DATA_DIR",
         "GEONAMES_USER",
         "PROD_URL",
         "PROD_API_URL",
@@ -96,7 +96,7 @@ REQUIRED = {
         "REDIS_DB_INDEX",
         "API_URL",
         "BASE_URL",
-        "MEDIA_DIR",        
+        "MEDIA_DIR",
     ),
     "docker/.env": (
         "DATA_FOLDER",
@@ -159,8 +159,8 @@ def prompt(key: str, default: str, desc: str) -> str:
 
 def resolve_values(mode: Literal["local","dev","prod"], assume_yes: bool) -> dict:
     """
-    create a dict containing all .env variables and their values, 
-    inheriting values from the existing .env and from .env.template  
+    create a dict containing all .env variables and their values,
+    inheriting values from the existing .env and from .env.template
 
     params:
         - mode: installation mode (influences the prompted variables)
@@ -177,7 +177,7 @@ def resolve_values(mode: Literal["local","dev","prod"], assume_yes: bool) -> dic
 
     for key, (default, desc) in env_template.items():
         val = env_current.get(key, default)
-        if key == "MEDIA_ROOT":
+        if key == "DATA_DIR":
             val = str(Path(val or ROOT / "data").resolve())
         if key in AUTOGEN and not val:
             val = secrets.token_urlsafe(40)
@@ -226,7 +226,9 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
         "REDIS_HOST": host("redis"),
         "REDIS_PORT": port("REDIS_PORT"),
         "REDIS_DB_INDEX": "2" if mode == "dev" else "0",
-        "MEDIA_DIR": "/data/mediafiles" if in_docker else f"{v['MEDIA_ROOT']}/mediafiles",
+        # django-side data directory, used to build django MEDIA_ROOT. DATA_DIR is the path on the host,
+        # MEDIA_DIR is either the path on the host OR in the docker, depending on build context.
+        "MEDIA_DIR": "/data/mediafiles" if in_docker else f"{v['DATA_DIR']}/mediafiles",
         "BASE_URL": base,
         "APP_URL_FROM_DOCKER": (
             base if prod
@@ -239,8 +241,8 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
             else f"http://localhost:{v['DJANGO_PORT']}"  # dev: api on host → localhost
         ),
         "API_URL": (
-            v["PROD_API_URL"] if prod 
-            else f"http://api:{v['API_PORT']}" if in_docker 
+            v["PROD_API_URL"] if prod
+            else f"http://api:{v['API_PORT']}" if in_docker
             else f"http://localhost:{v['API_PORT']}"
         ),
     }
@@ -267,7 +269,7 @@ def write_env(path: Path, variables: dict) -> None:
 
 def generate_nginx_conf(v: dict) -> None:
     # dict of special values to overwrite the .env values
-    overwrite = { 
+    overwrite = {
         "local": {
             "PROD_URL": "localhost"
         }
@@ -286,7 +288,7 @@ def generate_nginx_conf(v: dict) -> None:
             elif val := v.get(key):
                 text = text.replace(key, val)
         # output name: nginx_external.conf.template → nginx_external.conf
-        out = template.with_suffix("")  
+        out = template.with_suffix("")
         out.write_text(text)
         print(f"  wrote {out.relative_to(ROOT)}")
 
@@ -304,7 +306,7 @@ def generate_nginx_conf(v: dict) -> None:
 def generate(mode: str, assume_yes: bool) -> None:
     """
     generate and write:
-    - the root .env 
+    - the root .env
     - all inherited .env files
     - nginx configs
     """
@@ -321,7 +323,7 @@ def generate(mode: str, assume_yes: bool) -> None:
 
     # docker: perspective of compose and of every container (redis, db...).
     # host-side ports are re-applied on top: compose uses them for port mappings.
-    # NOTE: `dict1 | dict2` computes the UNION of dict1 and dict2   
+    # NOTE: `dict1 | dict2` computes the UNION of dict1 and dict2
     write_env(
         ROOT / "docker/.env",
         v
@@ -329,7 +331,7 @@ def generate(mode: str, assume_yes: bool) -> None:
         | {k: v[k] for k in INTERNAL_PORTS}
         | {
             "USERID": os.getuid() if hasattr(os, "getuid") else 1000,
-            "DATA_FOLDER": v["MEDIA_ROOT"],
+            "DATA_FOLDER": v["DATA_DIR"],
             "WEB_HOST": "web" if front_in_docker else "host.docker.internal",
             "COMPOSE_FILE": COMPOSE_FILES[mode],
             "COMPOSE_PATH_SEPARATOR": ":",
@@ -337,7 +339,7 @@ def generate(mode: str, assume_yes: bool) -> None:
         },
     )
 
-    (Path(v["MEDIA_ROOT"]) / "mediafiles/img").mkdir(parents=True, exist_ok=True)
+    (Path(v["DATA_DIR"]) / "mediafiles/img").mkdir(parents=True, exist_ok=True)
 
     generate_nginx_conf(v)
 

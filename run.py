@@ -1,5 +1,5 @@
 """
-Run an AIKON instance.
+run.py - run and manage an AIKON-demo instance.
 
 Usage:
     python run.py (up|build|down|logs)
