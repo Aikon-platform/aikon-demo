@@ -148,6 +148,7 @@ class Regions(AbstractAPITaskOnDataset("regions")):
                 crop_url = settings.MEDIA_URL + str(
                     crop_path.relative_to(settings.MEDIA_ROOT)
                 )
+                print("**** CROP_URL", crop_url)
                 relative = crop["relative"]
                 formatted_crops.append(
                     {
@@ -196,13 +197,13 @@ def AbstractAPITaskOnCrops(task_prefix: str):
             if self.crops:
                 kwargs["crops"] = self.crops.get_bounding_boxes()
             return kwargs
-        
+
         def prepare_dataset_from_api(self, output: dict) -> bool:
             """
             Handle the connection between the dataset served by the API and the front-end dataset
             Also crops the images if needed
             """
-            
+
             if not super().prepare_dataset_from_api(output):
                 return False
 
