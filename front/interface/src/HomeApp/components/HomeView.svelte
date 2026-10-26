@@ -1,26 +1,42 @@
-<script>
+<script lang="ts">
     import AlgorithmCard from "./AlgorithmCard.svelte";
 
+    const toStartTask = (kw: String) => `/${kw}/start`;
+
     const data = [
-        ["DTI Clustering", "Group images dataset based on prototype reconstruction"],
-        ["Watermark detection", "Detect and compare watermarks on historical documents"],
-        ["Regions extraction", "Extract visual elements from a document"],
-        ["Similarity retrieval", "Find similar images and copies within a dataset"]
+        [
+            "DTI Clustering",
+            "Group images dataset based on prototype reconstruction",
+            toStartTask("dti")
+        ],
+        [
+            "Watermark detection",
+            "Detect and compare watermarks on historical documents",
+            toStartTask("watermarks")
+        ],
+        [
+            "Regions extraction",
+            "Extract visual elements from a document",
+            toStartTask("regions")
+        ],
+        [
+            "Similarity retrieval",
+            "Find similar images and copies within a dataset",
+            toStartTask("similarity")
+        ]
     ]
 </script>
 
 <div>
     <div class="main-wrapper">
-        <div class="columns is-centered is-vcentered">
+        <div class="flex-vcentered">
             <h1 class="is-title column">What do you want to process ?</h1>
         </div>
-        <div class="is-flex is-align-items-center is-justify-content-center">
+        <div class="flex-centered">
             <ul class="cards-wrapper columns is-centered is-vcentered is-multiline">
-                {#each data as [title, desc]}
-                    <li class="column is-12"><AlgorithmCard>
-                        <span slot="algo-title">{title}</span>
-                        <span slot="algo-desc">{desc}</span>
-                    </AlgorithmCard></li>
+                {#each data as [title, desc, href]}
+                    <li class="column is-12">
+                        <AlgorithmCard {title} {desc} {href} /></li>
                 {/each}
             </ul>
         </div>

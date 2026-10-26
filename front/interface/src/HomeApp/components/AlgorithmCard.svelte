@@ -1,4 +1,16 @@
-<div>
-    <h2><slot name="algo-title"></slot></h2>
-    <h3><slot name="algo-desc"></slot></h3>
-</div>
+<script lang="ts">
+let { title, desc, href } = $props();
+</script>
+
+<a href={href}>
+    <div class="algo-card p-4 border">
+        <h2>{title}</h2>
+        <h3>{desc}</h3>
+    </div>
+</a>
+
+<style>
+.algo-card {
+
+}
+</style>
