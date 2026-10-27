@@ -1,15 +1,14 @@
 <script lang="ts">
-import { fade } from "svelte/transition";
+import { fade, slide } from "svelte/transition";
 
 const steps = [
-    { stepId: "step-0", stepFilename: "home-pipeline-1.png", stepDesc: "Import a dataset" },
-    { stepId: "step-1", stepFilename: "home-pipeline-2.png", stepDesc: "Run a computer vision task" },
+    { stepId: "step-0", stepFilename: "home-pipeline-1.png", stepDesc: "Import datasets" },
+    { stepId: "step-1", stepFilename: "home-pipeline-2.png", stepDesc: "Run computer vision algorithms" },
     { stepId: "step-2", stepFilename: "home-pipeline-3.png", stepDesc: "Visualize results" },
 ]
 const stepInterval = 2000;
 
 let currentStepIdx = $state(0);
-// let currentStep = $derived(steps[currentStepIdx])
 // each `stepInterval`, update `currentStepIdx` to display a new step in the animation
 setInterval(
     () => currentStepIdx =
@@ -26,10 +25,13 @@ setInterval(
         {#each steps as step}
             {#if step.stepId === steps[currentStepIdx].stepId}
                 <figure id={step.stepId} class="p-5">
-                    <img in:fade src={`/static/img/${step.stepFilename}`} alt={step.stepDesc}>
-                    <figcaption>
-                        <span class="tag is-link is-large is-rounded">{currentStepIdx+1}</span>
-                        {step.stepDesc}
+                    <img in:fade
+                        src={`/static/img/${step.stepFilename}`}
+                        alt={step.stepDesc}
+                    >
+                    <figcaption style="height: 100%">
+                        <span class="tag is-link is-large is-rounded m-2">{currentStepIdx+1}</span>
+                        <span in:slide class="m-2">{step.stepDesc}</span>
                     </figcaption>
                 </figure>
             {/if}
@@ -38,29 +40,13 @@ setInterval(
 </div>
 
 <style>
-#intro-grid {
-    /*
-    height: 90vh;
-    display: grid;
-    grid-template-rows: 10% 90%;
-    grid-template-columns: 100%;
-    justify-items: center;
-    align-items: center;
-    */
-}
-/*
-h1 { background-color: pink }
-*/
 #intro-fig-wrapper {
-    /*
-    background-color: purple;
-    height: 100%;
-    */
+    width: 100%;
+    /* background-color: red; */
 }
 figure {
-    /*
-    background-color: limegreen;
-    */
+    /* background-color: limegreen; */
+    width: 100%;
     margin: 0;
     min-height: 0;
     display: flex;
@@ -75,5 +61,12 @@ figure > img {
 }
 figcaption {
     flex: none;
+    /* background-color: pink; */
+    width: 70%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 </style>
