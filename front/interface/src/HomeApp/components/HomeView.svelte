@@ -6,6 +6,16 @@
 
     const data = [
         [
+            "Regions extraction",
+            "Extract visual elements from a document",
+            toStartTask("regions")
+        ],
+        [
+            "Similarity retrieval",
+            "Find similar images and copies within a dataset",
+            toStartTask("similarity")
+        ],
+        [
             "DTI Clustering",
             "Group images dataset based on prototype reconstruction",
             toStartTask("dti")
@@ -15,16 +25,6 @@
             "Detect and compare watermarks on historical documents",
             toStartTask("watermarks")
         ],
-        [
-            "Regions extraction",
-            "Extract visual elements from a document",
-            toStartTask("regions")
-        ],
-        [
-            "Similarity retrieval",
-            "Find similar images and copies within a dataset",
-            toStartTask("similarity")
-        ]
     ]
 </script>
 
@@ -32,9 +32,9 @@
     <div class="main-wrapper">
         <HomeIntro></HomeIntro>
         <div class="flex-centered">
-            <ul class="cards-wrapper columns is-centered is-vcentered is-multiline">
+            <ul class="columns is-centered is-vcentered is-multiline task-list">
                 {#each data as [title, desc, href]}
-                    <li class="column is-12">
+                    <li class="row column is-12">
                         <AlgorithmCard {title} {desc} {href} /></li>
                 {/each}
             </ul>
@@ -72,7 +72,7 @@
 
 <style>
 .main-wrapper {
-    height: 100vh;
+    height: calc(100vh - var(--bulma-navbar-height));
     display: grid;
     grid-template-columns: 50% 50%;
     grid-template-rows: 100%;

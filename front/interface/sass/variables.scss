@@ -16,10 +16,11 @@ $family-secondary: "redaction";
 $family-code: "sono";
 
 // colors
-$main-color: hsl(233, 100%, 63%);
+$main-color: hsl(233, 100%, 63%);  // aikon-blue
+$secondary-color: hsl(48, 100%, 50);  // aikon yellow
 
 $red: #c81307;
-$yellow: hsl(42, 100%, 53%);
+$yellow: $secondary-color;
 $green: hsl(84, 74%, 43%);
 $cyan: hsl(198, 75%, 40%);
 $blue: $main-color;
@@ -34,6 +35,10 @@ $head-color: $main-color;
 $light-color: $grey;
 $dark-color: color.adjust($head-color, $saturation: -5%, $lightness: -40%);
 
-$border:  2px solid $main-color;
+$border-thin-width: 1px;
+$border-thick-width: 2px;
+$border:  $border-thick-width solid $main-color;
+$border-thin:  $border-thin-width solid $main-color;
 $border-radius: 5px;
-$headfont: "Helvetica Neue", Helvetica, Arial, sans-serif;
+// $headfont: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$transition: .25s ease-in-out;

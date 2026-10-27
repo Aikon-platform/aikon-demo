@@ -91,11 +91,6 @@ a {
     text-decoration: none !important;
 }
 
-// buttons & clickable elts behaviour
-.navbar a:hover, .button:hover, button:hover, .clickable:hover {
-    background-color: $light-color;
-}
-
 pre {
     max-width: 900px;
     overflow: auto;
@@ -111,7 +106,7 @@ pre {
 input[type="submit"], input[type="file"], button:not(.not-button), .btn {
     white-space: normal;
     text-align: center;
-    font: 16px $headfont;
+    font: 16px $family-primary;
     font-weight: 500;
     border: none;
     padding: 0.6em 0.6em;
@@ -174,6 +169,50 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
 /**********************************
  * general purpose classes
  **********************************/
+
+// buttons, breadcrumbs & clickable elts behaviour
+.navbar a:hover, .button:hover, button:hover, .clickable:hover, input.button:hover {
+    // background-color: $light-color;
+    background-color: $secondary-color;
+    color: $main-color;
+    border: $border-thin;
+}
+
+// outside of navbar, on hover, emulate border with box-shadow (avoids layout shifting)
+:not(.navbar) .button:hover, :not(.navbar) button:hover, :not(.navbar) .clickable:hover, :not(.navbar) input.button:hover {
+    border: none;
+    box-shadow: 0 0 0 $border-thin-width $main-color;
+}
+
+// style of breadcrumbs is completed by JS in base.html
+.breadcrumbs-wrapper:has(.breadcrumbs-sticky-sidebar) {
+    height: 0;
+}
+
+.breadcrumbs {
+    width: fit-content;
+    background-color: white;
+    margin: 1em;
+    border-style: solid;
+    border-radius: var(--bulma-radius-rounded);
+    border-color: var(--bulma-link-75);
+    border-width: var(--bulma-control-border-width);
+}
+
+.breadcrumbs .button {
+    border-radius: var(--bulma-radius-rounded);
+}
+
+.breadcrumbs:hover .button {
+    background-color: $secondary-color;
+    color: $main-color;
+}
+
+.breadcrumbs-sticky-sidebar {
+    position: sticky;
+    top: 1em;
+    z-index: 1;
+}
 
 .clickable {
     transition: all 0.3s ease;
@@ -371,20 +410,26 @@ ul.messages {
 }
 
 // list of tasks
+.algo-card {
+}
+.algo-card:hover {
+}
+
 .task-list {
     display: block;
     max-width: 700px;
     margin: 0 auto;
     .row {
         background-color: color.adjust($bg-color, $lightness: 5%);
-        border-radius: $border-radius;
-        border: 2px solid $grey;
         margin: 0.5em 0;
         position: relative;
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 1.5em 1em 1em;
+        border-radius: $border-radius;
+        border: $border;
+        transition: box-shadow $transition;
 
         h2, p {
             margin: 0;
@@ -426,6 +471,9 @@ ul.messages {
             text-overflow: ellipsis;
             padding: 0.3em;
         }
+    }
+    .row:hover {
+        box-shadow: 5px 5px 0px $secondary-color;
     }
 }
 
@@ -518,25 +566,4 @@ ul.messages {
     border-radius: var(--bulma-box-radius);
     border-color: var(--bulma-link-75);
     border-width: var(--bulma-control-border-width);
-}
-
-/** NOTE style of breadcrumbs is completed by JS in base.html */
-.breadcrumbs-wrapper:has(.breadcrumbs-sticky-sidebar) {
-    height: 0;
-}
-
-.breadcrumbs {
-    width: fit-content;
-    background-color: white;
-    margin: 1em;
-    border-style: solid;
-    border-radius: var(--bulma-radius-rounded);
-    border-color: var(--bulma-link-75);
-    border-width: var(--bulma-control-border-width);
-}
-
-.breadcrumbs-sticky-sidebar {
-    position: sticky;
-    top: 1em;
-    z-index: 1;
 }
