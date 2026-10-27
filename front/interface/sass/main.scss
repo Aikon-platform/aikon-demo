@@ -183,18 +183,23 @@ input.button:hover,
 
 }
 
-// navbar-specific buttons
+// navbar-specific stuff
 .navbar {
-    // left elements
-    a:hover {
+    a:hover, .button:hover {
         background-color: $secondary-color;
         color: $main-color;
-        border: $border-thin;
+        border: none;// $border-thin;
     }
-    // right elements
-    .button:hover {
-        border: none;
-        box-shadow: $box-shadow-border-thin;
+    .navbar-dropdown {
+        background-color: $dark-color !important;
+
+        .navbar-item {
+            background-color: $dark-color !important;
+        }
+        .navbar-item:hover {
+            border: none;
+            color: $secondary-color;
+        }
     }
 }
 
