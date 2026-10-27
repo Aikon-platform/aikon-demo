@@ -171,17 +171,37 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
  **********************************/
 
 // buttons, breadcrumbs & clickable elts behaviour
-.navbar a:hover, .button:hover, button:hover, .clickable:hover, input.button:hover {
-    // background-color: $light-color;
+// NOTE : it's necessary for this rules to be before the `input`
+button:not(.not-button):hover,
+input.button:hover,
+.button:hover,
+.clickable:hover {
     background-color: $secondary-color;
     color: $main-color;
-    border: $border-thin;
+    border: none;
+    box-shadow: $box-shadow-border-thin;
+
 }
 
-// outside of navbar, on hover, emulate border with box-shadow (avoids layout shifting)
-:not(.navbar) .button:hover, :not(.navbar) button:hover, :not(.navbar) .clickable:hover, :not(.navbar) input.button:hover {
+// navbar-specific buttons
+.navbar {
+    // left elements
+    a:hover {
+        background-color: $secondary-color;
+        color: $main-color;
+        border: $border-thin;
+    }
+    // right elements
+    .button:hover {
+        border: none;
+        box-shadow: $box-shadow-border-thin;
+    }
+}
+
+// ImageFileDisplay
+.not-button.display-item:hover {
     border: none;
-    box-shadow: 0 0 0 $border-thin-width $main-color;
+    box-shadow: none;
 }
 
 // style of breadcrumbs is completed by JS in base.html
@@ -409,13 +429,10 @@ ul.messages {
     }
 }
 
-// list of tasks
-.algo-card {
-}
-.algo-card:hover {
-}
+// generic list of objects: datasets, tasks...
+// used throughout the app, has a thick border and a hover box shadow.
 
-.task-list {
+.object-list {
     display: block;
     max-width: 700px;
     margin: 0 auto;

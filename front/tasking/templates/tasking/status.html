@@ -78,7 +78,7 @@
                 <p>Part of pipeline <a href="{{ object.pipeline.get_absolute_url }}">{{ object.pipeline }}</a></p>
             {% endif %}
             {% if object.all_tasks %} {# for pipelines #}
-                <div class="task-list">
+                <div class="object-list">
                     <h4>Sub-task launched</h4>
                     {% for task in object.all_tasks %}
                         {% include "includes/list-item.html" %}

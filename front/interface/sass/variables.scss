@@ -39,6 +39,9 @@ $border-thin-width: 1px;
 $border-thick-width: 2px;
 $border:  $border-thick-width solid $main-color;
 $border-thin:  $border-thin-width solid $main-color;
+// emulation of border styles with a box-shadow (avoids layout shifting)
+$box-shadow-border-thin: 0 0 0 $border-thin-width $main-color;
+$box-shadow-border: 0 0 0 $border-thick-width $main-color;
 $border-radius: 5px;
 // $headfont: "Helvetica Neue", Helvetica, Arial, sans-serif;
 $transition: .25s ease-in-out;

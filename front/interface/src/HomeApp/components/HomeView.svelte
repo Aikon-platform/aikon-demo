@@ -32,7 +32,7 @@
     <div class="main-wrapper">
         <HomeIntro></HomeIntro>
         <div class="flex-centered">
-            <ul class="columns is-centered is-vcentered is-multiline task-list">
+            <ul class="columns is-centered is-vcentered is-multiline object-list">
                 {#each data as [title, desc, href]}
                     <li class="row column is-12">
                         <AlgorithmCard {title} {desc} {href} /></li>

@@ -8,6 +8,4 @@ let { title, desc, href } = $props();
 </a>
 
 <style lang="scss">
-@use "../../../sass/variables.scss" as *;
-
 </style>
