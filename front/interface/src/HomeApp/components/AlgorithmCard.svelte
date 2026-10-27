@@ -5,7 +5,7 @@ let { title, desc, href } = $props();
 <a href={href}>
     <div class="algo-card p-4 border">
         <h2>{title}</h2>
-        <h3>{desc}</h3>
+        <h3 class="is-family-sans-serif">{desc}</h3>
     </div>
 </a>
 

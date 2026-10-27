@@ -1,7 +1,8 @@
 <script lang="ts">
     import AlgorithmCard from "./AlgorithmCard.svelte";
+    import HomeIntro from "./HomeIntro.svelte";
 
-    const toStartTask = (kw: String) => `/${kw}/start`;
+    const toStartTask = (taskName: String) => `/${taskName}/start`;
 
     const data = [
         [
@@ -29,9 +30,7 @@
 
 <div>
     <div class="main-wrapper">
-        <div class="flex-vcentered">
-            <h1 class="is-title column">What do you want to process ?</h1>
-        </div>
+        <HomeIntro></HomeIntro>
         <div class="flex-centered">
             <ul class="cards-wrapper columns is-centered is-vcentered is-multiline">
                 {#each data as [title, desc, href]}

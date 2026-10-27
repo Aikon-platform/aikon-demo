@@ -171,6 +171,10 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
     }
 }
 
+/**********************************
+ * general purpose classes
+ **********************************/
+
 .clickable {
     transition: all 0.3s ease;
     box-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.3);
@@ -180,11 +184,7 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
     box-shadow: 0 0.5em 0.4em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.4);
 }
 
-/**********************************
- * general purpose classes
- **********************************/
-
- // fully centered flexbox
+// fully centered flexbox
 .flex-centered {
     display: flex;
     align-items: center;
