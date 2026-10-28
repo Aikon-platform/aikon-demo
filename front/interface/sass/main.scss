@@ -589,3 +589,18 @@ ul.messages {
     border-color: var(--bulma-link-75);
     border-width: var(--bulma-control-border-width);
 }
+
+.dataset-control-wrapper {
+    $control-height: 3.5rem;
+    $control-width: 4rem;
+
+    display: grid;
+    grid-template-rows: 50% 50%;
+    grid-gap: .5rem;
+
+    .tag, .button {
+        height: $control-height;
+        width: $control-width;
+        box-sizing: border-box;
+    }
+}

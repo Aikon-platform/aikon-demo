@@ -7,39 +7,42 @@
 {% include "datasets/includes/breadcrumbs.html" %}
 <div class="centerwrap">
     <!-- TITLE SECTION -->
-    <div class="columns is-vcentered">
-        <div class="column is-two-thirds">
+    <div class="columns">
+        <div class="column is-three-quarters">
             <h1 class=" is-title is-size-2 py-3 mb-0">
                 <span class="id-main">Dataset {{ dataset.name }}</span>
                 <span class="id-suffix">{{ dataset.id }}</span>
             </h1>
         </div>
-        <div class="column is-one-third">
-            <div class="columns is-vcentered">
-
-                <span class="column tag status content is-large m-1" title="Dataset format: {{ dataset.format }}">
-                    {{ dataset.format }}
-                </span>
-                <span class="column tag status content icon-text is-large m-1"
-                      title="{{ dataset.document|length }} document{% if dataset.document|length > 1 %}s{% endif %}">
-                    <span>{{ dataset.documents|length }}</span>
-                    <span class="icon has-text-white m-1">
-                        <i class="iconify" data-icon="mdi:file-document-multiple"></i>
+        <div class="column flex-centered">
+            <div class="dataset-control-wrapper">
+                <div class="columns">
+                    <span class="column tag status content is-large m-1" title="Dataset format: {{ dataset.format }}">
+                        {{ dataset.format }}
                     </span>
-                </span>
-                <span class="column tag status content icon-text is-large m-1"
-                      title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
-                    <span>{{ dataset.image_count }}</span>
-                    <span class="icon has-text-white">
-                        <i class="iconify" data-icon="mdi:file-image"></i>
+                    <span class="column tag status content icon-text is-large m-1"
+                          title="{{ dataset.documents|length }} document{% if dataset.documents|length > 1 %}s{% endif %}">
+                        <span>{{ dataset.documents|length }}</span>
+                        <span class="icon has-text-white m-1">
+                            <i class="iconify" data-icon="mdi:file-document-multiple"></i>
+                        </span>
                     </span>
-                </span>
-                <a class="button is-light is-content is-large m-1" href="{% url 'datasets:delete' dataset.pk %}" title="Delete dataset">
-                    <span class="iconify" data-icon="mdi:delete"></span>
-                </a>
-                <a class="button is-light is-content is-large m-1" href="{% url 'datasets:metadata' dataset.pk %}" title="Add metadata">
-                    <span class="iconify" data-icon="mdi:file-document-edit"></span>
-                </a>
+                    <span class="column tag status content icon-text is-large m-1"
+                          title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
+                        <span>{{ dataset.image_count }}</span>
+                        <span class="icon has-text-white">
+                            <i class="iconify" data-icon="mdi:file-image"></i>
+                        </span>
+                    </span>
+                </div>
+                <div class="columns is-centered">
+                    <a class="column button is-light is-content is-one-third is-large m-1" href="{% url 'datasets:delete' dataset.pk %}" title="Delete dataset">
+                        <span class="iconify" data-icon="mdi:delete"></span>
+                    </a>
+                    <a class="column button is-light is-content is-one-third is-large m-1" href="{% url 'datasets:metadata' dataset.pk %}" title="Add metadata">
+                        <span class="iconify" data-icon="mdi:file-document-edit"></span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
