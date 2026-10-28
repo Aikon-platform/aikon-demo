@@ -35,26 +35,40 @@
         </div>
 
         {# task mgmt buttons #}
-        <p>
+        <div class="columns is-centered is-vcentered is-multiline is-mobile">
+            {% if object.dataset %}
+                <span class="column is-narrow">
+                    <a href="{% url 'datasets:view' pk=object.dataset.pk %}" class="button is-link">
+                        <span class="iconify" data-icon="mdi:eye"></span>
+                        <span>Dataset</span>
+                    </a>
+                </span>
+            {% endif %}
             {% if not object.is_finished %}
-                <a href="{% url url_prefix|add:'cancel' object.id %}" class="button is-ghost">
-                    <span class="iconify" data-icon="mdi:close-circle"></span>
-                    <span>Cancel</span>
-                </a>
+                <span class="column is-narrow">
+                    <a href="{% url url_prefix|add:'cancel' object.id %}" class="button is-link">
+                        <span class="iconify" data-icon="mdi:close-circle"></span>
+                        <span>Cancel</span>
+                    </a>
+                </span>
             {% endif %}
             {% if object.is_finished %}
                 {% if object.dataset %}
-                    <a href="{% url url_prefix|add:'restart' object.id %}" class="button is-link is-light ml-2">
-                        <span class="iconify" data-icon="mdi:clock-start"></span>
-                        <span>Start new {{ task_name }} with same configuration</span>
-                    </a>
+                    <span class="column is-narrow">
+                        <a href="{% url url_prefix|add:'restart' object.id %}" class="button is-link">
+                            <span class="iconify" data-icon="mdi:clock-start"></span>
+                            <span>Start new {{ task_name }} with same configuration</span>
+                        </a>
+                    </span>
                 {% endif %}
-                <a href="{% url url_prefix|add:'delete' object.pk %}" class="button is-light">
-                    <span class="iconify" data-icon="mdi:delete"></span>
-                    <span>Delete this experiment</span>
-                </a>
+                <span class="column is-narrow">
+                    <a href="{% url url_prefix|add:'delete' object.pk %}" class="button is-link">
+                        <span class="iconify" data-icon="mdi:delete"></span>
+                        <span>Delete this experiment</span>
+                    </a>
+                </span>
             {% endif %}
-        </p>
+            </div>
 
         <hr class="mt-5 mb-1">
 
