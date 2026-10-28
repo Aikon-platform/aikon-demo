@@ -49,6 +49,12 @@
                     <a class="column button is-light is-content is-one-third is-large m-1" href="{% url 'datasets:metadata' dataset.pk %}" title="Add metadata">
                         <span class="iconify" data-icon="mdi:file-document-edit"></span>
                     </a>
+                    {% if dataset.zip_file %}
+                        <a class="column button is-light is-content is-one-third is-large m-1" href="{{ dataset.zip_file.url }}" title="Download dataset">
+                            <span class="iconify" data-icon="mdi:folder-download"></span>
+                        </a>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
