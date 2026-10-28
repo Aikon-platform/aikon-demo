@@ -1,0 +1,9 @@
+#task-details summary {
+    cursor: pointer;
+}
+#task-details ::marker {
+    content: "";
+}
+#task-details-eye {
+    margin-bottom: -0.15em;
+}
