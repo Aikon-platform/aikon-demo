@@ -65,57 +65,66 @@
                 <li id="tab-head-tree" class="tab-head">
                     <a>Document tree</a>
                 </li>
+                <li id="tab-head-tasks" class="tab-head">
+                    <a>Applied tasks</a>
+                </li>
             </ul>
         </div>
 
         <div class="tab-body-wrapper">
+            <!-- view images -->
             <div id="tab-body-images" class="tab-body">
                 <div id="document-image-browser"></div>
             </div>
-            <div id="tab-body-tree"class="tab-body is-hidden">
+            <!-- view document structure -->
+            <div id="tab-body-tree" class="tab-body is-hidden">
                 {% for document in dataset.documents %}
                     <h3 class="id-suffix">File structure of document #{{ forloop.counter }}</h3>
                     <div class="dataset-view-structure">{{ dataset.documents.0.document_tree|safe }}</div>
                 {% endfor %}
             </div>
+            <!-- view tasks -->
+            <div id="tab-body-tasks" class="tab-body is-hidden has-nested-tabs">
+                <div id="section-task" class="mt-6">
+                    <h2>Applied tasks ({{ dataset.tasks|length }})</h2>
+
+                    <div class="tabs tab-head-list is-centered is-normal">
+                        <ul>
+                            {% for prefix, tasks in dataset.tasks_by_prefix %}
+                                <li id="tab-head-{{ prefix }}"
+                                    class="tab-head
+                                        {% if dataset.tasks_by_prefix.0.0 == prefix %}
+                                            is-active
+                                        {% endif %}"
+                                >
+                                    <a>{{prefix}} ({{ tasks|length }} task{% if tasks|length > 1 %}s{% endif %})</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <!-- TODO find a better way to style than inline CSS -->
+                    <ul class="tab-body-wrapper list-invisible">
+                        {% for prefix, tasks in dataset.tasks_by_prefix %}
+                            <li id="tab-body-{{prefix}}"
+                                class="tab-body
+                                    {% if dataset.tasks_by_prefix.0.0 != prefix %}
+                                        is-hidden
+                                    {% endif %}"
+                            >
+                                <div class="object-list">
+                                    {% for task in tasks %}
+                                        {% include "includes/list-item.html" %}
+                                    {% endfor %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- TASKS SECTION -->
-    <div id="section-task" class="mt-6">
-        <h2>Applied tasks ({{ dataset.tasks|length }})</h2>
-        <div class="tabs tab-head-list is-centered is-normal">
-            <ul>
-                {% for prefix, tasks in dataset.tasks_by_prefix %}
-                    <li id="tab-head-{{ prefix }}"
-                        class="tab-head
-                            {% if dataset.tasks_by_prefix.0.0 == prefix %}
-                                is-active
-                            {% endif %}"
-                    >
-                        <a>{{prefix}} ({{ tasks|length }} tasks)</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <!-- TODO find a better way to style than inline CSS -->
-        <ul class="tab-body-wrapper list-invisible">
-            {% for prefix, tasks in dataset.tasks_by_prefix %}
-                <li id="tab-body-{{prefix}}"
-                    class="tab-body
-                        {% if dataset.tasks_by_prefix.0.0 != prefix %}
-                            is-hidden
-                        {% endif %}"
-                >
-                    <div class="object-list">
-                        {% for task in tasks %}
-                            {% include "includes/list-item.html" %}
-                        {% endfor %}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
 </div>
 
 {{ dataset.get_doc_image_mapping_json|json_script:"generic-image-array-script" }}
@@ -144,9 +153,28 @@
      * by corresponding HTML IDs, which have the structure:
      *      > `#tab-head-{slug}` for the `.tab-head` element
      *      > `#tab-body-{slug}` for the `.tab-body` element
-     * this function can be run several times for different tabs on a single
-     * HTML page. to isolate them, each tab+body block must be enclosed
-     * with a wrapper block that has an HTML ID, passed as the argument: `wrapperId`
+     *
+     * structure should be:
+     * root
+     * |_#parentTabWrapper (1)
+     *    |_.tabs
+     *    |  |_.tab-head-1
+     *    |  |_.tab-head-2
+     *    |_.tab-body-wrapper
+     *       |_.tab-body-1
+     *       |_.tab-body-2
+     *          |_#nestedTabWrapper.has-nested-tabs (2)
+     *
+     * (1) `#parentTabWrapper` is the argument `wrapperId`. it is
+     * the HTML ID of the element enclosing the `.tab-head/body`
+     * elts. it allows to isolate tab switching to tabs inside
+     * `#wrapperId`, and to use this function on several elements on the page.
+     *
+     * (2) note on recursivity: this function can be used recursively
+     * (a `.tab-body` also contains `.tab-head/body` elements). in this case,
+     * the wrapper of the nesdted `.tab-head/body` MUST have the
+     * `.has-nested-tabs`, and everything inside `.has-nested-tabs` won't be
+     * processed when calling `switchTabHook` on `#parentTabWrapper`.
      *
      * @param {String} wrapperId
      *      the HTML ID of the block wrapping .tab-head and .tab-body
@@ -158,9 +186,15 @@
     const switchTabHook = (wrapperId, slugArray) => {
         // variables and functions
         const
+            // for recursivity: don't process children of `#wrapperId` if they are enclosed
+            // in a `.has-nested-tabs` element.
+            filterNested = (elArr) =>
+                elArr.filter(el =>
+                    !el.parentElement?.closest(`#${wrapperId} .has-nested-tabs`)),
+
             tabHeadIdArray = slugArray.map(x => `#tab-head-${x}`),
-            tabHeadElArray = document.querySelectorAll(`#${wrapperId} .tab-head`),
-            tabBodyElArray = document.querySelectorAll(`#${wrapperId} .tab-body`),
+            tabHeadElArray = filterNested([...document.querySelectorAll(`#${wrapperId} .tab-head`)]),
+            tabBodyElArray = filterNested([...document.querySelectorAll(`#${wrapperId} .tab-body`)]),
             getSlugFromTabId = (tabId) =>
                 slugArray.filter(x => tabId ===`tab-head-${x}`)[0],
             switchActiveTab = (el) =>
@@ -175,6 +209,7 @@
                     ? tabBodyEl.classList.remove("is-hidden")
                     : tabBodyEl.classList.add("is-hidden")); },
             onClick = (e) => {
+                console.log("onClick", wrapperId, e.currentTarget)
                 switchActiveTab(e.currentTarget);
                 switchTabBody(e.currentTarget);
             };
@@ -188,7 +223,7 @@
     }
 
     const taskSlugArray = JSON.parse(document.getElementById('tasks-tab-manager').textContent),
-        contentSlugArray = ["tree", "images"],
+        contentSlugArray = ["tree", "images", "tasks"],
         taskWrapperId = "section-task",
         contentWrapperId = "section-content";
 
