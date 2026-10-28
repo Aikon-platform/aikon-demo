@@ -603,4 +603,10 @@ ul.messages {
         width: $control-width;
         box-sizing: border-box;
     }
+
+    // top row icon spacing
+    .tag .icon {
+        margin-inline-start: 0 !important;
+        //margin-inline-end: 0 !important;
+    }
 }

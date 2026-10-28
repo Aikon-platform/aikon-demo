@@ -23,7 +23,7 @@
                     <span class="column tag status content icon-text is-large m-1"
                           title="{{ dataset.documents|length }} document{% if dataset.documents|length > 1 %}s{% endif %}">
                         <span>{{ dataset.documents|length }}</span>
-                        <span class="icon has-text-white m-1">
+                        <span class="icon has-text-white">
                             <i class="iconify" data-icon="mdi:file-document-multiple"></i>
                         </span>
                     </span>
@@ -32,6 +32,13 @@
                         <span>{{ dataset.image_count }}</span>
                         <span class="icon has-text-white">
                             <i class="iconify" data-icon="mdi:file-image"></i>
+                        </span>
+                    </span>
+                    <span class="column tag status content icon-text is-large m-1"
+                          title="{{ dataset.tasks|length }} computer vision task{% if dataset.tasks|length > 1 %}s{% endif %}">
+                        <span>{{ dataset.tasks|length }}</span>
+                        <span class="icon has-text-white">
+                            <i class="iconify" data-icon="mdi:abacus"></i>
                         </span>
                     </span>
                 </div>
