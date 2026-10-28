@@ -7,23 +7,15 @@
 }
 
 .dataset-control-wrapper {
-    $control-height: 3.5rem;
-    $control-width: 4rem;
-
-    display: grid;
-    grid-template-rows: 50% 50%;
-    grid-gap: .5rem;
-
-    .tag, .button {
-        height: $control-height;
-        width: $control-width;
-        box-sizing: border-box;
-    }
+    width: 100%;
 
     // top row icon spacing
     .tag .icon {
         margin-inline-start: 0 !important;
-        //margin-inline-end: 0 !important;
+    }
+
+    .iconify {
+        margin-right: 0;
     }
 }
 

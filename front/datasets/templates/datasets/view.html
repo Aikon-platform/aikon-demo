@@ -17,28 +17,28 @@
         <div class="column flex-centered">
             <div class="dataset-control-wrapper">
                 <div class="columns">
-                    <span class="column tag status content is-large m-1" title="Dataset format: {{ dataset.format }}">
+                    <span class="column tag status content is-medium m-1" title="Dataset format: {{ dataset.format }}">
                         {{ dataset.format }}
                     </span>
-                    <span class="column tag status content icon-text is-large m-1"
+                    <span class="column tag status content is-medium icon-text m-1"
                           title="{{ dataset.documents|length }} document{% if dataset.documents|length > 1 %}s{% endif %}">
                         <span>{{ dataset.documents|length }}</span>
                         <span class="icon has-text-white">
                             <i class="iconify" data-icon="mdi:file-document-multiple"></i>
                         </span>
                     </span>
-                    <span class="column tag status content icon-text is-large m-1"
+                    <span class="column tag status content is-medium icon-text m-1"
                           title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
                         <span>{{ dataset.image_count }}</span>
                         <span class="icon has-text-white">
                             <i class="iconify" data-icon="mdi:file-image"></i>
                         </span>
                     </span>
-                    <span class="column tag status content icon-text is-large m-1"
+                    <span class="column tag status content is-medium icon-text m-1"
                           title="{{ dataset.tasks|length }} computer vision task{% if dataset.tasks|length > 1 %}s{% endif %}">
                         <span>{{ dataset.tasks|length }}</span>
                         <span class="icon has-text-white">
-                            <i class="iconify" data-icon="mdi:abacus"></i>
+                            <i class="iconify" data-icon="mdi:memory"></i>
                         </span>
                     </span>
                 </div>
@@ -56,7 +56,6 @@
 
     <!-- CONTENTS SECTION -->
     <div id="section-content">
-        <h2>Dataset contents</h2>
         <div class="tabs is-centered is-normal tab-head-list">
             <ul>
                 <li id="tab-head-images"class="tab-head is-active">
@@ -83,11 +82,9 @@
                     <div class="dataset-view-structure">{{ dataset.documents.0.document_tree|safe }}</div>
                 {% endfor %}
             </div>
-            <!-- view tasks -->
+            <!-- view tasks, containing nested tabs -->
             <div id="tab-body-tasks" class="tab-body is-hidden has-nested-tabs">
-                <div id="section-task" class="mt-6">
-                    <h2>Applied tasks ({{ dataset.tasks|length }})</h2>
-
+                <div id="section-task">
                     <div class="tabs tab-head-list is-centered is-normal">
                         <ul>
                             {% for prefix, tasks in dataset.tasks_by_prefix %}
@@ -102,7 +99,6 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    <!-- TODO find a better way to style than inline CSS -->
                     <ul class="tab-body-wrapper list-invisible">
                         {% for prefix, tasks in dataset.tasks_by_prefix %}
                             <li id="tab-body-{{prefix}}"
