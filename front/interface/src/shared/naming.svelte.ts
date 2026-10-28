@@ -72,7 +72,8 @@ export default class NameProvider implements TNameProvider {
                 name = name.slice(0, 5) + "..." + name.slice(-10);
             }
         }
-        return name;
+        // name is quite often "None" (python to js typecasting issue)
+        return name !== "None" ? name : "";
     }
 
     /**

@@ -14,6 +14,9 @@
     const tag = $derived(isTitle ? "h4" : "span");
     const name_provider = getNameProvider();
     const url = $derived(name_provider.getImageLink(image));
+
+    // getImageTitle =
+    console.log(">>>", name_provider.getImageTitle(image), name_provider.getImageTitle(image)==="None")
 </script>
 
 <svelte:element class="title-identification" class:mt-2={isTitle} this={tag} title={name_provider.getImageTitle(image)}>

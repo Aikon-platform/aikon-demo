@@ -20,7 +20,7 @@ setInterval(
 </script>
 
 <div id="intro-grid" class="flex-centered is-flex-direction-column">
-    <h1 class="is-title p-5">What do you want to process ?</h1>
+    <h1 class="is-title p-5 has-text-centered">Computer vision for historical data, made easier</h1>
     <div id="intro-fig-wrapper" class="flex-centered">
         {#each steps as step}
             {#if step.stepId === steps[currentStepIdx].stepId}
