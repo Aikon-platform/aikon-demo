@@ -22,7 +22,50 @@ LEARNING_SOURCE_CHOICES = [
 ]
 
 
-class DTIClusteringForm(AbstractTaskOnCropsForm):
+class DTIParametersForm(forms.Form):
+    """
+    DTI training settings, shared with DTI alignment
+    (field names are the DTI parameter names)
+    """
+
+    lr = forms.TypedChoiceField(
+        label="Learning Rate",
+        help_text="How fast the prototypes adapt: higher values learn faster but may be unstable.",
+        choices=LEARNING_RATE_CHOICES,
+        coerce=float,
+        initial=5e-4,
+    )
+    source = forms.ChoiceField(
+        label="Sprite Generation Method",
+        help_text="How sprites are learned: direct pixel optimization or neural network generation from latent vectors.",
+        choices=LEARNING_SOURCE_CHOICES,
+        initial="data",
+    )
+    transformation_sequence = HiddenJsonField(
+        label="Transform Configuration",
+        help_text="Image transformations to fit prototype",
+        json_structure={
+            "transforms": "identity",
+            "iterations": 1000,
+            "milestones": [1000],
+            "grid_size": 4,  # thin plate spline grid size
+        },
+    )
+    background_option = HiddenJsonField(
+        label="Learned Prototypes",
+        help_text="How parts of the images should be taken into account for prototype learning",
+        json_structure={
+            "use_sprites": False,  # Default to DTI (no sprites)
+            "freeze": [False, False, False],  # foreground, background, masks
+            "init": ["gaussian"],  # only one init for DTI
+        },
+    )
+
+    def get_dti_parameters(self):
+        return {name: self.cleaned_data[name] for name in DTIParametersForm.base_fields}
+
+
+class DTIClusteringForm(AbstractTaskOnCropsForm, DTIParametersForm):
     p_n_clusters = forms.IntegerField(
         label="Number of clusters",
         help_text="The number of different prototypes to generate from the dataset",
@@ -47,56 +90,16 @@ class DTIClusteringForm(AbstractTaskOnCropsForm):
         initial=0.025,
         required=True,
     )
-    lr = forms.ChoiceField(
-        label="Learning Rate",
-        help_text="How fast the prototypes adapt: higher values learn faster but may be unstable.",
-        choices=LEARNING_RATE_CHOICES,
-        initial=5e-4,
-        widget=forms.Select(),
-    )
-    source = forms.ChoiceField(
-        label="Sprite Generation Method",
-        help_text="How sprites are learned: direct pixel optimization or neural network generation from latent vectors.",
-        choices=LEARNING_SOURCE_CHOICES,
-        initial="data",
-        widget=forms.Select(),
-    )
-    p_transforms = HiddenJsonField(
-        label="Transform Configuration",
-        help_text="Image transformations to fit prototype",
-        json_structure={
-            "transforms": "identity",
-            "iterations": 1000,
-            "milestones": [1000],
-            "grid_size": 4,  # thin plate spline grid size
-        },
-    )
-
-    p_background = HiddenJsonField(
-        label="Learned Prototypes",
-        help_text="How parts of the images should be taken into account for prototype learning",
-        json_structure={
-            "use_sprites": False,  # Default to DTI (no sprites)
-            "freeze": [False, False, False],  # foreground, background, masks
-            "init": ["gaussian"],  # only one init for DTI
-        },
-    )
 
     class Meta(AbstractTaskOnCropsForm.Meta):
         model = DTIClustering
-
-    def clean_lr(self):
-        return float(self.cleaned_data["lr"])
 
     def _populate_instance(self, instance):
         instance.parameters = {
             "n_prototypes": self.cleaned_data["p_n_clusters"],
             # "batch_size": self.cleaned_data["p_batch_size"],
             "empty_cluster_threshold": self.cleaned_data["empty_cluster_thres"],
-            "lr": self.cleaned_data["lr"],
-            "source": self.cleaned_data["source"],
-            "background_option": self.cleaned_data["p_background"],
-            "transformation_sequence": self.cleaned_data["p_transforms"],
+            **self.get_dti_parameters(),
         }
 
         super()._populate_instance(instance)
