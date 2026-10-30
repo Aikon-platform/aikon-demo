@@ -1,0 +1,57 @@
+{% extends "tasking/start.html" %}
+{% load shared_tags %}
+
+{% block form_content %}
+{% include "demowebsite/dataset_baseform.html" with excluded_fields="method,ransac_feature,target_transform,dti_lr,dti_source,dti_transformation_sequence,dti_background_option,metadata" %}
+
+<h4 class="mt-4 mb-2">Options</h4>
+<hr class="mt-0 mb-1" />
+
+<div class="field">
+    {% include "includes/form/form_field.html" with field=form.method %}
+</div>
+
+<div id="method-ransac" class="methods">
+    <div class="field">
+        {% include "includes/form/form_field.html" with field=form.ransac_feature %}
+    </div>
+
+    <div class="field">
+        {% include "includes/form/form_field.html" with field=form.target_transform %}
+    </div>
+</div>
+
+<div id="method-dti" class="methods" style="display: none;">
+    <div class="columns is-flex is-align-items-center is-justify-content-space-between pb-2 m-0">
+        <div class="column pl-0">
+            {% include "includes/form/form_field.html" with field=form.dti_source %}
+        </div>
+        <div class="column">
+            {% include "includes/form/form_field.html" with field=form.dti_lr %}
+        </div>
+    </div>
+
+    {% include "dticlustering/transforms.html" with field=form.dti_transformation_sequence no_deformation=True %}
+
+    {% include "dticlustering/use-sprites.html" with field=form.dti_background_option default_init="sample" %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const methodSelect = document.getElementById("id_method");
+
+    function toggleMethodFields() {
+        document.querySelectorAll(".methods").forEach(div => {
+            div.style.display = div.id === `method-${methodSelect.value}` ? "block" : "none";
+        });
+    }
+
+    if (methodSelect) {
+        methodSelect.addEventListener("change", toggleMethodFields);
+        toggleMethodFields();
+    }
+});
+</script>
+{% endblock %}

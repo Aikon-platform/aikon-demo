@@ -10,6 +10,7 @@ urlpatterns = [
     # TODO make the following apps optional (set in .env)
     path("dti/", include("dticlustering.urls")),
     path("similarity/", include("similarity.urls")),
+    path("alignment/", include("alignment.urls")),
     path("regions/", include("regions.urls")),
     path("search/", include("search.urls")),
     path("watermarks/", include("watermarks.urls")),

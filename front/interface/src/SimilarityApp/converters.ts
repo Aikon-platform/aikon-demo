@@ -7,7 +7,8 @@ import type {
     TSimilarityOutputRaw,
     TSimilarityMatch,
 } from "./types";
-import type { TImageInfo } from "../shared/types";
+import type { TMatchTransposition } from "../shared/types";
+import { unserializeImageIndex } from "../shared/converters";
 
 /**
  * Unserializes a similarity index
@@ -15,26 +16,23 @@ import type { TImageInfo } from "../shared/types";
  * @returns The unserialized index
  */
 function unserializeSimilarityIndex(index: TSimilarityIndexRaw): TSimilarityIndex {
-    const source_documents = Object.fromEntries(
-        Object.entries(index.sources).map(([id, source]) => [
-            id,
-            { name: source.metadata?.name || source.uid, ...source },
-        ])
-    );
-    const source_images: TImageInfo[] = index.images.map((image, i) => ({
-        id: image.id,
-        num: i,
-        src: image.src,
-        url: image.url,
-        document: source_documents[image.doc_uid],
-        metadata: image.metadata || {},
-    }));
+    return {...unserializeImageIndex(index), transpositions: (index.transpositions || ["none"]).map(unserializeTransposition) };
+}
 
-    return {
-        sources: Object.values(source_documents),
-        images: source_images,
-        transpositions: index.transpositions || ["none"],
-    };
+// Based on PIL.Image.Transpose enum values
+const PIL_TRANSPOSITION_MAP: Record<number, TMatchTransposition> = {
+    0: "hflip",
+    1: "rot180 hflip",
+    2: "rot90",
+    3: "rot180",
+    4: "rot270",
+    [-1]: "none"
+}
+
+function unserializeTransposition(t: TMatchTransposition | number): TMatchTransposition {
+    if (t in PIL_TRANSPOSITION_MAP) return PIL_TRANSPOSITION_MAP[t as number];
+    if (typeof(t) === "string") return t;
+    return "none";
 }
 
 /**

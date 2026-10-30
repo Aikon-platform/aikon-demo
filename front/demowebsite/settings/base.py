@@ -13,6 +13,7 @@ Env.read_env(env_file=f"{BASE_DIR}/.env")
 DEMO_APPS = [
     "dticlustering",
     "similarity",
+    "alignment",
     "watermarks",
     "regions",
     "pipelines",

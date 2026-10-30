@@ -1,7 +1,7 @@
 {% extends "tasking/start.html" %}
 
 {% block form_content %}
-    {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,p_transforms,p_background,empty_cluster_thres,lr,source,metadata" %}
+    {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,transformation_sequence,background_option,empty_cluster_thres,lr,source,metadata" %}
 
     <h3 class="title mb-2">Prototype configuration</h4>
     <hr class="mt-0 mb-1">
@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    {% include "dticlustering/transforms.html" with field=form.p_transforms %}
+    {% include "dticlustering/transforms.html" with field=form.transformation_sequence %}
 
-    {% include "dticlustering/use-sprites.html" with field=form.p_background %}
+    {% include "dticlustering/use-sprites.html" with field=form.background_option %}
 {% endblock %}

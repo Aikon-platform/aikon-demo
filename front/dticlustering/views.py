@@ -51,8 +51,10 @@ class DTIClusteringStartFrom(DTIClusteringMixin.StartFrom, DTIClusteringStart):
             kwargs["initial"].update(
                 {
                     "p_n_clusters": parameters.get("n_prototypes", 10),
-                    "p_background": parameters.get("background_option", {}),
-                    "p_transforms": parameters.get("transformation_sequence", {}),
+                    "background_option": parameters.get("background_option", {}),
+                    "transformation_sequence": parameters.get(
+                        "transformation_sequence", {}
+                    ),
                     "empty_cluster_thres": parameters.get(
                         "empty_cluster_threshold", 0.025
                     ),
