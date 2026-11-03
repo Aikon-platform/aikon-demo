@@ -6,6 +6,7 @@ app_name = "alignment"
 urlpatterns = [
     path("", AlignmentMixin.List.as_view(), name="list"),
     path("start", AlignmentStart.as_view(), name="start"),
+    path("manual", AlignmentManual.as_view(), name="manual"),
     path("<uuid:pk>", AlignmentMixin.Status.as_view(), name="status"),
     path("<uuid:pk>/progress", AlignmentMixin.Progress.as_view(), name="progress"),
     path("<uuid:pk>/cancel", AlignmentMixin.Cancel.as_view(), name="cancel"),

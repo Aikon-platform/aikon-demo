@@ -1,11 +1,11 @@
 import json
 
-from django.views.generic import View
+from django.views.generic import View, TemplateView
 from django.http import FileResponse, Http404, HttpResponse
 
 from .forms import AlignmentForm
 from .models import Alignment
-from tasking.views import task_view_set
+from tasking.views import task_view_set, TaskMixin
 
 
 @task_view_set
@@ -23,6 +23,10 @@ class AlignmentMixin:
 
 class AlignmentStart(AlignmentMixin.Start):
     template_name = "alignment/start.html"
+
+
+class AlignmentManual(AlignmentMixin, TaskMixin, TemplateView):
+    template_name = "alignment/manual.html"
 
 
 class AlignmentStartFrom(AlignmentMixin.StartFrom, AlignmentStart):

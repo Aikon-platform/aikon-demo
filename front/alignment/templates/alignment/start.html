@@ -2,6 +2,8 @@
 {% load shared_tags %}
 
 {% block form_content %}
+<div class="notification is-link is-light">You can also <a href="{% url 'alignment:manual' %}" class="is-underlined">align manually <span class="iconify" data-icon="mdi:open-in-new"></span></a> a set of images, if you do not want to use the automatic alignment.</div>
+
 {% include "demowebsite/dataset_baseform.html" with excluded_fields="method,ransac_feature,target_transform,dti_lr,dti_source,dti_transformation_sequence,dti_background_option,metadata" %}
 
 <h4 class="mt-4 mb-2">Options</h4>
