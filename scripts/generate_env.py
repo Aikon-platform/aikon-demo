@@ -288,7 +288,7 @@ def generate_nginx_conf(v: dict) -> None:
     overwrite = {"local": {"PROD_URL": "localhost"}}
     mode = v["MODE"]
 
-    def apply_template(template: str) -> str:
+    def apply_template(template: Path) -> None:
         # replace all variables with values + rename file + write template to file
         text = template.read_text()
         for key in (
@@ -313,11 +313,9 @@ def generate_nginx_conf(v: dict) -> None:
 
     if mode == "dev":
         return
-    elif mode == "local":
+    elif mode in ("local", "prod"):
         template = ROOT / "docker" / "web" / "nginx.conf.template"
         apply_template(template)
-        text = template.read_text()
-        return
     for template in (ROOT / "docker" / "web").glob("nginx_*.conf.template"):
         apply_template(template)
 
