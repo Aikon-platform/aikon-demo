@@ -1,70 +1,75 @@
-// NOTE: font paths are defined relative to build location, not to the current file's location.
+// fonts.scss
+// NOTE: font URLs are root-absolute (`/static/fonts/...`), so they resolve the same way in every environment.
 // - in dev,
-//      - build sass path is `front/shared/static/dist/main.css`,
-//      - font path is `front/shared/static/fonts`
+//      - `runserver` serves `front/shared/static` through the staticfiles finders (see STATICFILES_DIRS),
+//      - so `/static/fonts/` maps to `front/shared/static/fonts`, with no `collectstatic` needed.
 // - in prod,
-//      - build sass path is `front/staticfiles/dist/main.css`,
-//      - font path is `front/staticfiles/fonts/`
-// => in both cases, `../fonts` points to the correct font folder.
+//      - `collectstatic` copies the same files to `front/staticfiles/fonts/`,
+//      - which the web server exposes at `/static/fonts/`.
+// => the compiled CSS contains the same literal URL in both cases, so its location on disk doesn't matter.
+//    To serve fonts from another origin (e.g. a CDN), override `$font-base` with `@use "fonts" with ($font-base: ...)`.
+
+$font-base: "/static/fonts" !default;
 
 /** default text font 1 (sans-serif) */
 @font-face {
-    font-family: 'absans';
-    src: url('../fonts/absans-main/fonts/Absans-Regular.woff') format('woff');
+    font-family: "absans";
+    src: url("#{$font-base}/absans-main/fonts/Absans-Regular.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
 
 /** default text font 2 (sans-serif) */
 @font-face {
-    font-family: 'urlaub-grotesk';
-    src: url('../fonts/urlaub_grotesk/Urlaub-Grotesk-Regular.otf') format('opentype');
+    font-family: "urlaub-grotesk";
+    src: url("#{$font-base}/urlaub_grotesk/Urlaub-Grotesk-Regular.otf") format("opentype");
     font-weight: normal;
     font-style: normal;
 }
 
 /** monospace font */
 @font-face {
-    font-family: 'sono';
-    src: url('../fonts/sono/Sono-VariableFont_MONO\,wght.ttf') format('truetype');
+    font-family: "sono";
+    src: url("#{$font-base}/sono/Sono-VariableFont_MONO\,wght.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
 }
 
 /** accentuation font 1 (serif) */
 @font-face {
-    font-family: 'lucette';
-    src: url('../fonts/lucette/font/woff/Lucette-Regular.woff') format('woff');
+    font-family: "lucette";
+    src: url("#{$font-base}/lucette/font/woff/Lucette-Regular.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
 
+
 @font-face {
-    font-family: 'lucette';
-    src: url('../fonts/lucette/font/woff/Lucette-Regularitalic.woff') format('woff');
+    font-family: "lucette";
+    src: url("#{$font-base}/lucette/font/woff/Lucette-Regularitalic.woff") format("woff");
     font-weight: normal;
     font-style: italic;
 }
 
 /** accentuation font 2 (serif) */
 @font-face {
-    font-family: 'redaction';
-    src: url('../fonts/redaction/webfonts/Redaction-Bold.woff2') format('woff2');
+    font-family: "redaction";
+    src: url("#{$font-base}/redaction/webfonts/Redaction-Bold.woff2") format("woff2");
     font-weight: 700;
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'redaction';
-    src: url('../fonts/redaction/webfonts/Redaction-Regular.woff2') format('woff2');
+    font-family: "redaction";
+    src: url("#{$font-base}/redaction/webfonts/Redaction-Regular.woff2") format("woff2");
     font-weight: normal;
     font-style: normal;
 }
 
 /** logo font */
 @font-face {
-    font-family: 'redaction-pixel';
-    src: url('../fonts/redaction/webfonts/Redaction_50-Bold.woff2') format('woff2');
+    font-family: "redaction-pixel";
+    src: url("#{$font-base}/redaction/webfonts/Redaction_50-Bold.woff2") format("woff2");
     font-weight: normal;
     font-style: normal;
 }

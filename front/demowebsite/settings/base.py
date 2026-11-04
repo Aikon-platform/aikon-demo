@@ -86,6 +86,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+# additional staticfiles directory to access the fonts in dev
+STATICFILES_DIRS = [BASE_DIR / "shared" / "static"]
 
 MEDIA_URL = "media/"
 # MEDIA_DIR is the path to media files, defined conditionnally depending
