@@ -75,6 +75,7 @@ PROMPTED = {
         "HTTP_PROXY",
         "HTTPS_PROXY",
         "NGINX_PORT",
+        "ALLOWED_HOSTS",
     ),
 }
 
@@ -187,6 +188,13 @@ def resolve_values(mode: Literal["local", "dev", "prod"], assume_yes: bool) -> d
         if key in PROMPTED[mode]:
             if key == "POSTGRES_PASSWORD":
                 val = prompt(key, val, desc)
+            elif key == "ALLOWED_HOSTS":
+                # in production, add PROD_URL to ALLOWED_HOSTS. note that this relies on PROD_URL being defined before ALLOWED_HOSTS in .env.template
+                if mode == "prod" and v["PROD_URL"] not in val:
+                    val = [v for v in val.split(",") if v]
+                    val.append(v["PROD_URL"])
+                    val = ",".join(val)
+                val = prompt(key, val, desc)
             elif not assume_yes:
                 val = prompt(key, val, desc)
         if key.endswith("_PORT") and mode != "prod" and key not in env_current:
@@ -224,10 +232,14 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
         if prod
         else f"http://localhost:{v['NGINX_PORT'] if nginx else v['DJANGO_PORT']}"
     )
+    allowed_hosts_base = "localhost,127.0.0.1,0.0.0.0,web,nginx,host.docker.internal"
+    allowed_hosts = (
+        allowed_hosts_base + f",{v['PROD_URL']}" if prod else allowed_hosts_base
+    )
 
     return {
         "MODE": mode,
-        "ALLOWED_HOSTS": "localhost,127.0.0.1,0.0.0.0,web,nginx,host.docker.internal",
+        "ALLOWED_HOSTS": allowed_hosts,
         "DEBUG": str(not prod),
         "DOCKER": str(in_docker),
         "C_FORCE_ROOT": "True",
@@ -288,7 +300,7 @@ def generate_nginx_conf(v: dict) -> None:
     overwrite = {"local": {"PROD_URL": "localhost"}}
     mode = v["MODE"]
 
-    def apply_template(template: str) -> str:
+    def apply_template(template: Path) -> None:
         # replace all variables with values + rename file + write template to file
         text = template.read_text()
         for key in (
@@ -313,11 +325,9 @@ def generate_nginx_conf(v: dict) -> None:
 
     if mode == "dev":
         return
-    elif mode == "local":
+    elif mode in ("local", "prod"):
         template = ROOT / "docker" / "web" / "nginx.conf.template"
         apply_template(template)
-        text = template.read_text()
-        return
     for template in (ROOT / "docker" / "web").glob("nginx_*.conf.template"):
         apply_template(template)
 
