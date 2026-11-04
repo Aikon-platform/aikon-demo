@@ -25,6 +25,7 @@
 @use "SimilarityApp" as *;
 @use "RegionsApp" as *;
 @use "WatermarksApp" as *;
+@use "AlignmentApp" as *;
 
 /*******************************
  * global themes
@@ -103,7 +104,10 @@ pre {
     color: white;
 }
 
-input[type="submit"], input[type="file"], button:not(.not-button), .btn {
+input[type="submit"],
+input[type="file"],
+button:not(.not-button),
+.btn {
     white-space: normal;
     text-align: center;
     font: 16px $family-primary;
@@ -114,8 +118,8 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
     display: inline-flex;
     vertical-align: middle;
     margin: 0.1em 0.3em;
-    min-height: 1.5em;
-    min-width: 1.5em;
+    min-height: var(--bulma-control-size, 1.5em);
+    min-width: var(--bulma-control-size, 1.5em);
     align-items: center;
     justify-content: space-evenly;
     text-decoration: none;
@@ -137,7 +141,8 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
         }
     }
 
-    &.cancel, &.validate {
+    &.cancel,
+    &.validate {
         color: #fff;
         padding: 0 5px;
     }
@@ -149,12 +154,12 @@ input[type="submit"], input[type="file"], button:not(.not-button), .btn {
         background: $green;
         border-color: color.adjust($green, $lightness: -20%);
     }
-    &:disabled, &.disabled {
-        background-color: #ccc;
-        border-color: #ccc;
-        color: #fff;
-        pointer-events: none;
-    }
+    // &:disabled, &.disabled {
+    //     background-color: #ccc;
+    //     border-color: #ccc;
+    //     color: #fff;
+    //     pointer-events: none;
+    // }
     &.big {
         font-size: 1.3em;
     }
@@ -200,6 +205,11 @@ input.button:hover,
             border: none;
             color: $secondary-color;
         }
+        &.warning,
+        &.error {
+            background-color: color.adjust($red, $lightness: -50%);
+            color: #fff;
+        }
     }
 }
 
@@ -241,11 +251,13 @@ input.button:hover,
 
 .clickable {
     transition: all 0.3s ease;
-    box-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.3);
+    box-shadow: 0 0.5em 1em -0.125em
+        hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.3);
 }
 .clickable:hover {
     transform: translateY(2px);
-    box-shadow: 0 0.5em 0.4em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.4);
+    box-shadow: 0 0.5em 0.4em -0.125em
+        hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.4);
 }
 
 // fully centered flexbox
@@ -588,4 +600,10 @@ ul.messages {
     border-radius: var(--bulma-box-radius);
     border-color: var(--bulma-link-75);
     border-width: var(--bulma-control-border-width);
+}
+
+.is-ghost {
+    &.is-white {
+        --bulma-button-ghost-color: var(--bulma-white);
+    }
 }
