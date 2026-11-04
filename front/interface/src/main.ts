@@ -11,6 +11,7 @@ import type { TDatasetFormatType, TDjangoDatasetInterface } from "./DatasetApp/t
 import "../sass/main.scss";
 import SearchResults from "./SimilarityApp/components/SearchResults.svelte";
 import { initWatermarksForm } from "./WatermarksApp/form";
+import AlignmentApp from "./AlignmentApp/components/AlignmentApp.svelte";
 
 /**
  * Mount the cluster viewer in the given target root.
@@ -138,6 +139,23 @@ function initDatasetImageBrowser(
     });
 }
 
+/**
+ * Mount the alignment app in the given target root.
+ * @param target_root the root element to mount the alignment app in
+ * @param alignment_url the url to alignment task results to load, if any
+ */
+function initAlignmentApp(
+    target_root: HTMLElement,
+    alignment_url?: string,
+) {
+    mount(AlignmentApp, {
+        target: target_root,
+        props: {
+            alignment_url,
+        },
+    })
+}
+
 (window as any).DemoTools = {
     initClusterViewer,
     initProgressTracker,
@@ -145,5 +163,6 @@ function initDatasetImageBrowser(
     initImageGenericList,
     initDatasetImageBrowser,
     initSearchResults,
-    initWatermarksForm
+    initWatermarksForm,
+    initAlignmentApp
 };

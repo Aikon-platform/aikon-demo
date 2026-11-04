@@ -16,7 +16,7 @@
      *
      */
 
-    type TDatasetValue = "zip"|"iiif"|"pdf"|"images"|""
+    type TDatasetValue = "zip"|"iiif"|"pdf"|"images";
 
     const EMPTY_FILE = "No file selected";
 
@@ -37,7 +37,7 @@
     // images is sent to Django.
     const switch_field = form.querySelector("#id_format") as HTMLInputElement;
     const defaultTab = "pdf";
-    let tab: TDatasetValue = $state("");  // set in `onMount`
+    let tab: TDatasetValue | undefined = $state(undefined);  // set in `onMount`
 
     const iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
     const zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
@@ -117,9 +117,10 @@
         }
     }
 
-    function onTabChange(value: string) {
-        updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value)
+    function onTabChange(value: string):TDatasetValue {
+        value = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value);
         switch_field.value = value == "images" ? "zip" : value;
+        return value as TDatasetValue;
     }
 
     function onDatasetReuseChange(value: boolean) {
@@ -145,13 +146,11 @@
 
         // if `dataset_type` is defined in the URL, use it to set `tab`. otherwise, tab is set using a default.
         // implicitly, `switch_field.value` is also updated.
-        const rawTab = urlDatasetType?.length
+        const rawTab = urlDatasetType && urlDatasetType?.length
             ? urlDatasetType
             : defaultTab;
-        // validate tab, and if `urlDatasetType` and sync tab and URL param.
-        tab = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", rawTab) as TDatasetValue  // validate and update value if necessary
-        // synchronize switch_field (internal django value) with URL param
-        switch_field.value = tab;
+        // validate tab, and if `urlDatasetType` and sync tab and URL param, sync with field.
+        tab = onTabChange(rawTab);
 
         // set dataset_reuse_value from URL, if possible.
         const urlDatasetReuse = maybeBooleanToBoolean(urlSearchParams.get("dataset_reuse"));
@@ -201,15 +200,28 @@
         </Toggle.Root>
     </div>
     {#if dataset_reuse_value}
-        <div class="select">
-            <select bind:value={dataset_reuse_target_value}>
-                <option value="">Use dataset from</option>
-                {#each dataset_reuse_target_field.children as option}
-                    {#if option instanceof HTMLOptionElement && option.value != ""}
-                        <option value={option.value}>{option.text}</option>
-                    {/if}
-                {/each}
-            </select>
+        <div class="is-flex is-flex-direction-column is-align-items-start">
+            <div class="m-1">
+                <div class="select">
+                    <select bind:value={dataset_reuse_target_value}>
+                        <option value="">Use dataset from</option>
+                        {#each dataset_reuse_target_field.children as option}
+                            {#if option instanceof HTMLOptionElement && option.value != ""}
+                                <option value={option.value}>{option.text}</option>
+                            {/if}
+                        {/each}
+                    </select>
+                </div>
+            </div>
+            <div class="m-1">
+                <a class="button"
+                    style={dataset_reuse_target_value ? '' : "cursor: not-allowed; opacity: 0.5"}
+                    href={dataset_reuse_target_value ? `/datasets/${dataset_reuse_target_value}/view` : undefined}
+                >
+                    <span class="iconify iconify--mdi" data-icon="mdi:eye"></span>
+                    View dataset
+                </a>
+            </div>
         </div>
     {:else}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
