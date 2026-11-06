@@ -227,6 +227,11 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
     )
     prod = mode == "prod"
     nginx = mode != "dev"  # nginx is the entrypoint whenever the front is containerized
+    base = (
+        f"https://{v['PROD_URL']}"
+        if prod
+        else f"http://localhost:{v['NGINX_PORT'] if nginx else v['DJANGO_PORT']}"
+    )
 
     return {
         "MODE": mode,
