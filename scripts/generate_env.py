@@ -75,6 +75,7 @@ PROMPTED = {
         "HTTP_PROXY",
         "HTTPS_PROXY",
         "NGINX_PORT",
+        "ALLOWED_HOSTS",
     ),
 }
 
@@ -186,6 +187,13 @@ def resolve_values(mode: Literal["local", "dev", "prod"], assume_yes: bool) -> d
             val = secrets.token_urlsafe(40)
         if key in PROMPTED[mode]:
             if key == "POSTGRES_PASSWORD":
+                val = prompt(key, val, desc)
+            elif key == "ALLOWED_HOSTS":
+                # in production, add PROD_URL to ALLOWED_HOSTS. note that this relies on PROD_URL being defined before ALLOWED_HOSTS in .env.template
+                if mode == "prod" and v["PROD_URL"] not in val:
+                    val = [v for v in val.split(",") if v]
+                    val.append(v["PROD_URL"])
+                    val = ",".join(val)
                 val = prompt(key, val, desc)
             elif not assume_yes:
                 val = prompt(key, val, desc)
