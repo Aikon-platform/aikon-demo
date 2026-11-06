@@ -227,19 +227,10 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
     )
     prod = mode == "prod"
     nginx = mode != "dev"  # nginx is the entrypoint whenever the front is containerized
-    base = (
-        f"https://{v['PROD_URL']}"
-        if prod
-        else f"http://localhost:{v['NGINX_PORT'] if nginx else v['DJANGO_PORT']}"
-    )
-    allowed_hosts_base = "localhost,127.0.0.1,0.0.0.0,web,nginx,host.docker.internal"
-    allowed_hosts = (
-        allowed_hosts_base + f",{v['PROD_URL']}" if prod else allowed_hosts_base
-    )
 
     return {
         "MODE": mode,
-        "ALLOWED_HOSTS": allowed_hosts,
+        "ALLOWED_HOSTS": v["ALLOWED_HOSTS"],
         "DEBUG": str(not prod),
         "DOCKER": str(in_docker),
         "C_FORCE_ROOT": "True",
