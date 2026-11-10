@@ -57,25 +57,22 @@ PROMPTED = {
     "dev": ("POSTGRES_PASSWORD", "DATA_DIR"),
     "prod": (
         "POSTGRES_PASSWORD",
-        "APP_NAME",
-        "APP_LANG",
         "DATA_DIR",
-        "GEONAMES_USER",
         "PROD_URL",
         "PROD_API_URL",
         "POSTGRES_DB",
         "POSTGRES_USER",
+        "EMAIL_USE_TLS",
+        "EMAIL_PORT",
         "EMAIL_HOST",
         "EMAIL_HOST_USER",
         "EMAIL_HOST_PASSWORD",
         "DEFAULT_FROM_EMAIL",
-        "APP_LOGO",
-        "SSL_CERTIFICATE",
-        "SSL_KEY",
+        "ADMIN_EMAIL",
+        "ALLOWED_HOSTS",
         "HTTP_PROXY",
         "HTTPS_PROXY",
         "NGINX_PORT",
-        "ALLOWED_HOSTS",
     ),
 }
 
@@ -232,14 +229,10 @@ def derive(v: dict, mode: str, in_docker: bool) -> dict:
         if prod
         else f"http://localhost:{v['NGINX_PORT'] if nginx else v['DJANGO_PORT']}"
     )
-    allowed_hosts_base = "localhost,127.0.0.1,0.0.0.0,web,nginx,host.docker.internal"
-    allowed_hosts = (
-        allowed_hosts_base + f",{v['PROD_URL']}" if prod else allowed_hosts_base
-    )
 
     return {
         "MODE": mode,
-        "ALLOWED_HOSTS": allowed_hosts,
+        "ALLOWED_HOSTS": v["ALLOWED_HOSTS"],
         "DEBUG": str(not prod),
         "DOCKER": str(in_docker),
         "C_FORCE_ROOT": "True",
