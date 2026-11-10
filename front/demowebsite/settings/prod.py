@@ -33,15 +33,24 @@ CSRF_TRUSTED_ORIGINS = https_hosts + wildcard_hosts
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 EMAIL_HOST = ENV("EMAIL_HOST", default="localhost")
-EMAIL_PORT = ENV(
-    "EMAIL_PORT", default=587
-)  # 25 for unencrypted, 587 for TLS, 465 for SSL
-EMAIL_USE_TLS = True if EMAIL_PORT == 587 else False
+# 25 for unencrypted, 587 for TLS, 465 for SSL
+EMAIL_PORT = ENV("EMAIL_PORT", default=587)
+# tls security. defined manually
+EMAIL_USE_TLS = ENV("EMAIL_USE_TLS", default=True)
+# ssl security
 EMAIL_USE_SSL = True if EMAIL_PORT == 465 else False
+# timeout in seconds when attempting to send an email. if not EMAIL_TIMEOUT
+# is None, failed email sending will hang, resulting in task errors.
+EMAIL_TIMEOUT = 10
+# username for the SMTP server
 EMAIL_HOST_USER = ENV("EMAIL_HOST_USER", default="")
+# password for the SMTP server
 EMAIL_HOST_PASSWORD = ENV("EMAIL_HOST_PASSWORD", default="")
+# address mail from which the app will send mails
 DEFAULT_FROM_EMAIL = ENV("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
-SERVER_EMAIL = ENV("SERVER_EMAIL", default=EMAIL_HOST_USER)
-ADMIN_EMAIL = EMAIL_HOST_USER
+# address mail from which the app will send mails to admins
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+# admin's email address
+ADMIN_EMAIL = ENV("ADMIN_MAIL", default=EMAIL_HOST_USER)
 
 ADMINS = [(ENV("POSTGRES_USER"), ADMIN_EMAIL)]
