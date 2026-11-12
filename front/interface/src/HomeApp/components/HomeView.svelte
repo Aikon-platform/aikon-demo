@@ -34,8 +34,10 @@
         <div class="flex-centered">
             <ul class="columns is-centered is-vcentered is-multiline object-list">
                 {#each data as [title, desc, href]}
-                    <li class="row column is-12">
-                        <AlgorithmCard {title} {desc} {href} /></li>
+                    <a href={href}>
+                        <h2>{title}</h2>
+                        <h3 class="is-family-sans-serif">{desc}</h3>
+                    </a>
                 {/each}
             </ul>
         </div>
