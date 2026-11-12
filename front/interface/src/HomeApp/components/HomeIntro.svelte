@@ -38,35 +38,3 @@ setInterval(
         {/each}
     </div>
 </div>
-
-<style>
-#intro-fig-wrapper {
-    width: 100%;
-    /* background-color: red; */
-}
-figure {
-    /* background-color: limegreen; */
-    width: 100%;
-    margin: 0;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-figure > img {
-    min-height: 0;    /* allow shrinking below the image's natural height */
-    width: 100%;
-    height: 40vh;
-    object-fit: contain;
-}
-figcaption {
-    flex: none;
-    /* background-color: pink; */
-    width: 70%;
-
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-}
-</style>

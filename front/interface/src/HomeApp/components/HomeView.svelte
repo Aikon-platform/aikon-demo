@@ -1,5 +1,4 @@
 <script lang="ts">
-    import AlgorithmCard from "./AlgorithmCard.svelte";
     import HomeIntro from "./HomeIntro.svelte";
 
     const toStartTask = (taskName: String) => `/${taskName}/start`;
@@ -31,13 +30,15 @@
 <div>
     <div class="main-wrapper">
         <HomeIntro></HomeIntro>
-        <div class="flex-centered">
+        <div class="algo-wrapper flex-centered">
             <ul class="columns is-centered is-vcentered is-multiline object-list">
                 {#each data as [title, desc, href]}
-                    <a href={href}>
-                        <h2>{title}</h2>
-                        <h3 class="is-family-sans-serif">{desc}</h3>
-                    </a>
+                    <li class="row column is-12">
+                        <a href={href}>
+                            <h2>{title}</h2>
+                            <h3 class="is-family-sans-serif">{desc}</h3>
+                        </a>
+                    </li>
                 {/each}
             </ul>
         </div>
@@ -71,13 +72,3 @@
         </section>
     </div>
 </div>
-
-<style>
-.main-wrapper {
-    height: calc(100vh - var(--bulma-navbar-height));
-    display: grid;
-    grid-template-columns: 50% 50%;
-    grid-template-rows: 100%;
-    width: 100%;
-}
-</style>

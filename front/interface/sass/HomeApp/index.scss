@@ -1,0 +1,46 @@
+#intro-fig-wrapper {
+    width: 100%;
+    /* background-color: red; */
+
+    figure {
+        /* background-color: limegreen; */
+        width: 100%;
+        margin: 0;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    figure > img {
+        min-height: 0;    /* allow shrinking below the image's natural height */
+        width: 100%;
+        height: 40vh;
+        object-fit: contain;
+    }
+    figcaption {
+        flex: none;
+        /* background-color: pink; */
+        width: 70%;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+    }
+
+}
+
+.main-wrapper {
+    height: calc(100vh - var(--bulma-navbar-height));
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 100%;
+    width: 100%;
+}
+.algo-wrapper {
+    max-height: 100%;
+    overflow: scroll;
+}
+.algo-wrapper ul {
+    max-height: 100%;
+}
