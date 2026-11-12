@@ -26,7 +26,7 @@
 
 <div class="dci-wrapper">
     <div
-        class="dci-title is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center"
+        class="dci-title is-flex is-flex-direction-row is-justify-content-space-between is-align-items-center mt-2 mb-2"
     >
         <h3 class="id-suffix m-0">
             Images in {datasetFormat === "iiif"
@@ -41,5 +41,7 @@
             ></IconBtn>
         {/if}
     </div>
-    <ImageGenericList image_array={datasetContentsItem.images.slice(0, displayLength)} />
+    <div class="dci-image-wrapper">
+        <ImageGenericList image_array={datasetContentsItem.images.slice(0, displayLength)} />
+    </div>
 </div>
