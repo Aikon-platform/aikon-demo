@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 from tasking.views import LoginRequiredIfConfProtectedMixin, TaskMixin
-from .forms import DatasetForm, DatasetAddMetadataForm
+from .forms import DatasetForm, DatasetUpdateForm
 from .models import Dataset
 
 User = get_user_model()
@@ -97,12 +97,10 @@ class DatasetMainView(DatasetMixin, DetailView):
     template_name = "datasets/view.html"
 
 
-class DatasetAddMetadataView(
-    DatasetMixin, LoginRequiredIfConfProtectedMixin, UpdateView
-):
+class DatasetUpdateView(DatasetMixin, LoginRequiredIfConfProtectedMixin, UpdateView):
     """
-    Add metadata to a dataset
+    Edit a dataset
     """
 
-    template_name = "datasets/metadata_form.html"
-    form_class = DatasetAddMetadataForm
+    template_name = "datasets/update_form.html"
+    form_class = DatasetUpdateForm
