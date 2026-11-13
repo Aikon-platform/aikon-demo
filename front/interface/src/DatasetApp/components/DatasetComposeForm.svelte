@@ -37,7 +37,10 @@
     // images is sent to Django.
     const switch_field = form.querySelector("#id_format") as HTMLInputElement;
     const defaultTab = "pdf";
-    let tab: TDatasetValue | undefined = $state(undefined);  // set in `onMount`
+    // NOTE: tab value is set in `onMount`. here it is necessary to use `null`
+    // instead of `undefined` to avoid a svelte error ("Cannot do `bind:value={undefined}` when `value` has a fallback value")
+    // https://svelte.dev/e/props_invalid_value)
+    let tab: TDatasetValue | null = $state(null);
 
     const iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
     const zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
