@@ -5,22 +5,27 @@
         <h2 class="task-ref">
             <a href="{{ task.get_absolute_url }}">
                 <span class="id-main">{{ task }}</span>
-                <span class="id-suffix">{{ task.id }}</span>
+                {% comment %} <span class="id-suffix">{{ task.id }}</span> {% endcomment %}
             </a>
         </h2>
         {% if app_name != "datasets" and not filter and task.dataset %}
-            <p>└ dataset
-                <a href="{% url url_prefix|add:'list_perdataset' task.dataset.pk %}">
+            <p class="flex-vcentered">
+                <span class="pr-1">└ dataset</span>
+                <a class="pr-1" href="{% url url_prefix|add:'list_perdataset' task.dataset.pk %}">
                     <span class="id-main">{{ task.dataset.name }}</span>
-                    <span class="id-suffix">{{ task.dataset.id }}</span>
+                    {% comment %} <span class="id-suffix">{{ task.dataset.id }}</span> {% endcomment %}
+                </a>
+                <a class="pr-1 flex-centered flex-inline" href="{% url 'datasets:view' pk=task.dataset.id %}">
+                    <span class="iconify" data-icon="mdi:eye" alt="View dataset"/>
                 </a>
             </p>
         {% endif %}
         {% for saved_task in task.task.all %}
-            <p>└ manual clustering
-                <a href="{{ task.get_absolute_url }}">
+            <p class="flex-vcentered">
+                <span class="pr-1">└ manual clustering</span>
+                <a class="pr-1" href="{{ task.get_absolute_url }}">
                     <span class="id-main">{{ task.name }}</span>
-                    <span class="id-suffix">{{ task.id }}</span>
+                    {% comment %} <span class="id-suffix">{{ task.id }}</span> {% endcomment %}
                 </a>
             </p>
         {% endfor %}

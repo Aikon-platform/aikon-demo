@@ -282,6 +282,12 @@ input.button:hover,
     align-items: center;
 }
 
+// combine with the above `.flex-(centered|hcenterd|vcentered)`
+// to have inline flex alignment
+.flex-inline {
+    display: inline-flex
+}
+
 .is-top {
     z-index: 1000;
 }
@@ -451,7 +457,7 @@ ul.messages {
     margin: 0 auto;
     .row {
         background-color: color.adjust($bg-color, $lightness: 5%);
-        margin: 0.5em 0;
+        margin: 0.75em 0;
         position: relative;
         display: flex;
         justify-content: space-between;
