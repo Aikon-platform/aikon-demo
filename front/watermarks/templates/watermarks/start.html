@@ -13,7 +13,7 @@
     <form action="" method="post" enctype="multipart/form-data">
         <div id="task_form">
             {% block form_content %}
-                {% include "tasking/task_form.html" %}
+                {% include "tasking/task_form.html" with use_svelte=False %}
             {% endblock %}
         </div>
 

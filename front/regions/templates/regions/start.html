@@ -1,7 +1,7 @@
 {% extends "tasking/start.html" %}
 
 {% block form_content %}
-    {% include "demowebsite/dataset_baseform.html" with excluded_fields="squarify,h_margin,v_margin,metadata" %}
+    {% include "demowebsite/dataset_baseform.html" with use_svelte=True excluded_fields="squarify,h_margin,v_margin,metadata" %}
 
     <div class="mt-5">
         <h3 class="title mb-2">Post-processing</h4>

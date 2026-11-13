@@ -7,6 +7,7 @@ import SimilarityApp from "./SimilarityApp/components/SimilarityApp.svelte";
 import ImageGenericList from "./shared/components/ImageGenericList.svelte";
 import type { TImageInfo } from "./shared/types";
 import DatasetImageBrowser from "./DatasetApp/components/DatasetImageBrowser.svelte";
+import DatasetComposeForm from "./DatasetApp/components/DatasetComposeForm.svelte";
 import type { TDatasetFormatType, TDjangoDatasetInterface } from "./DatasetApp/types";
 import SearchResults from "./SimilarityApp/components/SearchResults.svelte";
 import { initWatermarksForm } from "./WatermarksApp/form";
@@ -14,6 +15,7 @@ import HomeView from "./HomeApp/components/HomeView.svelte"
 import AlignmentApp from "./AlignmentApp/components/AlignmentApp.svelte";
 
 import "../sass/main.scss";
+import { textChangeRangeIsUnchanged } from "typescript";
 
 function initHomeApp(targetRoot: HTMLElement) {
     mount(HomeView, {
@@ -147,6 +149,21 @@ function initDatasetImageBrowser(
     });
 }
 
+
+function initDatasetComposeForm(
+    target_root: HTMLElement,
+    form: HTMLElement,
+    ready: boolean,
+) {
+    mount(DatasetComposeForm, {
+        target: target_root,
+        props: {
+            form,
+            ready
+        }
+    })
+}
+
 /**
  * Mount the alignment app in the given target root.
  * @param target_root the root element to mount the alignment app in
@@ -171,7 +188,8 @@ function initAlignmentApp(
     initSimilarityApp,
     initImageGenericList,
     initDatasetImageBrowser,
+    initDatasetComposeForm,
     initSearchResults,
     initWatermarksForm,
-    initAlignmentApp
+    initAlignmentApp,
 };

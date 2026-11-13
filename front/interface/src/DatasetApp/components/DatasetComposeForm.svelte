@@ -203,8 +203,8 @@
         </Toggle.Root>
     </div>
     {#if dataset_reuse_value}
-        <div class="is-flex is-flex-direction-column is-align-items-start">
-            <div class="m-1">
+        <div class="dataset-reuse-select is-flex is-flex-direction-column is-align-items-start">
+            <div class="select-wrapper mx-1 mb-1">
                 <div class="select">
                     <select bind:value={dataset_reuse_target_value}>
                         <option value="">Use dataset from</option>

@@ -83,6 +83,16 @@
     }
 }
 
+// .old-dataset-field {
+//     max-width: 75%;
+// }
+
+.dataset-form-hidden, .dataset-form-hidden * {
+    visibility: collapse;
+    height: 0;
+    width: 0;
+}
+
 .dataset-compose-form {
     [data-tabs-trigger] {
         border-radius: 5px;
@@ -120,6 +130,10 @@
         right: 0;
         z-index: 10;
 
+        button {
+            margin-top: 0;
+        }
+
         [data-toggle-root] {
             border-radius: var(--bulma-radius);
             border: 1px solid var(--bulma-text-soft);
@@ -132,6 +146,13 @@
                 font-weight: bold;
                 background-color: hsl(var(--bulma-light-h), var(--bulma-light-s), var(--bulma-light-l)) !important;
             }
+        }
+    }
+
+    .dataset-reuse-select {
+        max-width: 70%;
+        .select-wrapper {
+            width: 100%;
         }
     }
 }
