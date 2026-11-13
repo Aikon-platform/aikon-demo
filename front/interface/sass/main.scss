@@ -505,6 +505,14 @@ ul.messages {
     .row:hover {
         box-shadow: 5px 5px 0px $secondary-color;
     }
+
+    .preview-image {
+        border-radius: $border-radius;
+        border: $border-thin;
+        img {
+            min-height: 100%;
+        }
+    }
 }
 
 .status {

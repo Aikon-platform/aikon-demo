@@ -250,6 +250,7 @@ class Dataset(AbstractDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._images = None
+        self._preview_image = None
 
     def __str__(self) -> str:
         return f"{self.name} #{self.id}" if self.name else f"Dataset #{self.id}"
@@ -351,6 +352,14 @@ class Dataset(AbstractDataset):
         """
         return sum(len(doc.images) for doc in self.documents)
 
+    @property
+    def preview_image(self) -> Image | None:
+        if not self._preview_image:
+            images = self.get_images()
+            if len(images):
+                self._preview_image = images[0]
+        return self._preview_image
+
     def documents_for_api(self) -> List[Dict]:
         def update_url(d: dict) -> dict:
             d["src"] = rewrite_front_url_for_api(d["src"])
@@ -409,7 +418,7 @@ class Dataset(AbstractDataset):
         }
         self.download_from_api(need_extraction)
 
-    def get_images(self) -> List[Document]:
+    def get_images(self) -> List[Image]:
         """
         Check if images have been extracted, download and extract if needed
         """

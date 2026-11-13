@@ -21,11 +21,22 @@
 
             {% for dataset in object_list %}
                 <div class="row columns">
-                    <div class="column task-ref is-9 p">
+                    {% if dataset.preview_image %}
+                        <div class="column image is-square preview-image">
+                            <img src="{{dataset.preview_image.url}}"
+                                alt="Preview image for the dataset"
+                            >
+                        </div>
+                    {% endif %}
+                    <div class="column task-ref is-9 p pl-2">
                         <h2 class="task-ref">
                             <a href="{% url 'datasets:view' dataset.pk %}">
-                                <span class="id-main">{{ dataset }}</span>
-                                <span class="id-suffix">{{ dataset.id }}</span>
+                                <span class="id-main">
+                                    {% if dataset.name %}{{ dataset.name }}
+                                    {% else %}{{ dataset.id }}
+                                    {% endif %}
+                                </span>
+                                {% comment %} <span class="id-suffix">{{ dataset.id }}</span> {% endcomment %}
                             </a>
                         </h2>
                     </div>
