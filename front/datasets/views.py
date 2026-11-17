@@ -119,6 +119,6 @@ class DatasetRegionsView(DatasetMixin, DetailView):
         self.object = self.get_object()
         regions = Regions.objects.filter(Q(dataset=self.object))
         if regions:
-            regions = [{str(r.id): str(r)} for r in regions]
+            regions = [{"id": str(r.id), "name": str(r)} for r in regions]
             return JsonResponse(regions, safe=False)
         return JsonResponse([], safe=False)
