@@ -120,6 +120,32 @@
         }
     }
 
+    // "Use crops from..."
+    const dataset_crops_field = form.querySelector("#id_crops") as HTMLSelectElement;
+    let datasetCropsOptions: {id?: string, name: string}[] = $state([]);
+    let selectedDatasetCrops = $state();
+    console.log("dataset_crops_field", dataset_crops_field);
+
+    async function fetchCropsForDataset(datasetId?: string) {
+        // reset state
+        datasetCropsOptions = [];
+        selectedDatasetCrops = undefined;
+        // fetch and update state
+        if (datasetId) {
+            const r = await fetch(`${window.location.origin}/datasets/${datasetId}/regions`);
+            if (r.ok) {
+                datasetCropsOptions = await r.json()
+            }
+        }
+    }
+    $effect(() => {
+        selectedDatasetCrops;
+        //if (selectedDatasetCrops) {
+            console.log("omg hiiii", selectedDatasetCrops);
+            dataset_crops_field.value = selectedDatasetCrops;
+        //}
+    })
+
     function onTabChange(value: string):TDatasetValue {
         value = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value);
         switch_field.value = value == "images" ? "zip" : value;
@@ -133,6 +159,7 @@
 
     $effect(() => {
         dataset_reuse_target_field.value = dataset_reuse_target_value;
+        fetchCropsForDataset(dataset_reuse_target_value);
     });
 
     $effect(() => {
@@ -216,6 +243,21 @@
                     </select>
                 </div>
             </div>
+            {#if datasetCropsOptions.length}
+                <div class="m-1">
+                    <label for="dataset_crops_select">Use crops from...</label>
+                    <div class="select-wrapper">
+                        <div class="select">
+                            <select id="dataset_crops_select" bind:value={selectedDatasetCrops}>
+                                <option value="" selected>--------</option>
+                                {#each datasetCropsOptions as option}
+                                    <option value={option.id}>{option.name}</option>
+                                {/each}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            {/if}
             <div class="m-1">
                 <a class="button"
                     style={dataset_reuse_target_value ? '' : "cursor: not-allowed; opacity: 0.5"}
