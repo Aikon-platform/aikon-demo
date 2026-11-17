@@ -355,9 +355,16 @@ class Dataset(AbstractDataset):
     @property
     def preview_image(self) -> Image | None:
         if not self._preview_image:
-            images = self.get_images()
-            if len(images):
-                self._preview_image = images[0]
+            try:
+                images = self.get_images()
+                if len(images):
+                    self._preview_image = images[0]
+            except requests.exceptions.HTTPError as e:
+                # when running a task, if a dataset download fails,
+                # then the dataset is created but empty. in that case,
+                # `self.get_images` will fail as well
+                # => no preview image will be displayed.
+                print(f"Could not get images for dataset {self.id}:", e)
         return self._preview_image
 
     def documents_for_api(self) -> List[Dict]:

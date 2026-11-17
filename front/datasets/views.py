@@ -5,6 +5,7 @@ from django.db.models.query import QuerySet
 from django.views.generic import ListView, DetailView, UpdateView
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.http import JsonResponse
 
 from tasking.views import LoginRequiredIfConfProtectedMixin, TaskMixin
 from .forms import DatasetForm, DatasetUpdateForm
@@ -104,3 +105,20 @@ class DatasetUpdateView(DatasetMixin, LoginRequiredIfConfProtectedMixin, UpdateV
 
     template_name = "datasets/update_form.html"
     form_class = DatasetUpdateForm
+
+
+class DatasetRegionsView(DatasetMixin, DetailView):
+    """
+    fetch info on regions corresponding to a dataset
+    """
+
+    def get(self, request, pk: str):
+        from regions.models import Regions
+        from django.db.models import Q
+
+        self.object = self.get_object()
+        regions = Regions.objects.filter(Q(dataset=self.object))
+        if regions:
+            regions = [{str(r.id): str(r)} for r in regions]
+            return JsonResponse(regions, safe=False)
+        return JsonResponse([], safe=False)
