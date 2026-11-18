@@ -38,6 +38,13 @@
     // https://svelte.dev/e/props_invalid_value)
     let tab: TDatasetValue | null = $state(null);
 
+    // set dataset name (no URL binding)
+    const dataset_name_field = form.querySelector("#id_dataset_name") as HTMLInputElement
+    let datasetName = $state("");
+    $effect(() => {
+        dataset_name_field.value = datasetName;
+    })
+
     const iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
     const zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
     const pdf_field = form.querySelector("#id_pdf_file") as HTMLInputElement;
@@ -192,6 +199,7 @@
         }}
         class="has-background-light"
     >
+
         <div class="top-notification notification py-3 px-4">
             <span class="iconify" data-icon="mdi:info-outline"></span> You can drag and drop files
             here
@@ -199,6 +207,15 @@
         {#if dragover}
             <div class="notification dropper is-info is-overlay">Drop files here</div>
         {/if}
+
+        <div class="mx-0 mb-2">
+            <label for="dataset-name">Dataset name</label>
+            <input
+                class="input"
+                type="text"
+                bind:value={datasetName}
+            >
+        </div>
         <Tabs.Root bind:value={tab} onValueChange={onTabChange}>
             <Tabs.List class="columns gap-2">
                 <div class="column is-3">
