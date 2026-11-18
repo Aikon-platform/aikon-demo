@@ -14,6 +14,7 @@
 
 
     // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // - problem if dataset was uploaded, regions were launched but images were not found.
     // - URL binding for datasetCropsField
     // - URL binding for datasetReuseTargetField
     // - block crops (for watermarks: disallow running the experiment on crops)
@@ -23,14 +24,15 @@
             ? Array.from(datasetCropsField.querySelectorAll("option")).map(el => el.getAttribute("value"))
             : [];
     let datasetCropsOptions: {id?: string, name: string}[] = $state([]);
-    let selectedDatasetCrops = $state();
+    let selectedDatasetCrops: string = $state("");
     console.log("datasetCropsField", datasetCropsField);
+    console.log("allowedDatasetCropsValues", allowedDatasetCropsValues);
 
     // fetch all crops (region extractions) for a given dataset ID
     async function fetchCropsForDataset(datasetId?: string) {
         // reset state
         datasetCropsOptions = [];
-        selectedDatasetCrops = undefined;
+        selectedDatasetCrops = "";
         // fetch and update state
         if (datasetId) {
             const r = await fetch(`${window.location.origin}/datasets/${datasetId}/regions`);
@@ -42,9 +44,12 @@
 
     // selectedDatasetCrops is set => crops are selected
     $effect(() => {
-        console.log("omg hiiii", selectedDatasetCrops);
+        console.log("1: omg hiiii", selectedDatasetCrops);
         if (datasetCropsField) {
-            datasetCropsField.value = selectedDatasetCrops as string;
+            if (allowedDatasetCropsValues.includes(selectedDatasetCrops)) {
+                console.log("2: found", selectedDatasetCrops)
+                datasetCropsField.value = selectedDatasetCrops as string;
+            }
         }
     })
 
@@ -58,10 +63,7 @@
     });
 
     onMount(() => {
-        if (datasetCropsField) {
-            const options =
-            console.log("options", options);
-        }
+
     })
 
 </script>
