@@ -5,9 +5,11 @@
         // django form we are updating
         form: HTMLElement;
         // enough data has been supplied to validate the form.
-        reuseFormReady: boolean;
+        readyReuse: boolean;
     }
-    let { form, reuseFormReady = $bindable() }: Props = $props();
+    let { form, readyReuse = $bindable() }: Props = $props();
+
+    // TODO reset URL params when quitting the component
 
     // URL-binding for both parameters
     const urlSearchParams = new URLSearchParams(window.location.search);
@@ -85,7 +87,7 @@
     // selectedDataset is set => a dataset is selected
     $effect(() => {
         datasetReuseTargetField.value = selectedDataset;
-        reuseFormReady = selectedDataset != null;
+        readyReuse = selectedDataset != null;
         updateUrlSearchParamsDataset(selectedDataset);
         if (datasetCropsField) {
             fetchCropsForDataset(selectedDataset);
