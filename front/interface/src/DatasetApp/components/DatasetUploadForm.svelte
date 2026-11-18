@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { Tabs } from "bits-ui";
     import JSZip from "jszip";
 
@@ -22,6 +22,9 @@
     }
     let { form, readyUpload = $bindable() }: Props = $props();
     const form_id = $props.id();
+
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const paramNameDatasetType = "dataset_type"
 
     // `switch_field` represents the internal state sent to Django
     // `tab` represents the user-exposed / svelte side data
@@ -107,7 +110,7 @@
     }
 
     function onTabChange(value: string):TDatasetValue {
-        value = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value);
+        value = updateUrlSearchParams(enforceSwitchFieldValue, paramNameDatasetType, value);
         switch_field.value = value == "images" ? "zip" : value;
         return value as TDatasetValue;
     }
@@ -121,8 +124,7 @@
     })
 
     onMount(() => {
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        const urlDatasetType = urlSearchParams.get("dataset_type");
+        const urlDatasetType = urlSearchParams.get(paramNameDatasetType);
 
         // if `dataset_type` is defined in the URL, use it to set `tab`. otherwise, tab is set using a default.
         // implicitly, `switch_field.value` is also updated.
@@ -166,6 +168,11 @@
             parent_html_form.onsubmit = null;
         };
 
+    })
+
+    // reset value of URL-bound params before unmounting
+    onDestroy(() => {
+        updateUrlSearchParams(undefined, paramNameDatasetType, "");
     })
 
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import IIIFURLItem from "./IIIFURLItem.svelte";
     import { updateUrlSearchParams, isValidHttpUrl, isString } from "../../shared/utils";
 
@@ -130,6 +130,11 @@
         value = JSON.parse(field.value);
         readFromUrlParam();
     });
+
+    // reset params to avoid incoherent state
+    onDestroy(() => {
+        updateUrlSearchParams(undefined, paramName, "");
+    })
 </script>
 
 <div>

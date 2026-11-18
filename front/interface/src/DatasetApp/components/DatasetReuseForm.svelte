@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onDestroy } from "svelte";
     import { updateUrlSearchParams, isString, unquote } from "../../shared/utils";
 
     /**
@@ -100,6 +100,11 @@
             fetchCropsForDataset(selectedDataset);
         }
     });
+
+    // reset URL params
+    onDestroy(() => {
+        [paramNameCrops, paramNameDataset].forEach(paramName => _updateUrlSearchParams(paramName)(""));
+    })
 
 </script>
 
