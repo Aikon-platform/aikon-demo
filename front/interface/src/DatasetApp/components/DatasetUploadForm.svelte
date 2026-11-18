@@ -1,13 +1,17 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Tabs, Toggle } from "bits-ui";
+    import { Tabs } from "bits-ui";
     import JSZip from "jszip";
-    import Icon from "@iconify/svelte";
 
     import IIIFURLListInput from "./IIIFURLListInput.svelte";
     import { preprocessImage } from "../imageHelpers";
     import IconBtn from "../../shared/components/IconBtn.svelte";
-    import { enforceValue, enforceBooleanValue, unquote, updateUrlSearchParams, maybeBooleanToBoolean } from "../../shared/utils";
+    import { enforceValue, unquote, updateUrlSearchParams } from "../../shared/utils";
+
+    /**
+     * NOTE URL-bound params are:
+     * - "dataset_type": TDatasetValue. has no effect if dataset_reuse=true"
+     */
 
     type TDatasetValue = "zip"|"iiif"|"pdf"|"images";
     const EMPTY_FILE = "No file selected";

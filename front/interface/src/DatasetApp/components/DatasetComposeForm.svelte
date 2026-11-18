@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Tabs, Toggle } from "bits-ui";
-    import JSZip from "jszip";
+    import { Toggle } from "bits-ui";
     import Icon from "@iconify/svelte";
 
     import DatasetReuseForm from "./DatasetReuseForm.svelte";
@@ -10,9 +9,7 @@
 
     /**
      * NOTE URL-bound parameters are:
-     * - "dataset_type": TDatasetValue. has no effect if dataset_reuse=true
      * - "dataset_reuse": boolean
-     *
      */
 
     interface Props {
@@ -25,7 +22,12 @@
         // DatasetUploadForm is ready
         readyUpload: boolean;
     }
-    let { form, ready = $bindable(), readyReuse = $bindable(), readyUpload = $bindable() }: Props = $props();
+    let {
+        form,
+        ready = $bindable(),
+        readyReuse = $bindable(),
+        readyUpload = $bindable()
+    }: Props = $props();
 
     $effect(() => {
         ready = readyReuse || readyUpload;

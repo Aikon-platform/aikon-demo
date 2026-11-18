@@ -1,5 +1,12 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { updateUrlSearchParams, isString, unquote } from "../../shared/utils";
+
+    /**
+     * NOTE URL-bound parameters are:
+     * - "id_dataset": string: ID of the selected dataset on which to run the task
+     * - "id_crops": string: ID of the selected Region Extraction on which to run the task
+     */
 
     interface Props {
         // django form we are updating
