@@ -1,0 +1,65 @@
+{% extends "demowebsite/base.html" %}
+{% load static %}
+
+{% block title %}About{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<div class="centerwrap">
+    <h1 class="mt-5 title">About <span class="font-logo">AIKON-demo</span></h1>
+    <p>AIKON-demo is a platform to run computer vision experiments on user-defined datasets.
+        It is tailored to historical document analysis and offers state of the art algorithms for
+        region extraction (image, diagram or text detection), similarity retrieval, watermark
+        detection and image clustering.
+    </p>
+
+    <p>Once you have selected the experiment to run, AIKON-demo has a <b>3-step workflow</b>:</p>
+
+    <ol>
+        <li><b>Pick a dataset</b>, or upload a new one</li>
+        <li><b>Configure the experiment</b> (which algorithm and parameters)</li>
+        <li>Run the experiment and <b>visualize results</b></li>
+    </ol>
+
+    <p>AIKON-demo is developped cojointly with the <a href="https://aikon-platform.github.io/">AIKON platform</a>,
+        which offers research projects a collaborative environment for historical corpora management, computer
+        vision and document analysis.</p>
+
+    <p>If you enjoy the project, you can cite our work:</p>
+    <blockquote><p>
+        Albouy, S., Norindr, S., Kervegan, P. et al.
+        AIKON: a modular computer vision platform for historical corpora.
+        <i>IJDAR</i> 29, 801–814 (2026). <a href="https://doi.org/10.1007/s10032-026-00581-x">https://doi.org/10.1007/s10032-026-00581-x</a>
+    </p></blockquote>
+    <pre>{% verbatim %}@article{albouy2026aikon,
+    title={{AIKON : A Modular Computer Vision Platform for Historical Corpora}},
+    author={
+        Albouy, Ségolène and
+        Norindr, Somkeo and
+        Kervegan, Paul and
+        Aouinti, Fouad and
+        Delanaux, Rémy and
+        Champenois, Robin and
+        Grometto, Clara and
+        Lazaris, Stavros and
+        Guilbaud, Alexandre and
+        Husson, Matthieu and
+        Aubry, Mathieu
+    },
+    url={https://doi.org/10.1007/s10032-026-00581-x},
+    year={2026},
+    month={June},
+    journal={International Journal on Document Analysis and Recognition (IJDAR)},
+    keyword={Digital Humanities, Computer Vision, Historical Documents, Visual Analysis},
+}{% endverbatim  %}</pre>
+
+    <p>AIKON-demo is developped at the École nationale des Ponts et chaussées's <a href="https://imagine-lab.enpc.fr/">IMAGINE lab</a>
+        as part of the <a href="https://erc-discover.github.io/">ERC project DISCOVER</a> funded by the European Union’s Horizon
+        Europe Research and Innovation program under grant agreement No. 101076028.
+    </p>
+</div>
+{% endblock %}

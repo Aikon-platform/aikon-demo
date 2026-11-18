@@ -47,7 +47,7 @@
 
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">
-                    Demos
+                    Experiments
                 </a>
 
                 <div class="navbar-dropdown">
@@ -82,6 +82,10 @@
         </div>
 
         <div class="navbar-end mr-3">
+            <a href="{% url "about" %}" title="About" class="navbar-item">
+                <span class=""></span> <span>About</span>
+            </a>
+
             <div class="navbar-item">
                 {% if request.user.is_authenticated %}
                     <div class="buttons">
