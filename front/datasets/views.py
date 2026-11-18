@@ -117,7 +117,7 @@ class DatasetRegionsView(DatasetMixin, DetailView):
         from django.db.models import Q
 
         self.object = self.get_object()
-        regions = Regions.objects.filter(Q(dataset=self.object))
+        regions = Regions.objects.filter(Q(dataset=self.object) & Q(status="SUCCESS"))
         if regions:
             regions = [{"id": str(r.id), "name": str(r)} for r in regions]
             return JsonResponse(regions, safe=False)
