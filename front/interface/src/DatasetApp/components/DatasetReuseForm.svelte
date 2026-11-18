@@ -1,15 +1,13 @@
 <script lang="ts">
-    import { onMount } from "svelte";
     import { updateUrlSearchParams, isString, unquote } from "../../shared/utils";
 
     interface Props {
+        // django form we are updating
         form: HTMLElement;
+        // enough data has been supplied to validate the form.
         reuseFormReady: boolean;
     }
     let { form, reuseFormReady = $bindable() }: Props = $props();
-
-    // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // - in the Django form, unset dataset value when crops are selected (but don't touch the svelte values)
 
     // URL-binding for both parameters
     const urlSearchParams = new URLSearchParams(window.location.search);
@@ -26,6 +24,7 @@
 
     // dataset selection
     const datasetReuseTargetField = form.querySelector("#id_dataset") as HTMLInputElement;
+    // currently selected dataset.
     let selectedDataset = $state(unquote(urlSearchParams.get(paramNameDataset)) || datasetReuseTargetField.value);
 
     // crops selection.
@@ -39,10 +38,10 @@
             : [];
     // updated by `fetchCropsForDataset`: list of available crops for the currently selected dataset
     let datasetCropsOptions: {id: string|null, name: string}[] = $state([]);
-    // currently selected crops. on mount, updated in `fetchCropsForDataset`
-    let selectedCrops: string = $state("");
     // dirty crops ID read from URL. validated when `fetchCropsForDataset` is first run.
     let cropsIdFromUrl: string|null = unquote(urlSearchParams.get(paramNameCrops)) || "";
+    // currently selected crops. on mount, updated in `fetchCropsForDataset`
+    let selectedCrops: string = $state("");
 
     // fetch all crops (region extractions) for a given dataset ID
     async function fetchCropsForDataset(datasetId?: string) {
@@ -67,12 +66,18 @@
 
     // selectedCrops is set => crops are selected and URL is updated
     $effect(() => {
-        console.log("1: omg hiiii", selectedCrops);
         if (datasetCropsField) {
             if (allowedDatasetCropsValues.includes(selectedCrops)) {
-                console.log("2: found", selectedCrops)
                 datasetCropsField.value = selectedCrops as string;
-                updateUrlSearchParamsCrops(selectedCrops)
+                updateUrlSearchParamsCrops(selectedCrops);
+                if (selectedCrops.length) {
+                    // the Django form expects datasetReuseTargetField OR datasetCropsField to be defined, not both
+                    // => unset datasetReuseTargetField when crops are selected. only affects the Django form, the svelte.
+                    datasetReuseTargetField.value = "";
+                } else {
+                    // if unselecting crops, re-select the dataset in the Django form.
+                    datasetReuseTargetField.value = selectedDataset;
+                }
             }
         }
     })
@@ -126,13 +131,15 @@
                 <span class="iconify iconify--mdi" data-icon="mdi:eye"></span>
                 View dataset
             </a>
-            <a class="button"
-                style={selectedCrops ? '' : "cursor: not-allowed; opacity: 0.5"}
-                href={selectedCrops ? `/regions/${selectedCrops}` : undefined}
-            >
-                <span class="iconify iconify--mdi" data-icon="mdi:eye"></span>
-                View crops
-            </a>
+            {#if datasetCropsField}
+                <a class="button"
+                    style={selectedCrops ? '' : "cursor: not-allowed; opacity: 0.5"}
+                    href={selectedCrops ? `/regions/${selectedCrops}` : undefined}
+                >
+                    <span class="iconify iconify--mdi" data-icon="mdi:eye"></span>
+                    View crops
+                </a>
+            {/if}
         </div>
     </div>
 </div>
