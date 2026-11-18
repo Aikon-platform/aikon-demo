@@ -4,6 +4,7 @@
     import JSZip from "jszip";
     import Icon from "@iconify/svelte";
 
+    import DatasetReuseForm from "./DatasetReuseForm.svelte";
     import IIIFURLListInput from "./IIIFURLListInput.svelte";
     import { preprocessImage } from "../imageHelpers";
     import IconBtn from "../../shared/components/IconBtn.svelte";
@@ -27,8 +28,10 @@
     let { form, ready = $bindable() }: Props = $props();
     const form_id = $props.id();
 
+    // DatsetReuseForm is ready
+    let reuseFormReady: boolean = $state(false);
+
     const dataset_reuse_field = form.querySelector("#id_reuse_dataset") as HTMLInputElement;
-    const dataset_reuse_target_field = form.querySelector("#id_dataset") as HTMLInputElement;
 
     // `switch_field` represents the internal state sent to Django
     // `tab` represents the user-exposed / svelte side data
@@ -50,8 +53,6 @@
     // checkbox: reuse existing dataset.
     let dataset_reuse_value = $state(dataset_reuse_field.checked);
     const defaultDatasetReuse = false;
-    // which dataset to reuse
-    let dataset_reuse_target_value = $state(dataset_reuse_target_field.value);
 
     let iiif_value = $state<string[][]>([]);
     let zip_file_name = $state(EMPTY_FILE);
@@ -120,32 +121,6 @@
         }
     }
 
-    // "Use crops from..."
-    const dataset_crops_field = form.querySelector("#id_crops") as HTMLSelectElement;
-    let datasetCropsOptions: {id?: string, name: string}[] = $state([]);
-    let selectedDatasetCrops = $state();
-    console.log("dataset_crops_field", dataset_crops_field);
-
-    async function fetchCropsForDataset(datasetId?: string) {
-        // reset state
-        datasetCropsOptions = [];
-        selectedDatasetCrops = undefined;
-        // fetch and update state
-        if (datasetId) {
-            const r = await fetch(`${window.location.origin}/datasets/${datasetId}/regions`);
-            if (r.ok) {
-                datasetCropsOptions = await r.json()
-            }
-        }
-    }
-    $effect(() => {
-        selectedDatasetCrops;
-        //if (selectedDatasetCrops) {
-            console.log("omg hiiii", selectedDatasetCrops);
-            dataset_crops_field.value = selectedDatasetCrops;
-        //}
-    })
-
     function onTabChange(value: string):TDatasetValue {
         value = updateUrlSearchParams(enforceSwitchFieldValue, "dataset_type", value);
         switch_field.value = value == "images" ? "zip" : value;
@@ -157,13 +132,9 @@
         updateUrlSearchParams(enforceDatasetReuseValue, "dataset_reuse", value);
     }
 
+    // TODO outdated reference to dataset_reuse_target_value here
     $effect(() => {
-        dataset_reuse_target_field.value = dataset_reuse_target_value;
-        fetchCropsForDataset(dataset_reuse_target_value);
-    });
-
-    $effect(() => {
-        ready = dataset_reuse_value ? dataset_reuse_target_value != "" :
+        ready = dataset_reuse_value ? reuseFormReady :
             (tab == "images" && image_files.length > 0) ||
             (tab == "zip" && zip_file_name !== EMPTY_FILE) ||
             (tab == "iiif" && iiif_value.length > 0) ||
@@ -230,44 +201,7 @@
         </Toggle.Root>
     </div>
     {#if dataset_reuse_value}
-        <div class="dataset-reuse-select is-flex is-flex-direction-column is-align-items-start">
-            <div class="select-wrapper mx-1 mb-1">
-                <div class="select">
-                    <select bind:value={dataset_reuse_target_value}>
-                        <option value="">Use dataset from</option>
-                        {#each dataset_reuse_target_field.children as option}
-                            {#if option instanceof HTMLOptionElement && option.value != ""}
-                                <option value={option.value}>{option.text}</option>
-                            {/if}
-                        {/each}
-                    </select>
-                </div>
-            </div>
-            {#if datasetCropsOptions.length}
-                <div class="m-1">
-                    <label for="dataset_crops_select">Use crops from...</label>
-                    <div class="select-wrapper">
-                        <div class="select">
-                            <select id="dataset_crops_select" bind:value={selectedDatasetCrops}>
-                                <option value="" selected>--------</option>
-                                {#each datasetCropsOptions as option}
-                                    <option value={option.id}>{option.name}</option>
-                                {/each}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            {/if}
-            <div class="m-1">
-                <a class="button"
-                    style={dataset_reuse_target_value ? '' : "cursor: not-allowed; opacity: 0.5"}
-                    href={dataset_reuse_target_value ? `/datasets/${dataset_reuse_target_value}/view` : undefined}
-                >
-                    <span class="iconify iconify--mdi" data-icon="mdi:eye"></span>
-                    View dataset
-                </a>
-            </div>
-        </div>
+        <DatasetReuseForm form={form} bind:reuseFormReady={reuseFormReady}></DatasetReuseForm>
     {:else}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div

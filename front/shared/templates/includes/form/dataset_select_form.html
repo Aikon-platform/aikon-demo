@@ -1,7 +1,8 @@
 {% load shared_tags %}
 
-<div class="dataset-form {% if use_svelte is True %}dataset-form-hidden{% endif %}">
-    <h3 class="title mb-2">{{ dataset_label|default:"Dataset" }}</h3>
+{% comment %} <div class="dataset-form {% if use_svelte is True %}dataset-form-hidden{% endif %}"> {% endcomment %}
+<div class="dataset-form">
+        <h3 class="title mb-2">{{ dataset_label|default:"Dataset" }}</h3>
     <span id="crop-help" class="help">Select either a dataset or crops.</span>
 
     {% include "includes/form/field_group.html" with included_fields="reuse_dataset" %}
@@ -31,6 +32,7 @@
         const datasetSelect = document.getElementById("id_dataset");
 
         const is_crops = Boolean(document.getElementById("id_crops"));
+        console.log("is_crops", is_crops);
 
         function toggleFormatField() {
             const selectedFormat = formatSelect.value;
@@ -75,6 +77,7 @@
                 newDataset.forEach(div => { div.style.display = "none";});
                 existingDataset.forEach(div => { div.style.display = "block";});
                 if (is_crops) {
+                    console.log(document.querySelector("#id_crops").value)
                     reuseHelp.style.display = "block";
                 }
             } else {
