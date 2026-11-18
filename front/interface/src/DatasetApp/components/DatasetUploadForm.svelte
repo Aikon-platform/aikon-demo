@@ -26,6 +26,13 @@
     const urlSearchParams = new URLSearchParams(window.location.search);
     const paramNameDatasetType = "dataset_type"
 
+    // set dataset name (no URL binding)
+    const dataset_name_field = form.querySelector("#id_dataset_name") as HTMLInputElement
+    let datasetName = $state("");
+    $effect(() => {
+        dataset_name_field.value = datasetName;
+    })
+
     // `switch_field` represents the internal state sent to Django
     // `tab` represents the user-exposed / svelte side data
     // the notable difference is that, if tab==="images", images are zipped in svelte-side
@@ -37,13 +44,6 @@
     // instead of `undefined` to avoid a svelte error ("Cannot do `bind:value={undefined}` when `value` has a fallback value")
     // https://svelte.dev/e/props_invalid_value)
     let tab: TDatasetValue | null = $state(null);
-
-    // set dataset name (no URL binding)
-    const dataset_name_field = form.querySelector("#id_dataset_name") as HTMLInputElement
-    let datasetName = $state("");
-    $effect(() => {
-        dataset_name_field.value = datasetName;
-    })
 
     const iiif_field = form.querySelector("#id_iiif_manifests") as HTMLTextAreaElement;
     const zip_field = form.querySelector("#id_zip_file") as HTMLInputElement;
