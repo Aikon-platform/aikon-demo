@@ -8,27 +8,10 @@
     }
     let { form, reuseFormReady = $bindable() }: Props = $props();
 
-    const datasetReuseTargetField = form.querySelector("#id_dataset") as HTMLInputElement;
-    // which dataset to reuse
-    let selectedDataset = $state(datasetReuseTargetField.value);
-
     // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // - in the Django form, unset dataset value when crops are selected (but don't touch the svelte values)
 
-    // "Use crops from" field in Django form.
-    // in region extractions and datasets, it's impossible to select crops => is null.
-    const datasetCropsField = form.querySelector("#id_crops") as HTMLSelectElement|null;
-    // list of crops available in the django form (empty array if datasetCropsField is undefined)
-    const allowedDatasetCropsValues =
-        datasetCropsField
-            ? Array.from(datasetCropsField.querySelectorAll("option")).map(el => el.getAttribute("value"))
-            : [];
-    // updated by `fetchCropsForDataset`: list of available crops for the currently selected dataset
-    let datasetCropsOptions: {id: string|null, name: string}[] = $state([]);
-    // currently selected crops.`
-    let selectedCrops: string = $state("");
-
-    // URL-binding
+    // URL-binding for both parameters
     const urlSearchParams = new URLSearchParams(window.location.search);
     const paramNameCrops = "crops_id";
     const paramNameDataset = "dataset_id";
@@ -41,6 +24,24 @@
     const updateUrlSearchParamsCrops = _updateUrlSearchParams(paramNameCrops);
     const updateUrlSearchParamsDataset = _updateUrlSearchParams(paramNameDataset);
 
+    // dataset selection
+    const datasetReuseTargetField = form.querySelector("#id_dataset") as HTMLInputElement;
+    let selectedDataset = $state(unquote(urlSearchParams.get(paramNameDataset)) || datasetReuseTargetField.value);
+
+    // crops selection.
+    // in region extractions and datasets, it's impossible to select crops => it is null in those cases.
+    const el = form.querySelector("#id_crops");
+    const datasetCropsField = el instanceof HTMLSelectElement ? el : null;
+    // list of crops available in the django form (empty array if datasetCropsField is undefined)
+    const allowedDatasetCropsValues =
+        datasetCropsField
+            ? Array.from(datasetCropsField.querySelectorAll("option")).map(el => el.getAttribute("value"))
+            : [];
+    // updated by `fetchCropsForDataset`: list of available crops for the currently selected dataset
+    let datasetCropsOptions: {id: string|null, name: string}[] = $state([]);
+    // currently selected crops. on mount, updated in `fetchCropsForDataset`
+    let selectedCrops: string = $state("");
+    // dirty crops ID read from URL. validated when `fetchCropsForDataset` is first run.
     let cropsIdFromUrl: string|null = unquote(urlSearchParams.get(paramNameCrops)) || "";
 
     // fetch all crops (region extractions) for a given dataset ID
@@ -85,13 +86,6 @@
             fetchCropsForDataset(selectedDataset);
         }
     });
-
-    onMount(() => {
-        // set the start value of `selectedDataset` from URL parameters.
-        // will trigger `fetchCropsForDataset`, after which the start value of `selectedCrops`
-        // is set from the URL.
-        selectedDataset = unquote(urlSearchParams.get(paramNameDataset));
-    })
 
 </script>
 
