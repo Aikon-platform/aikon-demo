@@ -211,7 +211,6 @@
                     ? tabBodyEl.classList.remove("is-hidden")
                     : tabBodyEl.classList.add("is-hidden")); },
             onClick = (e) => {
-                console.log("onClick", wrapperId, e.currentTarget)
                 switchActiveTab(e.currentTarget);
                 switchTabBody(e.currentTarget);
             };

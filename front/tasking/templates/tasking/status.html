@@ -148,7 +148,6 @@
             // NOTE: iconify replaces our span #task-details-eye with an SVG dynamically
             // => detailsIcon must be selected here to avoid
             const eyeSvg = document.querySelector("#task-details-eye");
-            console.log(eyeSvg);
             if (eyeSvg) {
                 details.hasAttribute("open")
                     ? eyeSvg.setAttribute("data-icon", "mdi:eye")
