@@ -1,13 +1,12 @@
 {% load shared_tags %}
 
-{% comment %} <div class="dataset-form {% if use_svelte is True %}dataset-form-hidden{% endif %}"> {% endcomment %}
-<div class="dataset-form">
-        <h3 class="title mb-2">{{ dataset_label|default:"Dataset" }}</h3>
+<div class="dataset-form {% if use_svelte is True %}dataset-form-hidden{% endif %}">
+    <h3 class="title mb-2">{{ dataset_label|default:"Dataset" }}</h3>
     <span id="crop-help" class="help">Select either a dataset or crops.</span>
 
     {% include "includes/form/field_group.html" with included_fields="reuse_dataset" %}
 
-    <div class="columns" style="background-color: red">
+    <div class="columns">
         <div class="column">
             {% include "includes/form/field_group.html" with included_fields=dataset_fields|remove_from_list:"reuse_dataset" %}
         </div>
