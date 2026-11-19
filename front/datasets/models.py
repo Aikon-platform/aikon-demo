@@ -20,7 +20,13 @@ from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 
 from shared.utils import pprint, rewrite_api_url_for_front, rewrite_front_url_for_api
-from .utils import PathAndRename, IMG_EXTENSIONS, unzip_on_the_fly, sanitize_str
+from .utils import (
+    PathAndRename,
+    IMG_EXTENSIONS,
+    unzip_on_the_fly,
+    sanitize_str,
+    TreeDict,
+)
 from .fields import URLListModelField
 
 User = get_user_model()
@@ -101,14 +107,11 @@ class Document:
         """
         return self.path / "images"
 
-    def get_document_tree(self) -> str:
-        from .utils import TreeDict
-
-        tree = TreeDict(os.path.join(self.path, "images/"))
-        return tree.to_html_pre()
+    def get_document_tree(self) -> TreeDict:
+        return TreeDict(os.path.join(self.path, "images/"), root=True)
 
     @property
-    def document_tree(self) -> str:
+    def document_tree(self) -> TreeDict:
         if self._document_tree is None:
             self._document_tree = self.get_document_tree()
         return self._document_tree
@@ -351,6 +354,13 @@ class Dataset(AbstractDataset):
         which takes time, while `image_count` is only used in templates
         """
         return sum(len(doc.images) for doc in self.documents)
+
+    @property
+    def folders_count(self) -> int:
+        """get the number of folders in all documents of the current dataset"""
+        return sum(
+            len(document.document_tree.get_folders()) for document in self.documents
+        )
 
     @property
     def preview_image(self) -> Image | None:

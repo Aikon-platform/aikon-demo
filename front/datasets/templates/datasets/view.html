@@ -16,25 +16,37 @@
         </div>
         <div class="column flex-centered">
             <div class="dataset-control-wrapper">
-                <div class="columns">
-                    <span class="column tag status content is-medium m-1" title="Dataset format: {{ dataset.format }}">
+                <div class="columns is-centered">
+                    <span class="column tag status content is-medium m-1 is-one-fifth"
+                        title="Dataset format: {{ dataset.format }}">
                         {{ dataset.format }}
                     </span>
-                    <span class="column tag status content is-medium icon-text m-1"
+                    {% if dataset.documents|length > 1 %}
+                    <span class="column tag status content is-medium icon-text m-1 is-one-fifth"
                           title="{{ dataset.documents|length }} document{% if dataset.documents|length > 1 %}s{% endif %}">
                         <span>{{ dataset.documents|length }}</span>
                         <span class="icon has-text-white">
                             <i class="iconify" data-icon="mdi:file-document-multiple"></i>
                         </span>
                     </span>
-                    <span class="column tag status content is-medium icon-text m-1"
+                    {% endif %}
+                    {% if dataset.folders_count > 0 %}
+                        <span class="column tag status content is-medium icon-text m-1 is-one-fifth"
+                              title="{{ dataset.folders_count }} folder{% if dataset.folders_count > 1 %}s{% endif %}">
+                            <span>{{ dataset.folders_count }}</span>
+                            <span class="icon has-text-white">
+                                <i class="iconify" data-icon="mdi:folder"></i>
+                            </span>
+                        </span>
+                    {% endif %}
+                    <span class="column tag status content is-medium icon-text m-1 is-one-fifth"
                           title="{{ dataset.image_count }} image{% if dataset.image_count > 1 %}s{% endif %}">
                         <span>{{ dataset.image_count }}</span>
                         <span class="icon has-text-white">
                             <i class="iconify" data-icon="mdi:file-image"></i>
                         </span>
                     </span>
-                    <span class="column tag status content is-medium icon-text m-1"
+                    <span class="column tag status content is-medium icon-text m-1 is-one-fifth"
                           title="{{ dataset.tasks|length }} computer vision task{% if dataset.tasks|length > 1 %}s{% endif %}">
                         <span>{{ dataset.tasks|length }}</span>
                         <span class="icon has-text-white">
@@ -85,7 +97,7 @@
             <div id="tab-body-tree" class="tab-body is-hidden">
                 {% for document in dataset.documents %}
                     <h3 class="id-suffix">File structure of document #{{ forloop.counter }}</h3>
-                    <div class="dataset-view-structure">{{ dataset.documents.0.document_tree|safe }}</div>
+                    <div class="dataset-view-structure">{{ dataset.documents.0.document_tree.to_html_pre|safe }}</div>
                 {% endfor %}
             </div>
             <!-- view tasks, containing nested tabs -->
