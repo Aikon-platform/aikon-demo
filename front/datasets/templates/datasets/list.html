@@ -9,7 +9,7 @@
 
         {% include "includes/pagination.html" %}
 
-        <div class="task-list">
+        <div class="object-list">
             <p class="columns">
                 {% can_monitor request.user app_name as is_admin %}
 {#                {% if is_admin %}#}
@@ -21,14 +21,24 @@
 
             {% for dataset in object_list %}
                 <div class="row columns">
-                    <div class="column task-ref is-9 p">
+                    {% if dataset.preview_image %}
+                        <div class="column image is-square preview-image">
+                            <img src="{{dataset.preview_image.url}}"
+                                alt="Preview image for the dataset"
+                            >
+                        </div>
+                    {% endif %}
+                    <div class="column task-ref is-9 p pl-2 is-flex-grow-1">
                         <h2 class="task-ref">
                             <a href="{% url 'datasets:view' dataset.pk %}">
-                                <span class="id-main">{{ dataset }}</span>
-                                <span class="id-suffix">{{ dataset.id }}</span>
+                                <span class="id-main">
+                                    {% if dataset.name %}{{ dataset.name }}
+                                    {% else %}{{ dataset.id }}
+                                    {% endif %}
+                                </span>
+                                {% comment %} <span class="id-suffix">{{ dataset.id }}</span> {% endcomment %}
                             </a>
                         </h2>
-                        {# TODO display tasks that use the dataset #}
                     </div>
                     <div class="column is-1 p-0 is-left is-top">
                         <span class="tag status">{{ dataset.format }}</span>

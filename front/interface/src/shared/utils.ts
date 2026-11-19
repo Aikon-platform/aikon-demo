@@ -76,7 +76,7 @@ export function valueOrDefault(defaultValue: any, resolver: ((value:any)=>boolea
  * update a key-value pair of search parameters, without reloading the page (otherwise, would trigger infinite loop)
  * if `validateValueFunc` is provided, also validate `paramValue`.
  *
- * about using widow.history, see: https://stackoverflow.com/a/70591485
+ * about using window.history, see: https://stackoverflow.com/a/70591485
  *
  * NOTE: value must be JSON-stringifiable
  */

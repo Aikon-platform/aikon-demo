@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import IIIFURLItem from "./IIIFURLItem.svelte";
-    import { enforceValue, enforceBooleanValue, valueOrDefault, updateUrlSearchParams, isValidHttpUrl, isString } from "../../shared/utils";
+    import { updateUrlSearchParams, isValidHttpUrl, isString } from "../../shared/utils";
 
     /**
      * NOTE URL-bound parameters are:
@@ -130,6 +130,11 @@
         value = JSON.parse(field.value);
         readFromUrlParam();
     });
+
+    // reset params to avoid incoherent state
+    onDestroy(() => {
+        updateUrlSearchParams(undefined, paramName, "");
+    })
 </script>
 
 <div>

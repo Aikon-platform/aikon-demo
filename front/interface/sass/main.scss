@@ -1,9 +1,24 @@
 @use "sass:color";
-@use "bulma/sass" with (
-    $scheme-main: hsl(233, 100%, 63%),
-    $success: hsl(84, 74%, 43%)
-);
+@use "fonts" as *;
 @use "variables" as *;
+@use "bulma/sass" with (
+    // https://bulma.io/documentation/customize/list-of-sass-variables/
+    $scheme-main: $main-color,
+    $success: $green,
+    $warning: $yellow,
+    $danger: $red,
+    $link: $main-color,
+
+    $card-background-color: $dark-color,
+    $code-background: $dark-color,
+    $pre-background: $dark-color,
+
+    $family-primary: $family-sans-serif,
+    $family-secondary: $family-secondary,
+    $family-monospace: $family-monospace,
+    $family-sans-serif: $family-sans-serif,
+    $family-code: $family-monospace,
+);
 @use "DatasetApp" as *;
 @use "ClusterApp" as *;
 @use "shared" as *;
@@ -11,21 +26,62 @@
 @use "RegionsApp" as *;
 @use "WatermarksApp" as *;
 @use "AlignmentApp" as *;
+@use "HomeApp" as *;
 
-*,
-*::before,
-*::after {
+/*******************************
+ * global themes
+ *******************************/
+
+ *, *::before, *::after {
     box-sizing: border-box;
 }
 
 body {
     background-color: $bg-color;
-    font:
-        100% Helvetica,
-        sans-serif;
     margin: 0;
     padding: 0;
 }
+
+[data-theme="dark"] {
+    background-color: $dark-color;
+}
+
+/*******************************
+ * font definitions
+ * (as far as possible, font defs are done in `@use bulma/sass` block
+ *******************************/
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title {
+    font-family: $family-secondary !important;
+    font-weight: bold !important;
+}
+
+a,
+.is-family-serif {
+    font-family: $family-secondary;
+}
+
+button a, .button, .pagination-item {
+    font-family: $family-primary;
+}
+
+.font-logo {
+    font-family: 'redaction-pixel';
+}
+
+#nav-title {
+    font-family: 'redaction-pixel';
+}
+
+/*******************************
+ * generic elements
+ *******************************/
 
 h1 {
     color: $main-color !important;
@@ -41,70 +97,16 @@ a {
     text-decoration: none !important;
 }
 
-.wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#nav-icon {
-    max-height: 30px;
-    width: auto;
-    object-fit: contain; /* or object-fit: cover; */
-}
-
-#nav-title {
-    font-family: monospace;
-    font-size: larger;
-}
-
-.content {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.strong {
-    color: var(--bulma-text-strong);
-    font-size: var(--bulma-size-normal);
-    font-weight: var(--bulma-weight-semibold);
-}
-
-.centerwrap {
-    max-width: 900px;
-    width: 100%;
-    margin: 1% auto;/*
-    padding-top: 2em; */
-    padding-top: 0.5em;
-}
-
-.hidden {
-    display: none;
-}
-
 pre {
     max-width: 900px;
     overflow: auto;
     white-space: pre-wrap;
-    background: #333;
-    color: #eee;
     border: 2px solid #ccc;
     padding: 1em;
     text-indent: 0;
-}
 
-.full-log {
-    max-height: 300px;
-    overflow: auto;
-}
-
-.iconify {
-    width: 1em;
-    margin-right: 5px;
-    min-width: 1em;
-    height: 1em;
-    min-height: 1em;
-    display: inline-block;
+    background-color: $dark-color;
+    color: white;
 }
 
 input[type="submit"],
@@ -113,7 +115,7 @@ button:not(.not-button),
 .btn {
     white-space: normal;
     text-align: center;
-    font-family: $headfont;
+    font: 16px $family-primary;
     font-weight: 500;
     border: none;
     padding: 0.6em 0.6em;
@@ -174,31 +176,39 @@ button:not(.not-button),
     }
 }
 
-.text-shadow {
-    text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+/**********************************
+ * general purpose classes
+ **********************************/
+
+// buttons, breadcrumbs & clickable elts behaviour
+// NOTE : it's necessary for this rules to be before the `input`
+button:not(.not-button):hover,
+input.button:hover,
+.button:hover,
+.clickable:hover {
+    background-color: $secondary-color;
+    color: $main-color;
+    border: none;
+    box-shadow: $box-shadow-border-thin;
+
 }
 
-.card-cover {
-    background-position: center center;
-    box-shadow: inset 0 0 0 2000px rgba(47, 21, 6, 0.2);
-    text-decoration: none !important;
-}
+// navbar-specific stuff
+.navbar {
+    a:hover, .button:hover {
+        background-color: $secondary-color;
+        color: $main-color;
+        border: none;// $border-thin;
+    }
+    .navbar-dropdown {
+        background-color: $dark-color !important;
 
-ul.messages {
-    margin: 0.5em 0;
-
-    li {
-        background: #ccc;
-        color: #333;
-        padding: 0.6rem 1rem;
-        font-weight: bold;
-        list-style: none;
-        font-size: 0.9em;
-        border-radius: $border-radius;
-
-        &.success {
-            background-color: color.adjust($green, $lightness: -50%);
-            color: #fff;
+        .navbar-item {
+            background-color: $dark-color !important;
+        }
+        .navbar-item:hover {
+            border: none;
+            color: $secondary-color;
         }
         &.warning,
         &.error {
@@ -208,122 +218,40 @@ ul.messages {
     }
 }
 
-// List of tasks
-
-.task-list {
-    display: block;
-    max-width: 700px;
-    margin: 0 auto;
-    .row {
-        background-color: color.adjust($bg-color, $lightness: 5%);
-        border-radius: $border-radius;
-        border: 2px solid $grey;
-        margin: 0.5em 0;
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.5em 1em 1em;
-
-        h2,
-        p {
-            margin: 0;
-        }
-        h2 {
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        p.date {
-            position: absolute;
-            top: -0.5em;
-            right: 1em;
-            font-size: 0.7em;
-            font-weight: bold;
-            background-color: inherit;
-            padding: 0.5em;
-            border-radius: $border-radius;
-            margin-right: -1em;
-        }
-        p.user {
-            position: absolute;
-            border-radius: $border-radius;
-            top: -0.5em;
-            left: 1em;
-            font-size: 0.9em;
-            background-color: inherit;
-            padding: 0.3em 0.5em;
-        }
-        .task-ref {
-            a {
-                color: $dark-color !important;
-            }
-        }
-        div.task-ref {
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            padding: 0.3em;
-        }
-    }
+// ImageFileDisplay
+.not-button.display-item:hover {
+    border: none;
+    box-shadow: none;
 }
 
-.status {
-    background-color: $main-color;
-    color: #fff;
-    padding: 0.32em 0.5em 0.2em;
-    font-size: 0.8em;
-    margin: 0;
-    border-radius: $border-radius;
-    font-weight: bold;
-    &.status-CANCELLED,
-    &.status-UNKNOWN {
-        background-color: $grey;
-    }
-    &.status-PENDING {
-        background-color: $yellow;
-    }
-    &.status-ERROR {
-        background-color: $red;
-    }
-    &.status-SUCCESS {
-        background-color: $green;
-    }
+// style of breadcrumbs is completed by JS in base.html
+.breadcrumbs-wrapper:has(.breadcrumbs-sticky-sidebar) {
+    height: 0;
 }
 
-.id-suffix {
-    font-size: 0.6em;
-    opacity: 0.5;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
+.breadcrumbs {
+    width: fit-content;
+    background-color: white;
+    margin: 1em;
+    border-style: solid;
+    border-radius: var(--bulma-radius-rounded);
+    border-color: var(--bulma-link-75);
+    border-width: var(--bulma-control-border-width);
 }
 
-// Pagination
-
-.pagination {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    font-size: var(--bulma-size-small);
-
-    .pagination-list {
-        flex: 1;
-        display: flex;
-        justify-content: right;
-        margin: 0.3em 0;
-    }
+.breadcrumbs .button {
+    border-radius: var(--bulma-radius-rounded);
 }
 
-// Nice tables
+.breadcrumbs:hover .button {
+    background-color: $secondary-color;
+    color: $main-color;
+}
 
-.table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 0.5em 0;
-    overflow: hidden;
+.breadcrumbs-sticky-sidebar {
+    position: sticky;
+    top: 1em;
+    z-index: 1;
 }
 
 .clickable {
@@ -335,6 +263,33 @@ ul.messages {
     transform: translateY(2px);
     box-shadow: 0 0.5em 0.4em -0.125em
         hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), 50%, 0.4);
+}
+
+// fully centered flexbox
+.flex-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// horizontally centered flexbox
+.flex-hcentered {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+// vertically centered flexbox
+.flex-vcentered {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+// combine with the above `.flex-(centered|hcenterd|vcentered)`
+// to have inline flex alignment
+.flex-inline {
+    display: inline-flex
 }
 
 .is-top {
@@ -395,8 +350,7 @@ ul.messages {
     width: 100%;
 }
 
-// Remove the wrapping borders
-
+// remove the wrapping borders
 .widen {
     width: calc(100vw - 2em);
     margin-left: calc(-50vw + 50% + 1em);
@@ -404,6 +358,224 @@ ul.messages {
     display: flex;
     justify-content: center; /* Horizontal centering */
     align-items: center; /* Vertical centering */
+}
+
+.border {
+    border: $border;
+    border-radius: $border-radius;
+}
+
+/***********************************
+ * other UX elements
+ ***********************************/
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#nav-icon {
+    max-height: 30px;
+    width: auto;
+    object-fit: contain; /* or object-fit: cover; */
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.strong {
+    color: var(--bulma-text-strong);
+    font-size: var(--bulma-size-normal);
+    font-weight: var(--bulma-weight-semibold);
+}
+
+.centerwrap {
+    max-width: 900px;
+    width: 100%;
+    margin: 1% auto;/*
+    padding-top: 2em; */
+    padding-top: 0.5em;
+}
+
+.hidden {
+    display: none;
+}
+
+.full-log {
+    max-height: 300px;
+    overflow: auto;
+}
+
+.iconify {
+    width: 1em;
+    margin-right: 5px;
+    min-width: 1em;
+    height: 1em;
+    min-height: 1em;
+    display: inline-block;
+}
+
+.text-shadow {
+    text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+}
+
+.card-cover {
+    background-position: center center;
+    box-shadow: inset 0 0 0 2000px rgba(47, 21, 6, 0.2);
+    text-decoration: none !important;
+}
+
+ul.messages {
+    margin: 0.5em 0;
+
+    li {
+        background: #ccc;
+        color: #333;
+        padding: 0.6rem 1rem;
+        font-weight: bold;
+        list-style: none;
+        font-size: 0.9em;
+        border-radius: $border-radius;
+
+        &.success {
+            background-color: color.adjust($green, $lightness: -50%);
+            color: #fff;
+        }
+        &.warning, &.error {
+            background-color: color.adjust($red, $lightness: -50%);
+            color: #fff;
+        }
+    }
+}
+
+// generic list of objects: datasets, tasks...
+// used throughout the app, has a thick border and a hover box shadow.
+
+.object-list {
+    display: block;
+    max-width: 700px;
+    margin: 0 auto;
+    .row {
+        background-color: color.adjust($bg-color, $lightness: 5%);
+        margin: 0.75em 0;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5em 1em 1em;
+        border-radius: $border-radius;
+        border: $border;
+        transition: box-shadow $transition;
+
+        h2, p {
+            margin: 0;
+        }
+        h2 {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        p.date {
+            position: absolute;
+            top: -0.5em;
+            right: 1em;
+            font-size: 0.7em;
+            font-weight: bold;
+            background-color: inherit;
+            padding: 0.5em;
+            border-radius: $border-radius;
+            margin-right: -1em;
+        }
+        p.user {
+            position: absolute;
+            border-radius: $border-radius;
+            top: -0.5em;
+            left: 1em;
+            font-size: 0.9em;
+            background-color: inherit;
+            padding: 0.3em 0.5em;
+        }
+        .task-ref {
+            a {
+                color: $dark-color !important;
+            }
+        }
+        div.task-ref {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding: 0.3em;
+        }
+    }
+    .row:hover {
+        box-shadow: 5px 5px 0px $secondary-color;
+    }
+
+    .preview-image {
+        border-radius: $border-radius;
+        border: $border-thin;
+        img {
+            min-height: 100%;
+        }
+    }
+}
+
+.status {
+    background-color: $main-color;
+    color: #fff;
+    padding: 0.32em 0.5em 0.2em;
+    font-size: 0.8em;
+    margin: 0;
+    border-radius: $border-radius;
+    font-weight: bold;
+    &.status-CANCELLED, &.status-UNKNOWN {
+        background-color: $grey;
+    }
+    &.status-PENDING {
+        background-color: $yellow;
+    }
+    &.status-ERROR {
+        background-color: $red;
+    }
+    &.status-SUCCESS {
+        background-color: $green;
+    }
+}
+
+.id-suffix {
+    font-size: 0.6em;
+    opacity: 0.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.pagination {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    font-size: var(--bulma-size-small);
+
+    .pagination-list {
+        flex: 1;
+        display: flex;
+        justify-content: right;
+        margin: 0.3em 0;
+    }
+}
+
+ // nice tables
+.table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0;
+    overflow: hidden;
 }
 
 .duration-tag {
@@ -431,7 +603,18 @@ ul.messages {
     }
 }
 
-// misc
+.content h1:not(:first-child) {
+    margin-top: 0;
+    margin-bottom: 0.1em;
+}
+
+.box {
+    box-shadow: none;
+    border-style: solid;
+    border-radius: var(--bulma-box-radius);
+    border-color: var(--bulma-link-75);
+    border-width: var(--bulma-control-border-width);
+}
 
 .is-ghost {
     &.is-white {

@@ -1,7 +1,7 @@
 {% extends "tasking/start.html" %}
 
 {% block form_content %}
-    {% include "demowebsite/dataset_baseform.html" with excluded_fields="p_n_clusters,p_batch_size,transformation_sequence,background_option,empty_cluster_thres,lr,source,metadata" %}
+    {% include "demowebsite/dataset_baseform.html" with use_svelte=True excluded_fields="p_n_clusters,p_batch_size,transformation_sequence,background_option,empty_cluster_thres,lr,source,metadata" %}
 
     <h3 class="title mb-2">Prototype configuration</h4>
     <hr class="mt-0 mb-1">

@@ -10,9 +10,11 @@
     <script type="module" src="http://localhost:5173/src/main.ts"></script>
     {% else %}
     <script type="module" src="{% static "dist/main.js" %}"></script>
-    <link rel="stylesheet" href="{% static "dist/main.css" %}?v1.1">
-    <link rel="stylesheet" href="{% static "css/custom.css" %}?v1.1">
     {% endif %}
+    <link rel="stylesheet" href="{% static "dist/main.css" %}?v1.1">
+    <!--
+    <link rel="stylesheet" href="{% static "css/custom.css" %}?v1.1">
+    -->
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -45,7 +47,7 @@
 
             <div class="navbar-item has-dropdown is-hoverable">
                 <a class="navbar-link">
-                    Demos
+                    Experiments
                 </a>
 
                 <div class="navbar-dropdown">
@@ -80,6 +82,10 @@
         </div>
 
         <div class="navbar-end mr-3">
+            <a href="{% url "about" %}" title="About" class="navbar-item">
+                <span class=""></span> <span>About</span>
+            </a>
+
             <div class="navbar-item">
                 {% if request.user.is_authenticated %}
                     <div class="buttons">
