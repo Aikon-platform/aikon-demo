@@ -3,10 +3,14 @@ from urllib.parse import urlsplit
 from stat import S_IFREG
 from stream_zip import ZIP_64, ZIP_32, stream_zip
 from typing import List, Tuple, Iterable, Generator, Union
-
 from pathlib import Path
 import os
 from datetime import datetime
+
+from django.apps import apps
+from django.conf import settings
+from django.urls import path
+from django.views.generic import TemplateView
 
 from demowebsite.settings import BASE_URL, API_URL, APP_URL_FROM_API
 
@@ -123,3 +127,32 @@ def rewrite_api_url_for_front(api_url: str) -> str:
     """
     api_url = api_url.replace(get_url_host_and_scheme(api_url), API_URL)
     return api_url
+
+
+def about_route(app_name):
+    """
+    return a namespaced `about` route for the app if it's a demo app and has an about.html.
+
+    usage: in a demo app's `urls.py`:
+        ```
+        from shared.utils import about_route
+        urlpatterns.extend(about_route(app_name))
+        ```
+    """
+    cfg = apps.get_app_config(app_name)
+    about_template = Path(cfg.path) / "templates" / cfg.name / "about.html"
+    if app_name not in settings.DEMO_APPS or not about_template.is_file():
+        return []
+    return [
+        path(
+            "about",
+            TemplateView.as_view(
+                template_name=f"{cfg.name}/about.html",
+                extra_context={
+                    "app_label": cfg.label,
+                    "app_name": cfg.verbose_name,
+                },
+            ),
+            name="about",
+        ),
+    ]

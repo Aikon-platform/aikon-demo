@@ -36,3 +36,7 @@ urlpatterns = [
         name="download_json",
     ),
 ]
+
+from shared.utils import about_route
+
+urlpatterns.extend(about_route(app_name))

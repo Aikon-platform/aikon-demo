@@ -42,3 +42,7 @@ urlpatterns = [
         "monitor/clear/api", ClearAPIOldClusterings.as_view(), name="monitor_clear_api"
     ),
 ]
+
+from shared.utils import about_route
+
+urlpatterns.extend(about_route(app_name))
