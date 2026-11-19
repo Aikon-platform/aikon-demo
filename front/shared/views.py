@@ -27,6 +27,10 @@ class HomeView(TemplateView):
     template_name = "demowebsite/home.html"
 
 
+class AboutView(TemplateView):
+    template_name = "demowebsite/about.html"
+
+
 class GDPRView(TemplateView):
     template_name = "demowebsite/gdpr.html"
 

@@ -9,102 +9,114 @@
 
         {# title block #}
         <div class="columns is-vcentered mb-5">
-            <div class="column">
-                <h1>
+            <div class="column flex-vcentered">
+                <h1 class="mb-0">
                     {# TODO allow task name modification #}
                     <span class="id-main">{{ object.name|default:task_name }}</span>
                     <span class="id-suffix">#{{ object.id }}</span>
                 </h1>
-                <p>
-                    Requested by {{ object.requested_by }}
-                    {% if object.dataset %}
-                        on dataset
-                        <a class="is-hoverable" href="{% url 'datasets:view' pk=object.dataset.pk %}">
-                            <span class="id-main">{{ object.dataset.name }}</span>
-                            <span class="id-suffix">{{ object.dataset.id }}</span>
-                        </a>
-                    {% endif %}
-                </p>
             </div>
             {% if object.is_finished %}
-                <div class="column is-narrow box is-flex is-flex-direction-column is-flex-align-items-center is-flex-justify-content-center">
-                    <b class="has-text-centered">Status</b>
+                <div class="column is-narrow box">
+                    <b class="has-text-centered mr-2">Status</b>
                     <span class="tag is-medium status status-{{ object.status }}">{{ object.status }}</span>
                 </div>
             {% endif %}
         </div>
 
         {# task mgmt buttons #}
-        <p>
-            {% if not object.is_finished %}
-                <a href="{% url url_prefix|add:'cancel' object.id %}" class="button is-ghost">
-                    <span class="iconify" data-icon="mdi:close-circle"></span>
-                    <span>Cancel</span>
-                </a>
-            {% endif %}
+        <div class="columns is-centered is-vcentered is-multiline is-mobile">
             {% if object.dataset %}
-                {% if object.dataset.zip_file %}
-                    <a class="button is-link is-light" href="{{ object.dataset.zip_file.url }}">
-                        <span class="iconify" data-icon="mdi:folder-download"></span> <span>Download dataset</span>
+                <span class="column is-narrow">
+                    <a href="{% url 'datasets:view' pk=object.dataset.pk %}" class="button is-light">
+                        <span class="iconify" data-icon="mdi:eye"></span>
+                        <span>Dataset</span>
                     </a>
-                {% endif %}
+                </span>
             {% endif %}
-            {% if object.is_finished %}
+            {% if not object.is_finished %}
+                <span class="column is-narrow">
+                    <a href="{% url url_prefix|add:'cancel' object.id %}" class="button is-light">
+                        <span class="iconify" data-icon="mdi:close-circle"></span>
+                        <span>Cancel</span>
+                    </a>
+                </span>
+            {% else %}
                 {% if object.dataset %}
-                    <a href="{% url url_prefix|add:'restart' object.id %}" class="button is-link is-light ml-2">
-                        <span class="iconify" data-icon="mdi:clock-start"></span>
-                        <span>Start new {{ task_name }} with same configuration</span>
+                    <span class="column is-narrow">
+                        <a href="{% url url_prefix|add:'restart' object.id %}" class="button is-light">
+                            <span class="iconify" data-icon="mdi:clock-start"></span>
+                            <span>Start new {{ task_name }} with same configuration</span>
+                        </a>
+                    </span>
+                {% endif %}
+                <span class="column is-narrow">
+                    <a href="{% url url_prefix|add:'delete' object.pk %}" class="button is-light">
+                        <span class="iconify" data-icon="mdi:delete"></span>
+                        <span>Delete this experiment</span>
+                    </a>
+                </span>
+            {% endif %}
+            </div>
+
+        <hr class="mt-5 mb-5">
+
+        <details id="task-details" {% if not object.is_finished or object.status == "ERROR" %}open{% endif %}>
+            <summary>
+                <h2 class="title is-4">
+                    Task details
+                    <span id="task-details-eye"
+                        class="iconify"
+                        title="Show or hide details"
+                        {% if not object.is_finished or object.status == "ERROR" %}data-icon="teenyicons:eye-closed-outline"
+                        {% else %}data-icon="mdi:eye"
+                        {% endif %}
+                    ></span>
+                </h2>
+            </summary>
+
+            <p>
+                Requested by {{ object.requested_by }}
+                {% if object.dataset %}
+                    on dataset
+                    <a class="is-hoverable" href="{% url 'datasets:view' pk=object.dataset.pk %}">
+                        <span class="id-main">{{ object.dataset.name }}</span>
+                        <span class="id-suffix">{{ object.dataset.id }}</span>
                     </a>
                 {% endif %}
-                <a href="{% url url_prefix|add:'delete' object.pk %}" class="button is-light">
-                    <span class="iconify" data-icon="mdi:delete"></span>
-                    <span>Delete this experiment</span>
-                </a>
-            {% endif %}
-        </p>
+            </p>
+            {# general task info #}
+            <div class="mt-5 mb-5">
+                {% if object.parameters %}
+                    <div >
+                        <h4>Parameters</h4>
+                        <pre>{{ object.parameters }}</pre>
+                    </div>
+                {% endif %}
 
-        <hr class="mt-5 mb-1">
-
-        {# general task info #}
-        <div class="mt-5 mb-5">
-            {% if object.parameters %}
-                <div class="columns is-vcentered">
-                    <h4 class="column is-narrow m-0">Parameters:</h4>
-                    <pre class="column">{{ object.parameters }}</pre>
-                </div>
-            {% endif %}
-
-            {% if object.pipeline %}
-                <p>Part of pipeline <a href="{{ object.pipeline.get_absolute_url }}">{{ object.pipeline }}</a></p>
-            {% endif %}
-            {% if object.all_tasks %} {# for pipelines #}
-                <div class="task-list">
-                    <h4>Sub-task launched</h4>
-                    {% for task in object.all_tasks %}
-                        {% include "includes/list-item.html" %}
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-
-        {# logs of finished task #}
-        {% if object.is_finished %}
-            {% if object.full_log %}
+                {% if object.pipeline %}
+                    <p>Part of pipeline <a href="{{ object.pipeline.get_absolute_url }}">{{ object.pipeline }}</a></p>
+                {% endif %}
+                {% if object.all_tasks %} {# for pipelines #}
+                    <div class="object-list">
+                        <h4>Sub-task launched</h4>
+                        {% for task in object.all_tasks %}
+                            {% include "includes/list-item.html" %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            {# logs of finished task #}
+            {% if object.is_finished and object.full_log %}
                 <div>
-                    <details id="task-logs">
-                        <summary>
-                            <h4 class="">
-                                <span class="">Execution logs</span>
-                                <span id="task-logs-eye" class="iconify" data-icon="mdi:eye"></span>
-                            </h4>
-                        </summary>
-                        <pre class="full-log">{{ object.full_log }}</pre>
-                    </details>
+                    <h4 class="">Execution logs</h4>
+                    <pre class="full-log">{{ object.full_log }}</pre>
                 </div>
             {% endif %}
+        </details>
 
         {# monitoring of ongoing task #}
-        {% else %}
+        {% if not object.is_finished %}
             <div id="tracking"></div>
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", () => {
@@ -113,7 +125,8 @@
             </script>
         {% endif %}
 
-        <hr class="mt-1 mb-0" color="var(--bulma-)">
+
+    <hr class="m-1">
     </div>
 
     {# view results #}
@@ -123,40 +136,27 @@
         {% endblock %}
     {% endif %}
 
-    <style>
-    #task-logs summary {
-        cursor: pointer;
-    }
-    #task-logs ::marker {
-        content: "";
-    }
-    #task-logs-eye {
-        margin-bottom: -0.15em;
-    }
-    </style>
-
 {% endblock %}
 
 {% block extra_js %}
     <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const logsDetails = document.querySelector("#task-logs");
-        const logsDetailsSummary = document.querySelector("#task-logs > summary");
+        const details = document.querySelector("#task-details");
+        const detailsSummary = document.querySelector("#task-details > summary");
 
         const toggleEyeSvg = () => {
-            // NOTE: iconify replaces our span #task-logs-eye with an SVG dynamically
-            // => logsDetailsIcon must be selected here to avoid
-            const eyeSvg = document.querySelector("#task-logs-eye");
-            console.log(eyeSvg);
+            // NOTE: iconify replaces our span #task-details-eye with an SVG dynamically
+            // => detailsIcon must be selected here to avoid
+            const eyeSvg = document.querySelector("#task-details-eye");
             if (eyeSvg) {
-                logsDetails.hasAttribute("open")
+                details.hasAttribute("open")
                     ? eyeSvg.setAttribute("data-icon", "mdi:eye")
                     : eyeSvg.setAttribute("data-icon", "teenyicons:eye-closed-outline");
             }
         }
 
-        if (logsDetailsSummary) {
-            logsDetailsSummary.addEventListener("click", toggleEyeSvg);
+        if (detailsSummary) {
+            detailsSummary.addEventListener("click", toggleEyeSvg);
         }
     })
     </script>

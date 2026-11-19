@@ -28,7 +28,7 @@
 </svelte:element>
 {#if isTitle}
     <p>{name_provider.getImageDescription(image) || image.document?.name || image.subtitle || ""}</p>
-{#if url}
-    <p><a href={url} target="_blank">See in context</a></p>
-{/if}
+    {#if url}
+        <p><a href={url} target="_blank">See in context</a></p>
+    {/if}
 {/if}

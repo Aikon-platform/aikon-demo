@@ -20,7 +20,13 @@ from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
 
 from shared.utils import pprint, rewrite_api_url_for_front, rewrite_front_url_for_api
-from .utils import PathAndRename, IMG_EXTENSIONS, unzip_on_the_fly, sanitize_str
+from .utils import (
+    PathAndRename,
+    IMG_EXTENSIONS,
+    unzip_on_the_fly,
+    sanitize_str,
+    TreeDict,
+)
 from .fields import URLListModelField
 
 User = get_user_model()
@@ -101,14 +107,11 @@ class Document:
         """
         return self.path / "images"
 
-    def get_document_tree(self) -> str:
-        from .utils import TreeDict
-
-        tree = TreeDict(os.path.join(self.path, "images/"))
-        return tree.to_html_pre()
+    def get_document_tree(self) -> TreeDict:
+        return TreeDict(os.path.join(self.path, "images/"), root=True)
 
     @property
-    def document_tree(self) -> str:
+    def document_tree(self) -> TreeDict:
         if self._document_tree is None:
             self._document_tree = self.get_document_tree()
         return self._document_tree
@@ -250,6 +253,7 @@ class Dataset(AbstractDataset):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._images = None
+        self._preview_image = None
 
     def __str__(self) -> str:
         return f"{self.name} #{self.id}" if self.name else f"Dataset #{self.id}"
@@ -351,6 +355,28 @@ class Dataset(AbstractDataset):
         """
         return sum(len(doc.images) for doc in self.documents)
 
+    @property
+    def folders_count(self) -> int:
+        """get the number of folders in all documents of the current dataset"""
+        return sum(
+            len(document.document_tree.get_folders()) for document in self.documents
+        )
+
+    @property
+    def preview_image(self) -> Image | None:
+        if not self._preview_image:
+            try:
+                images = self.get_images()
+                if len(images):
+                    self._preview_image = images[0]
+            except requests.exceptions.HTTPError as e:
+                # when running a task, if a dataset download fails,
+                # then the dataset is created but empty. in that case,
+                # `self.get_images` will fail as well
+                # => no preview image will be displayed.
+                print(f"Could not get images for dataset {self.id}:", e)
+        return self._preview_image
+
     def documents_for_api(self) -> List[Dict]:
         def update_url(d: dict) -> dict:
             d["src"] = rewrite_front_url_for_api(d["src"])
@@ -409,7 +435,7 @@ class Dataset(AbstractDataset):
         }
         self.download_from_api(need_extraction)
 
-    def get_images(self) -> List[Document]:
+    def get_images(self) -> List[Image]:
         """
         Check if images have been extracted, download and extract if needed
         """

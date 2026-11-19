@@ -105,18 +105,21 @@ class TreeDict:
         {
             curdir  : Str,  # name of the current directory
             files   : List[str],  # list of file names in the current directory
-            subdirs : List[dict],  # a list of subdirectories, each represented by the same structure
+            subdirs : List[TreeDict],  # a list of subdirectories, each represented by a TreeDict
         }
-
     """
 
     tree: Dict
 
-    def __init__(self, path: str | os.PathLike) -> Dict:
+    def __init__(self, path: str | os.PathLike, root: bool = False) -> Dict:
         to_abspath = lambda _path, _file: os.path.join(_path, _file)
         to_basename = lambda _path: Path(_path).name
 
-        self.tree = {"curdir": to_basename(path), "files": [], "subdirs": []}
+        self.tree = {
+            "curdir": to_basename(path) if not root else "root",
+            "files": [],
+            "subdirs": [],
+        }
 
         if os.path.exists(path):
             for el in sorted(os.listdir(path)):
@@ -125,6 +128,19 @@ class TreeDict:
                     self.tree["files"].append(to_basename(el_abspath))
                 elif os.path.isdir(el_abspath):
                     self.tree["subdirs"].append(TreeDict(el_abspath))
+
+    def get_folders(self) -> list[str]:
+        # get all folders and return them as a list. skip root directory as it falsifies the folder count.
+        def inner(acc: list, tree: dict):
+            if (curdir := tree.get("curdir")) != "root":
+                acc.append(curdir)
+            for subdir in tree.get("subdirs", []):
+                acc = inner(acc, subdir.tree)
+            return acc
+
+        folders = []
+        folders = inner(folders, self.tree)
+        return folders
 
     def to_html_list(self) -> str:
         filearray_to_html = lambda files: (
