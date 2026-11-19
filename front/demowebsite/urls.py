@@ -30,6 +30,9 @@ def project_app_configs():
     return [cfg for cfg in apps.get_app_configs() if cfg.path.startswith(base)]
 
 
+# if app name is different from route
+app_to_route_prefix = {"dticlustering": "dti"}
+
 # generate about views for each task.
 # for each of our app, if an "about" template exists at `$app_name/templates/$app_name/about.html`,
 # add :
@@ -38,11 +41,12 @@ def project_app_configs():
 # context variables for the about templates MUST be passed through `TemplateView.extra_context`
 for cfg in project_app_configs():
     about_template = Path(cfg.path) / "templates" / cfg.name / "about.html"
-    print("###", cfg.name, cfg.label)
     if cfg.name in settings.DEMO_APPS and about_template.is_file():
+        print("###", cfg.name, cfg.label)
+        route_prefix = app_to_route_prefix.get(cfg.label, cfg.label)
         urlpatterns.append(
             path(
-                f"{cfg.label}/about",
+                f"{route_prefix}/about",
                 TemplateView.as_view(
                     template_name=f"{cfg.name}/about.html",
                     extra_context={
@@ -50,7 +54,7 @@ for cfg in project_app_configs():
                         "app_name": cfg.verbose_name,
                     },
                 ),
-                name=f"{cfg.label}_about",
+                name=f"about",
             )
         )
 
