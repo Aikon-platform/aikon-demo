@@ -18,21 +18,21 @@
         formfield?: HTMLInputElement;
     }
 
-    let { clustering_data, base_url, editable, formfield }: Props = $props();
+    const { clustering_data, base_url, editable, formfield }: Props = $props();
 
     const editor_state = $state(new ClusterEditorState(clustering_data, base_url));
     setEditorState(editor_state);
 
-    let magnifying: MagnifyingContext = $state({});
+    const magnifying: MagnifyingContext = $state({});
     if (!getMagnifyingContext()) setMagnifyingContext(magnifying);
 
-    let cluster_sorting = $derived({
+    const cluster_sorting = $derived({
         size: (a: TClusterInfo, b: TClusterInfo) => b.images.length - a.images.length,
         id: (a: TClusterInfo, b: TClusterInfo) => a.id - b.id,
         name: (a: TClusterInfo, b: TClusterInfo) => a.name.localeCompare(b.name),
     }[editor_state.viewer_sort]);
 
-    let clusters = $derived(Object.values(editor_state.content.clusters).sort(cluster_sorting));
+    const clusters = $derived(Object.values(editor_state.content.clusters).sort(cluster_sorting));
 
     function save() {
         if (formfield) {

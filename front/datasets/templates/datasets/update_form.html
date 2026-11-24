@@ -1,0 +1,18 @@
+{% extends "demowebsite/base.html" %}
+{% load static shared_tags %}
+
+{% block title %}Dataset {{ dataset.id }}{% endblock %}
+
+{% block content %}
+
+{% include "datasets/includes/breadcrumbs.html" %}
+
+<div class="centerwrap">
+
+    <h1>Edit dataset {{ dataset.id }}</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% include "demowebsite/baseform.html" %}
+        <p class="has-text-centered has-text-weight-bold"><input type="submit" value="Update dataset" class="button is-link"> </p>
+    </form>
+</div>
+{% endblock %}

@@ -6,7 +6,7 @@
         cluster: TSimpleCluster;
         index: TSimilarityIndex;
     }
-    let { cluster, index }: Props = $props();
+    const { cluster, index }: Props = $props();
 </script>
 
 <div class="cl-cluster box">

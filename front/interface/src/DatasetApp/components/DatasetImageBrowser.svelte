@@ -11,14 +11,14 @@
         datasetFormat: TDatasetFormatType;
         metadataURL?: string;
     }
-    let { dataset, datasetFormat, metadataURL }: Props = $props();
+    const { dataset, datasetFormat, metadataURL }: Props = $props();
 
-    let name_provider = new NameProvider();
+    const name_provider = new NameProvider();
     setNameProvider(name_provider);
 
     const datasetAsInterface = toDatasetImageBrowserInterface(dataset, datasetFormat);
 
-    let magnifying = $state({});
+    const magnifying = $state({});
     setMagnifyingContext(magnifying);
 
     onMount(() => {

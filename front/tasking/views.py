@@ -341,9 +341,11 @@ class ClearOldResultsView(LoginRequiredIfConfProtectedMixin, TaskMixin, View):
         if output is None or output.get("error"):
             messages.error(
                 self.request,
-                output["error"]
-                if output
-                else "Unknown error when clearing old experiments",
+                (
+                    output["error"]
+                    if output
+                    else "Unknown error when clearing old experiments"
+                ),
             )
         else:
             output_str = " / ".join(

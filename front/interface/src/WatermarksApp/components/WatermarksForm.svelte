@@ -1,31 +1,54 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
     import DatasetComposeForm from "../../DatasetApp/components/DatasetComposeForm.svelte";
     import AnalysisTypeSelect from "./AnalysisTypeSelect.svelte";
     import IndexSelect from "./IndexSelect.svelte";
     import NeedRegionsToggle from "./NeedRegionsToggle.svelte";
+    import { enforceValue, updateUrlSearchParams } from "../../shared/utils";
+
+    /**
+     * NOTE URL-bound parameters are:
+     * - "analysis_type"
+     */
 
     interface Props {
         originalForm: HTMLElement;
     }
 
-    let { originalForm }:Props = $props();
+    const enforceAnalysisTypeFieldValue = enforceValue([ "", "query", "indexing", "similarity" ], "");
 
-    let experiment_name_field = originalForm.querySelector("#id_name") as HTMLInputElement;
+    // django form
+    const { originalForm }:Props = $props();
 
-    let analysis_type_field = originalForm.querySelector("#id_analysis_type") as HTMLSelectElement;
+    const experiment_name_field = originalForm.querySelector("#id_name") as HTMLInputElement;
+
+    const analysis_type_field = originalForm.querySelector("#id_analysis_type") as HTMLSelectElement;
     let analysis_type_value = $state(analysis_type_field.value);
 
-    let index_options = Array.from(originalForm.querySelectorAll("[name=query_target_index]")).map(option => option.parentElement as HTMLLabelElement);
+    let mounted = $state(false);
+
+    // `analysis_type_field.value` and URLSearchParams.analysis_type can both set a value.
+    // to avoid conflict, we defer the effect until after onMount has run. which defines form values from the URLSearchParams  ``
+    $effect(() => {
+        if (mounted) {
+            analysis_type_field.value = analysis_type_value;
+            updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", analysis_type_value);
+        }
+    });
+
+    const index_options = Array.from(originalForm.querySelectorAll("[name=query_target_index]")).map(option => option.parentElement as HTMLLabelElement);
+    // if analysis_type_field == "indexing"
     let index_value = $state("");
 
-    let dataset_form = originalForm.querySelector(".dataset-form") as HTMLFormElement;
+    const dataset_form = originalForm.querySelector(".dataset-form") as HTMLFormElement;
 
-    let need_regions_field = originalForm.querySelector("#id_need_regions") as HTMLInputElement;
+    const need_regions_field = originalForm.querySelector("#id_need_regions") as HTMLInputElement;
 
-    let are_sketches_field = originalForm.querySelector("#id_are_sketches") as HTMLInputElement;
+    const are_sketches_field = originalForm.querySelector("#id_are_sketches") as HTMLInputElement;
 
-    let errors = originalForm.querySelectorAll(".errorlist");
-    let submit_button = analysis_type_field.form!.querySelector("input[type=submit]") as HTMLButtonElement;
+    const errors = originalForm.querySelectorAll(".errorlist");
+    const submit_button = analysis_type_field.form!.querySelector("input[type=submit]") as HTMLButtonElement;
     let dataset_ready = $state(false);
 
     $effect(() => {
@@ -37,8 +60,21 @@
     });
 
     $effect(() => {
-        submit_button.disabled = analysis_type_value === "" || (analysis_type_value === "query" && index_value === "") || !dataset_ready;
+        submit_button.disabled =
+            analysis_type_value === ""
+            || (analysis_type_value === "query" && index_value === "")
+            || !dataset_ready;
     });
+
+    // on mount, read `analysis_type` from URL search params and use it to set the form value.
+    onMount(() => {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const searchParamAnalysisType = urlSearchParams.get("analysis_type");
+        if (searchParamAnalysisType) {
+            analysis_type_value = updateUrlSearchParams(enforceAnalysisTypeFieldValue, "analysis_type", searchParamAnalysisType)
+        }
+        mounted = true;
+    })
 </script>
 
 {#if errors.length > 0}
@@ -59,18 +95,12 @@
 {/if}
 
 {#if analysis_type_value && (analysis_type_value !== "query" || index_value != "")}
-<h4 class="mt-6 mb-5">
-    {#if analysis_type_value === "query"}
-    What images do you want to use as a query?
-    {:else}
-    What is your dataset?
-    {/if}
-</h4>
+<h4 class="mt-6 mb-5">What is your dataset?</h4>
 <div class="box has-background-light">
     <DatasetComposeForm form={dataset_form} bind:ready={dataset_ready} />
 </div>
 
-<h4 class="mt-6 mb-5">What kind of images is it?</h4>
+<h4 class="mt-6 mb-5">What kind of images are in the dataset?</h4>
 <NeedRegionsToggle field={need_regions_field} are_sketches_field={analysis_type_value === "indexing" ? are_sketches_field : undefined} />
 {/if}
 <div class="mb-4"></div>

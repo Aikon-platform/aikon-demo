@@ -5,9 +5,10 @@ from django.db.models.query import QuerySet
 from django.views.generic import ListView, DetailView, UpdateView
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.http import JsonResponse
 
 from tasking.views import LoginRequiredIfConfProtectedMixin, TaskMixin
-from .forms import DatasetForm, DatasetAddMetadataForm
+from .forms import DatasetForm, DatasetUpdateForm
 from .models import Dataset
 
 User = get_user_model()
@@ -96,10 +97,28 @@ class DatasetMainView(DatasetMixin, DetailView):
 
     template_name = "datasets/view.html"
 
-class DatasetAddMetadataView(DatasetMixin, LoginRequiredIfConfProtectedMixin, UpdateView):
+
+class DatasetUpdateView(DatasetMixin, LoginRequiredIfConfProtectedMixin, UpdateView):
     """
-    Add metadata to a dataset
+    Edit a dataset
     """
 
-    template_name = "datasets/metadata_form.html"
-    form_class = DatasetAddMetadataForm
+    template_name = "datasets/update_form.html"
+    form_class = DatasetUpdateForm
+
+
+class DatasetRegionsView(DatasetMixin, DetailView):
+    """
+    fetch info on regions corresponding to a dataset
+    """
+
+    def get(self, request, pk: str):
+        from regions.models import Regions
+        from django.db.models import Q
+
+        self.object = self.get_object()
+        regions = Regions.objects.filter(Q(dataset=self.object) & Q(status="SUCCESS"))
+        if regions:
+            regions = [{"id": str(r.id), "name": str(r)} for r in regions]
+            return JsonResponse(regions, safe=False)
+        return JsonResponse([], safe=False)

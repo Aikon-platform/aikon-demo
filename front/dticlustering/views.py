@@ -51,8 +51,10 @@ class DTIClusteringStartFrom(DTIClusteringMixin.StartFrom, DTIClusteringStart):
             kwargs["initial"].update(
                 {
                     "p_n_clusters": parameters.get("n_prototypes", 10),
-                    "p_background": parameters.get("background_option", {}),
-                    "p_transforms": parameters.get("transformation_sequence", {}),
+                    "background_option": parameters.get("background_option", {}),
+                    "transformation_sequence": parameters.get(
+                        "transformation_sequence", {}
+                    ),
                     "empty_cluster_thres": parameters.get(
                         "empty_cluster_threshold", 0.025
                     ),
@@ -186,9 +188,11 @@ class ClearOldClusterings(DTIClusteringMixin, ClearOldResultsView):
         if output is None or output.get("error"):
             messages.error(
                 self.request,
-                output["error"]
-                if output
-                else "Unknown error when clearing old clusterings",
+                (
+                    output["error"]
+                    if output
+                    else "Unknown error when clearing old clusterings"
+                ),
             )
         else:
             messages.success(
@@ -212,9 +216,11 @@ class ClearAPIOldClusterings(DTIClusteringMixin, ClearAPIOldResultsView):
         if output is None or output.get("error"):
             messages.error(
                 self.request,
-                output["error"]
-                if output
-                else "Unknown error when clearing old clusterings",
+                (
+                    output["error"]
+                    if output
+                    else "Unknown error when clearing old clusterings"
+                ),
             )
         else:
             messages.success(

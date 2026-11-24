@@ -131,6 +131,7 @@
                 </td>
             </tr>
 
+            {% if not no_deformation %}
             <!-- Morphological -->
             <tr data-transform="morpho">
                 <td>4</td>
@@ -190,6 +191,7 @@
                     {% include "dticlustering/iteration.html" with transform="tps" %}
                 </td>
             </tr>
+            {% endif %}
             </tbody>
         </table>
     </div>

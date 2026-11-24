@@ -57,6 +57,7 @@ class AbstractDatasetForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={"extra-class": "new-dataset-field mt-2"}),
     )
+
     format = forms.ChoiceField(
         label="Type",
         choices=[],  # will be set in __init__
@@ -141,7 +142,9 @@ class DatasetForm(AbstractDatasetForm):
         model = Dataset
         fields = AbstractDatasetForm.Meta.fields
 
-class DatasetAddMetadataForm(forms.ModelForm):
+
+class DatasetUpdateForm(forms.ModelForm):
+    # dataset_name = dataset_name_field
     metadata_file = ContentRestrictedFileField(
         label="Metadata",
         help_text="A .csv file containing metadata for the images (matching will be made based on folder/file prefix)",
@@ -150,9 +153,10 @@ class DatasetAddMetadataForm(forms.ModelForm):
         max_size=settings.MAX_UPLOAD_SIZE,
         widget=forms.ClearableFileInput(),
     )
+
     class Meta:
         model = Dataset
-        fields = ["metadata_file"]
+        fields = ["name", "metadata_file"]
 
     def save(self, commit=True):
         instance = super().save(commit=False)

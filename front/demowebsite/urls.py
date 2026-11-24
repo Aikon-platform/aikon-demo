@@ -1,7 +1,12 @@
+from pathlib import Path
+
+from django.apps import apps
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from django.urls import path, include
+from django.views.generic import TemplateView
+
 
 urlpatterns = [
     path("", include("shared.urls")),
@@ -10,6 +15,7 @@ urlpatterns = [
     # TODO make the following apps optional (set in .env)
     path("dti/", include("dticlustering.urls")),
     path("similarity/", include("similarity.urls")),
+    path("alignment/", include("alignment.urls")),
     path("regions/", include("regions.urls")),
     path("search/", include("search.urls")),
     path("watermarks/", include("watermarks.urls")),

@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.conf import settings
 
 from datasets.models import Dataset
-from demowebsite.settings import INTERNAL_URL
+from shared.utils import get_url_host_and_scheme, rewrite_api_url_for_front
 
 """
 MODELS: AbstractAPITask
@@ -35,6 +35,7 @@ User = get_user_model()
 
 API_URL = getattr(settings, "API_URL", "http://localhost:5000")
 BASE_URL = getattr(settings, "BASE_URL", "http://localhost:8000")
+APP_URL_FROM_API = getattr(settings, "APP_URL_FROM_API", None)
 
 TypeDurationEval = Literal["short", "mid", "long"]
 TypeDuration = TypedDict("TypeDuration", {"delta": str, "eval": TypeDurationEval})
@@ -166,9 +167,11 @@ def AbstractTask(task_prefix: str):
             delta = (
                 self.finished_on - self.requested_on
                 if self.finished_on and self.requested_on
-                else datetime.now(timezone.utc) - self.requested_on
-                if not self.is_finished and not self.finished_on
-                else None
+                else (
+                    datetime.now(timezone.utc) - self.requested_on
+                    if not self.is_finished and not self.finished_on
+                    else None
+                )
             )
             if delta is None:
                 return delta
@@ -217,7 +220,7 @@ def AbstractTask(task_prefix: str):
             """
             Returns the URL to notify the front-end
             """
-            return f"{INTERNAL_URL}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
+            return f"{APP_URL_FROM_API}{reverse(f'{self.url_prefix}notify', kwargs={'pk': self.pk})}?token={self.get_token()}"
 
         def get_task_kwargs(self):
             return {"parameters": self.parameters}
@@ -451,8 +454,14 @@ def AbstractAPITaskOnDataset(task_prefix: str):
         Abstract model for tasks that are sent to the API
         """
 
+        # NOTE : in the API, the `regions` module is named `region_extraction` => set endpoint accordingly
+        if task_prefix == "regions":
+            api_task_prefix = "region_extraction"
+        else:
+            api_task_prefix = task_prefix
+
         api_tracking_id = models.UUIDField(null=True, editable=False)
-        api_endpoint_prefix = f"{API_URL}/{task_prefix}"
+        api_endpoint_prefix = f"{API_URL}/{api_task_prefix}"
 
         class Meta:
             abstract = True

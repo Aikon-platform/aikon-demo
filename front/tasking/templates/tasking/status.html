@@ -4,98 +4,160 @@
 {% block title %}{{ task_name }} experiment #{{ object.name }}-{{ object.id }}{% endblock %}
 
 {% block content %}
-    <div class="centerwrap">
+    {% include "includes/breadcrumbs.html" %}
+    <div class="centerwrap mb-0">
 
-        {% include "includes/breadcrumbs.html" %}
-
-        <h1>
-            {# TODO allow task name modification #}
-            <span class="id-main">{{ object.name|default:task_name }}</span>
-            <span class="id-suffix">#{{ object.id }}</span>
-        </h1>
-        <p>
-            Requested by {{ object.requested_by }}
-            {% if object.dataset %}
-                on dataset
-                <a class="is-hoverable" href="{% url url_prefix|add:'list_perdataset' object.dataset.pk %}">
-                    <span class="id-main">{{ object.dataset.name }}</span>
-                    <span class="id-suffix">{{ object.dataset.id }}</span>
-                </a>
-            {% endif %}
-        </p>
-        <p>
-            {% if not object.is_finished %}
-                <a href="{% url url_prefix|add:'cancel' object.id %}" class="button is-ghost">
-                    <span class="iconify" data-icon="mdi:close-circle"></span>
-                    <span>Cancel</span>
-                </a>
-            {% endif %}
-            {% if object.dataset %}
-                {% if object.dataset.zip_file %}
-                    <a class="button is-link is-light" href="{{ object.dataset.zip_file.url }}">
-                        <span class="iconify" data-icon="mdi:folder-download"></span> <span>Download dataset</span>
-                    </a>
-                {% endif %}
-            {% endif %}
-            {% if object.is_finished %}
-                {% if object.dataset %}
-                    <a href="{% url url_prefix|add:'restart' object.id %}" class="button is-link is-light ml-2">
-                        <span class="iconify" data-icon="mdi:clock-start"></span>
-                        <span>Start new {{ task_name }} with same configuration</span>
-                    </a>
-                {% endif %}
-                <a href="{% url url_prefix|add:'delete' object.pk %}" class="button is-light">
-                    <span class="iconify" data-icon="mdi:delete"></span>
-                    <span>Delete this experiment</span>
-                </a>
-            {% endif %}
-        </p>
-        {% if object.parameters %}
-            <pre>Parameters : {{ object.parameters }}</pre>
-        {% endif %}
-
-        {% if object.pipeline %}
-        <p>
-            Part of pipeline <a href="{{ object.pipeline.get_absolute_url }}">{{ object.pipeline }}</a>
-        </p>
-        {% endif %}
-        {% if object.all_tasks %} {# for pipelines #}
-            <div class="task-list">
-                <h4>Sub-task launched</h4>
-                {% for task in object.all_tasks %}
-                    {% include "includes/list-item.html" %}
-                {% endfor %}
+        {# title block #}
+        <div class="columns is-vcentered mb-5">
+            <div class="column flex-vcentered">
+                <h1 class="mb-0">
+                    {# TODO allow task name modification #}
+                    <span class="id-main">{{ object.name|default:task_name }}</span>
+                    <span class="id-suffix">#{{ object.id }}</span>
+                </h1>
             </div>
-        {% endif %}
-    </div>
-    {% if object.is_finished %}
-        <div class="centerwrap">
-            <p>Status: <span class="status status-{{ object.status }}">{{ object.status }}</span></p>
-            {% if object.full_log %}
-                <div class="centerwrap">
-                    <details>
-                        <summary>
-                            <h4 style="display: inline">View Execution Logs</h4>
-                        </summary>
-                        <pre class="full-log">{{ object.full_log }}</pre>
-                    </details>
+            {% if object.is_finished %}
+                <div class="column is-narrow box">
+                    <b class="has-text-centered mr-2">Status</b>
+                    <span class="tag is-medium status status-{{ object.status }}">{{ object.status }}</span>
                 </div>
             {% endif %}
         </div>
 
-        {% block results %}
-            {% include results_template %}
-        {% endblock %}
+        {# task mgmt buttons #}
+        <div class="columns is-centered is-vcentered is-multiline is-mobile">
+            {% if object.dataset %}
+                <span class="column is-narrow">
+                    <a href="{% url 'datasets:view' pk=object.dataset.pk %}" class="button is-light">
+                        <span class="iconify" data-icon="mdi:eye"></span>
+                        <span>Dataset</span>
+                    </a>
+                </span>
+            {% endif %}
+            {% if not object.is_finished %}
+                <span class="column is-narrow">
+                    <a href="{% url url_prefix|add:'cancel' object.id %}" class="button is-light">
+                        <span class="iconify" data-icon="mdi:close-circle"></span>
+                        <span>Cancel</span>
+                    </a>
+                </span>
+            {% else %}
+                {% if object.dataset %}
+                    <span class="column is-narrow">
+                        <a href="{% url url_prefix|add:'restart' object.id %}" class="button is-light">
+                            <span class="iconify" data-icon="mdi:clock-start"></span>
+                            <span>Start new {{ task_name }} with same configuration</span>
+                        </a>
+                    </span>
+                {% endif %}
+                <span class="column is-narrow">
+                    <a href="{% url url_prefix|add:'delete' object.pk %}" class="button is-light">
+                        <span class="iconify" data-icon="mdi:delete"></span>
+                        <span>Delete this experiment</span>
+                    </a>
+                </span>
+            {% endif %}
+            </div>
 
-    {% else %}
-        <div class="centerwrap">
+        <hr class="mt-5 mb-5">
+
+        <details id="task-details" {% if not object.is_finished or object.status == "ERROR" %}open{% endif %}>
+            <summary>
+                <h2 class="title is-4">
+                    Task details
+                    <span id="task-details-eye"
+                        class="iconify"
+                        title="Show or hide details"
+                        {% if not object.is_finished or object.status == "ERROR" %}data-icon="teenyicons:eye-closed-outline"
+                        {% else %}data-icon="mdi:eye"
+                        {% endif %}
+                    ></span>
+                </h2>
+            </summary>
+
+            <p>
+                Requested by {{ object.requested_by }}
+                {% if object.dataset %}
+                    on dataset
+                    <a class="is-hoverable" href="{% url 'datasets:view' pk=object.dataset.pk %}">
+                        <span class="id-main">{{ object.dataset.name }}</span>
+                        <span class="id-suffix">{{ object.dataset.id }}</span>
+                    </a>
+                {% endif %}
+            </p>
+            {# general task info #}
+            <div class="mt-5 mb-5">
+                {% if object.parameters %}
+                    <div >
+                        <h4>Parameters</h4>
+                        <pre>{{ object.parameters }}</pre>
+                    </div>
+                {% endif %}
+
+                {% if object.pipeline %}
+                    <p>Part of pipeline <a href="{{ object.pipeline.get_absolute_url }}">{{ object.pipeline }}</a></p>
+                {% endif %}
+                {% if object.all_tasks %} {# for pipelines #}
+                    <div class="object-list">
+                        <h4>Sub-task launched</h4>
+                        {% for task in object.all_tasks %}
+                            {% include "includes/list-item.html" %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            {# logs of finished task #}
+            {% if object.is_finished and object.full_log %}
+                <div>
+                    <h4 class="">Execution logs</h4>
+                    <pre class="full-log">{{ object.full_log }}</pre>
+                </div>
+            {% endif %}
+        </details>
+
+        {# monitoring of ongoing task #}
+        {% if not object.is_finished %}
             <div id="tracking"></div>
-
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", () => {
                     DemoTools.initProgressTracker(document.getElementById("tracking"), "{% url url_prefix|add:'progress' object.id %}");
                 });
             </script>
-        </div>
+        {% endif %}
+
+
+    <hr class="m-1">
+    </div>
+
+    {# view results #}
+    {% if object.is_finished %}
+        {% block results %}
+            {% include results_template %}
+        {% endblock %}
     {% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const details = document.querySelector("#task-details");
+        const detailsSummary = document.querySelector("#task-details > summary");
+
+        const toggleEyeSvg = () => {
+            // NOTE: iconify replaces our span #task-details-eye with an SVG dynamically
+            // => detailsIcon must be selected here to avoid
+            const eyeSvg = document.querySelector("#task-details-eye");
+            if (eyeSvg) {
+                details.hasAttribute("open")
+                    ? eyeSvg.setAttribute("data-icon", "mdi:eye")
+                    : eyeSvg.setAttribute("data-icon", "teenyicons:eye-closed-outline");
+            }
+        }
+
+        if (detailsSummary) {
+            detailsSummary.addEventListener("click", toggleEyeSvg);
+        }
+    })
+    </script>
 {% endblock %}

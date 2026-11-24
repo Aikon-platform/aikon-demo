@@ -25,3 +25,7 @@ urlpatterns = [
         name="monitor_clear_front",
     ),
 ]
+
+from shared.utils import about_route
+
+urlpatterns.extend(about_route(app_name))

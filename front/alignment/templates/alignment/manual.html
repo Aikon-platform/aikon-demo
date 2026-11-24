@@ -1,0 +1,42 @@
+{% extends "demowebsite/base.html" %}
+{% load static shared_tags %}
+
+{% block title %}Manual Alignment{% endblock %}
+
+{% block content %}
+    {% include "includes/breadcrumbs.html" %}
+    <div class="centerwrap mb-0">
+
+        <div class="columns is-vcentered mb-5">
+            <div class="column">
+                <h1>
+                    <span class="id-main">Manual alignment interface</span>
+                </h1>
+            </div>
+        </div>
+
+        <p>
+            <a href="{% url url_prefix|add:'start' %}" class="button is-link is-light ml-2">
+                <span class="iconify" data-icon="mdi:clock-start"></span>
+                <span>Start automatic alignment task</span>
+            </a>
+        </p>
+
+    </div>
+
+    <div class="centerwrap details-wrapper detailed">
+        <h3>Manual Alignment</h3>
+
+        <div class="widen">
+            <div id="matches" class="alignment-viewer"></div>
+        </div>
+
+        <script type="text/javascript">
+            document.addEventListener("DOMContentLoaded", () => {
+                DemoTools.initAlignmentApp(
+                    document.getElementById("matches"));
+            });
+        </script>
+    </div>
+
+{% endblock %}

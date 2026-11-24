@@ -1,0 +1,14 @@
+{% extends "demowebsite/base.html" %}
+{% load static shared_tags %}
+
+{% block title %}About: {{ app_name }}{% endblock %}
+
+{% block content %}
+
+<div class="centerwrap">
+    <h1>About the task: {{ app_name }}</h1>
+
+    {% block about_task %}
+    {% endblock %}
+</div>
+{% endblock %}
