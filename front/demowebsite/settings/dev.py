@@ -31,3 +31,11 @@ CSRF_TRUSTED_ORIGINS = https_hosts + wildcard_hosts
 APP_URL_FROM_API = ENV.str("APP_URL_FROM_API", default=BASE_URL)
 
 LOGIN_REQUIRED = True
+
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}

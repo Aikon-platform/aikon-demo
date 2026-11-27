@@ -85,6 +85,12 @@ class AlignmentForm(AbstractTaskOnCropsForm):
         initial=AVAILABLE_TRANSFORMS[0][0],
     )
 
+    reference_image = forms.CharField(
+        label="Reference image file name",
+        help_text="Select a particular image as reference. If blank, first one alphabetically will be chosen",
+        required=False
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["ransac_feature"].choices = Alignment.get_available_models()
@@ -106,7 +112,10 @@ class AlignmentForm(AbstractTaskOnCropsForm):
         instance = super().save(commit=False)
         method = self.cleaned_data.get("method", "ransac")
 
-        parameters = {"method": method}
+        parameters = {
+            "method": method,
+            "reference_image": self.cleaned_data.get("reference_image", None),
+        }
         if method == "ransac":
             parameters.update(
                 {
